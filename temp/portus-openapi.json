@@ -1,0 +1,546 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API Server for Portus URL Shortener",
+    "title": "Portus API",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "API Support",
+      "url": "http://www.swagger.io/support",
+      "email": "support@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "returns JSON object with health statuses.",
+        "tags": [
+          "health"
+        ],
+        "summary": "checks app and database health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten": {
+      "post": {
+        "description": "Creates a new shortened URL from a long URL, with optional custom code and expiration. If no custom code is provided, one will be generated.",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Create a shortened URL",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ShortenRequest"
+              }
+            }
+          },
+          "description": "URL to shorten",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format or short code already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten/lookup": {
+      "post": {
+        "description": "Checks if an original URL already has a short code and optionally creates one if it doesn't exist",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Check if a URL is already shortened",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.GetByOriginalURLRequest"
+              }
+            }
+          },
+          "description": "Original URL to check",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved shortened URL information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successfully created new shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Original URL not found and createIfNotExists is false",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten/{code}": {
+      "get": {
+        "description": "Redirects to the original URL from a short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Redirect to original URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Found - Redirects to the original URL",
+            "headers": {
+              "Location": {
+                "description": "The URL to redirect to",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing code parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found or has expired",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates an existing shortened URL by its short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Update a shortened URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ShortenRequest"
+              }
+            }
+          },
+          "description": "Updated URL data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes an existing shortened URL by its short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Delete a shortened URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - URL successfully deleted"
+          },
+          "400": {
+            "description": "Bad request - missing code parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "models.APIResponse-models_ShortenData": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.ShortenData"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.ErrorResponse-error": {
+        "type": "object",
+        "properties": {
+          "details": {},
+          "message": {
+            "type": "string",
+            "example": "This is a pretty message"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "integer",
+            "example": 201
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/models.ErrorType"
+              }
+            ],
+            "example": "FAILED_CHECK"
+          }
+        }
+      },
+      "models.ErrorType": {
+        "type": "string",
+        "enum": [
+          "FAILED_CHECK",
+          "UNAUTHORIZED",
+          "NOT_FOUND",
+          "BAD_REQUEST",
+          "INTERNAL_ERROR",
+          "FORBIDDEN",
+          "CONFLICT",
+          "VALIDATION_ERROR",
+          "RATE_LIMITED",
+          "TIMEOUT",
+          "SERVICE_UNAVAILABLE",
+          "UNPROCESSABLE_ENTITY"
+        ],
+        "x-enum-varnames": [
+          "ErrorTypeFailedCheck",
+          "ErrorTypeUnauthorized",
+          "ErrorTypeNotFound",
+          "ErrorTypeBadRequest",
+          "ErrorTypeInternalError",
+          "ErrorTypeForbidden",
+          "ErrorTypeConflict",
+          "ErrorTypeValidation",
+          "ErrorTypeRateLimited",
+          "ErrorTypeTimeout",
+          "ErrorTypeServiceUnavailable",
+          "ErrorTypeUnprocessableEntity"
+        ]
+      },
+      "models.GetByOriginalURLRequest": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "createIfNotExists": {
+            "type": "boolean"
+          },
+          "customCode": {
+            "type": "string"
+          },
+          "expiresAfter": {
+            "type": "integer"
+          },
+          "originalUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "models.HealthResponse": {
+        "type": "object",
+        "required": [
+          "application",
+          "database",
+          "status"
+        ],
+        "properties": {
+          "application": {
+            "type": "boolean",
+            "example": true
+          },
+          "database": {
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "description": "Overall status of the system",
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "degraded"
+            ],
+            "example": "up"
+          }
+        }
+      },
+      "models.Shorten": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "clickCount": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "originalUrl": {
+            "type": "string",
+            "example": "https://example.com/some/long/path"
+          },
+          "shortCode": {
+            "type": "string",
+            "example": "abc123"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        }
+      },
+      "models.ShortenData": {
+        "type": "object",
+        "properties": {
+          "shortUrl": {
+            "type": "string"
+          },
+          "shorten": {
+            "$ref": "#/components/schemas/models.Shorten"
+          }
+        }
+      },
+      "models.ShortenRequest": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "customCode": {
+            "type": "string"
+          },
+          "expiresAfter": {
+            "description": "In days",
+            "type": "integer"
+          },
+          "originalUrl": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
