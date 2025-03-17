@@ -8,19 +8,19 @@
 	let { children } = $props();
 </script>
 
-<div class="mx-auto grid w-full 2xl:max-w-[1500px]">
+<div class="mx-auto grid w-full 2xl:max-w-[2000px]">
 	<!-- Page -->
 	<div class="mx-auto grid w-full grid-cols-[auto_1fr_auto]">
 		<SideBar />
 		<div class="container">
 			<!-- Header -->
-			<header class=""><HeaderBar /></header>
+			<header><HeaderBar /></header>
 			<!-- Main -->
 			<div class="flex flex-row">
-				<main class="col-span-1 w-full space-y-4 p-4">
+				<main class="col-span-1 w-full space-y-4 p-4 pt-0">
 					{@render children()}
 				</main>
-				<aside class="bg-surface-100-900/20 sticky top-0 col-span-1 hidden h-dvh p-4 md:block">
+				<aside class="bg-surface-100-900/20 sticky top-0 col-span-1 hidden h-dvh 2xl:block">
 					<PanelRight />
 				</aside>
 			</div>

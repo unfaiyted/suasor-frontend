@@ -3,7 +3,11 @@
 	import { Menu, ArrowLeft, Paperclip, Calendar, CircleUser } from '@lucide/svelte';
 </script>
 
-<AppBar headlineClasses="sm:hidden" centerClasses="hidden sm:block">
+<AppBar
+	background="bg-surface-100-900/30"
+	headlineClasses=" sm:hidden"
+	centerClasses="hidden   sm:block"
+>
 	{#snippet lead()}
 		<ArrowLeft size={24} />
 	{/snippet}
@@ -18,7 +22,7 @@
 		</div>
 	{/snippet}
 	{#snippet headline()}
-		<h2 class="h2">Title</h2>
+		<h2 class="h2">Movie Recommendations</h2>
 	{/snippet}
-	<span>Title</span>
+	<span>Movie Recommendations</span>
 </AppBar>

@@ -11,7 +11,7 @@
 	const year = new Date().getFullYear();
 </script>
 
-<footer class="border-surface-50-950 bg-surface-900 border-t">
+<footer class="border-surface-50-950 bg-surface-100-900/30 border-t">
 	<div class="container mx-auto px-4 py-8">
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-4">
 			<!-- Brand/About -->
