@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Settings, User, Server, Database, Shield, Film, Radio } from '@lucide/svelte';
+	import { Brain, Settings, User, Server, Database, Shield, Film, Radio } from '@lucide/svelte';
 
 	// Import components
 	import SettingsTabs from '$lib/components/settings/SettingsTabs.svelte';
+	import AIIntegrationsPanel from '$lib/components/settings/AIIntegrationsPanel.svelte';
 	import NotificationArea from '$lib/components/util/NotificationArea.svelte';
 	import UserSettingsPanel from '$lib/components/settings/UserSettingsPanel.svelte';
 	import MediaServersPanel from '$lib/components/settings/MediaServersPanel.svelte';
@@ -25,8 +26,9 @@
 	// Define tabs
 	const tabs = [
 		{ id: 'user', label: 'User Settings', icon: User, adminOnly: false },
-		{ id: 'media-servers', label: 'Media Servers', icon: Film, adminOnly: false },
-		{ id: 'automation', label: 'Automation Tools', icon: Radio, adminOnly: false },
+		{ id: 'media-servers', label: 'Media Servers', icon: Film, adminOnly: true },
+		{ id: 'automation', label: 'Automation Tools', icon: Radio, adminOnly: true },
+		{ id: 'ai-integrations', label: 'AI', icon: Brain, adminOnly: true },
 		{ id: 'site', label: 'Site Configuration', icon: Settings, adminOnly: true },
 		{ id: 'server', label: 'Server Settings', icon: Server, adminOnly: true },
 		{ id: 'database', label: 'Database', icon: Database, adminOnly: true },
@@ -49,6 +51,14 @@
 		sonarr: { enabled: false, url: '', apiKey: '' },
 		radarr: { enabled: false, url: '', apiKey: '' },
 		liadrr: { enabled: false, url: '', apiKey: '' }
+	};
+
+	// AI integrations
+	let aiIntegrations = {
+		claude: { enabled: false, url: 'https://api.anthropic.com', apiKey: '' },
+		openai: { enabled: false, url: 'https://api.openai.com', apiKey: '' },
+		gemini: { enabled: false, url: 'https://generativelanguage.googleapis.com', apiKey: '' },
+		ollama: { enabled: false, url: 'http://localhost:11434' }
 	};
 
 	// User settings
@@ -81,7 +91,7 @@
 	let error = '';
 	let success = '';
 
-	function switchTab(tabId) {
+	function switchTab(tabId: string) {
 		if (tabs.find((tab) => tab.id === tabId && tab.adminOnly && !user.isAdmin)) {
 			error = 'You do not have permission to access this section';
 			return;
@@ -91,7 +101,7 @@
 		activeTab = tabId;
 	}
 
-	async function saveSettings(section) {
+	async function saveSettings(section: string) {
 		isLoading = true;
 		error = '';
 		success = '';
@@ -150,6 +160,8 @@
 			<DatabasePanel {saveSettings} {isLoading} />
 		{:else if activeTab === 'security' && user.isAdmin}
 			<SecurityPanel {saveSettings} {isLoading} />
+		{:else if activeTab === 'ai-integrations' && user.isAdmin}
+			<AIIntegrationsPanel {aiIntegrations} {saveSettings} {isLoading} />
 		{:else}
 			<div class="flex h-64 items-center justify-center">
 				<p class="text-lg">Please select a settings category from the tabs above.</p>
