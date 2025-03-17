@@ -1,8 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { Plus, Play, Info, Calendar, Star, Clock, Heart, Bookmark, Check } from '@lucide/svelte';
-	import MovieSpotlightCarousel from '$lib/components/MovieSpotlightCarousel.svelte';
+	import MovieSpotlightCarousel from '$lib/components/movie/MovieSpotlightCarousel.svelte';
+	import MovieSection from '$lib/components/movie/MovieSection.svelte';
+	import MovieFilters from '$lib/components/movie/MovieFilters.svelte';
+	import MovieDetailModal from '$lib/components/movie/MovieDetailModal.svelte';
+	import LoadingSpinner from '$lib/components/util/LoadingSpinner.svelte';
+	import ErrorAlert from '$lib/components/util/ErrorAlert.svelte';
+	import { Check, Plus } from '@lucide/svelte';
 
 	// Mock data for recommendations - in a real app this would come from your backend
 	let recommendations = {
@@ -211,7 +216,6 @@
 				]
 			};
 
-			MovieSpotlightCarousel;
 			spotlightMovies = [
 				recommendations.aiRecommended[0],
 				recommendations.trending[0],
@@ -228,13 +232,18 @@
 	});
 
 	// Handle events from the carousel
-	function handleShowDetails(event) {
+	function handleShowDetails(event: MouseEvent) {
 		showMovieDetail(event.detail);
 	}
 
-	function handleToggleWatchlist(event) {
+	function handleToggleWatchlist(event: MouseEvent) {
 		toggleWatchlist(event.detail);
 	}
+
+	function handleRequestDownload(event: MouseEvent) {
+		closeDetail();
+	}
+
 	function isInWatchlist(id) {
 		return userPreferences.savedToWatchlist.includes(id);
 	}
@@ -248,7 +257,6 @@
 				on:showDetails={handleShowDetails}
 				on:toggleWatchlist={handleToggleWatchlist}
 			>
-				<!-- Optional: Custom watchlist button slot -->
 				<svelte:fragment slot="watchlist-button" let:movie>
 					{#if isInWatchlist(movie.id)}
 						<Check size={18} />
@@ -262,354 +270,56 @@
 		</div>
 	{/if}
 
-	<!-- Hero Section with Featured Recommendation -->
-	<!-- {#if !isLoading && recommendations.aiRecommended.length > 0} -->
-	<!-- <div -->
-	<!-- 	class="relative mb-8 h-[400px] w-full overflow-hidden rounded-xl bg-cover bg-center" -->
-	<!-- 	style="background-image: url('{recommendations.aiRecommended[0].backdrop}');" -->
-	<!-- > -->
-	<!-- 	<div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div> -->
-	<!-- 	<div class="absolute bottom-0 left-0 p-6 text-white"> -->
-	<!-- 		<span class="bg-primary-500 mb-2 inline-block rounded px-2 py-1 text-sm font-bold"> -->
-	<!-- 			AI Recommended For You -->
-	<!-- 		</span> -->
-	<!-- 		<h1 class="h1 mb-2 text-4xl font-bold">{recommendations.aiRecommended[0].title}</h1> -->
-	<!-- 		<p class="mb-4 max-w-2xl"> -->
-	<!-- 			{recommendations.aiRecommended[0].overview.substring(0, 150)}... -->
-	<!-- 		</p> -->
-	<!-- 		<div class="flex gap-3"> -->
-	<!-- 			<button class="btn preset-filled-primary-500 flex items-center gap-2"> -->
-	<!-- 				<Play size={16} /> -->
-	<!-- 				<span>Watch Trailer</span> -->
-	<!-- 			</button> -->
-	<!-- 			<button -->
-	<!-- 				class="btn preset-outlined-surface-500 flex items-center gap-2" -->
-	<!-- 				on:click={() => showMovieDetail(recommendations.aiRecommended[0])} -->
-	<!-- 			> -->
-	<!-- 				<Info size={16} /> -->
-	<!-- 				<span>More Info</span> -->
-	<!-- 			</button> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- </div> -->
-	<!-- {/if} -->
+	<MovieFilters {filters} {genres} />
 
-	<!-- Controls & Filters -->
-	<div class="mt-6 mb-6 flex flex-wrap items-center justify-between gap-4">
-		<div class="flex flex-wrap items-center gap-4">
-			<h2 class="h2 text-primary-500 font-bold">Movie Recommendations</h2>
-
-			<div class="flex gap-2">
-				<select class="select !bg-surface-200-800" bind:value={filters.source}>
-					<option value="all">All Sources</option>
-					<option value="plex">Plex</option>
-					<option value="emby">Emby</option>
-					<option value="jellyfin">Jellyfin</option>
-				</select>
-
-				<select class="select !bg-surface-200-800" bind:value={filters.genre}>
-					<option value="all">All Genres</option>
-					{#each genres as genre}
-						<option value={genre}>{genre}</option>
-					{/each}
-				</select>
-
-				<select class="select !bg-surface-200-800" bind:value={filters.sort}>
-					<option value="recommended">AI Recommended</option>
-					<option value="rating">Highest Rated</option>
-					<option value="release_date">Newest First</option>
-				</select>
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading State -->
 	{#if isLoading}
-		<div class="flex h-64 items-center justify-center">
-			<div class="loader"></div>
-		</div>
+		<LoadingSpinner />
 	{:else if error}
-		<div class="alert alert-error mb-4" transition:fade>
-			<div class="card preset-outlined-error-500 p-4">
-				<p class="font-bold">Error</p>
-				<p class="text-xs opacity-60">{error}</p>
-			</div>
-		</div>
+		<ErrorAlert message={error} />
 	{:else}
-		<!-- Continue Watching -->
+		<!-- Movie Sections -->
 		{#if recommendations.continuePlaying.length > 0}
-			<div class="mb-8">
-				<h3 class="mb-4 text-xl font-bold">Continue Watching</h3>
-				<div
-					class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-				>
-					{#each recommendations.continuePlaying as item}
-						<div
-							class="group relative cursor-pointer overflow-hidden rounded-lg transition-transform hover:scale-105"
-							on:click={() => showMovieDetail(item)}
-						>
-							<img src={item.poster} alt={item.title} class="h-[300px] w-full object-cover" />
-							<div
-								class="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black to-transparent p-4"
-							>
-								<h4 class="font-bold text-white">{item.title}</h4>
-								<div class="mt-1 flex items-center gap-2 text-sm text-gray-300">
-									<span>{item.year}</span>
-									<span>•</span>
-									<span>{item.type === 'movie' ? 'Movie' : 'Series'}</span>
-								</div>
-								<div class="mt-2 h-1 w-full rounded bg-gray-700">
-									<div class="bg-primary-500 h-full rounded" style="width: {item.progress}%"></div>
-								</div>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
+			<MovieSection
+				title="Continue Watching"
+				movies={recommendations.continuePlaying}
+				{isInWatchlist}
+				on:showDetails={handleShowDetails}
+				on:toggleWatchlist={handleToggleWatchlist}
+			/>
 		{/if}
 
-		<!-- AI Recommended -->
-		<div class="mb-8">
-			<h3 class="mb-4 text-xl font-bold">AI Recommended For You</h3>
-			<div
-				class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			>
-				{#each recommendations.aiRecommended as item}
-					<div
-						class="group relative cursor-pointer overflow-hidden rounded-lg transition-transform hover:scale-105"
-						on:click={() => showMovieDetail(item)}
-					>
-						<img src={item.poster} alt={item.title} class="h-[300px] w-full object-cover" />
-						<div class="absolute top-2 right-2 flex flex-col gap-2">
-							<button
-								class="hover:bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white transition-colors"
-								on:click|stopPropagation={() => toggleWatchlist(item)}
-							>
-								{#if isInWatchlist(item.id)}
-									<Check size={16} />
-								{:else}
-									<Plus size={16} />
-								{/if}
-							</button>
-						</div>
-						<div
-							class="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black to-transparent p-4"
-						>
-							<h4 class="font-bold text-white">{item.title}</h4>
-							<div class="mt-1 flex items-center gap-2 text-sm text-gray-300">
-								<span>{item.year}</span>
-								<span>•</span>
-								<span>{item.type === 'movie' ? 'Movie' : 'Series'}</span>
-							</div>
-							<div class="mt-1 flex items-center gap-1 text-sm text-yellow-400">
-								<Star size={14} />
-								<span>{item.rating}</span>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		</div>
+		<MovieSection
+			title="AI Recommended For You"
+			movies={recommendations.aiRecommended}
+			{isInWatchlist}
+			on:showDetails={handleShowDetails}
+			on:toggleWatchlist={handleToggleWatchlist}
+		/>
 
-		<!-- Trending Now -->
-		<div class="mb-8">
-			<h3 class="mb-4 text-xl font-bold">Trending Now</h3>
-			<div
-				class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			>
-				{#each recommendations.trending as item}
-					<div
-						class="group relative cursor-pointer overflow-hidden rounded-lg transition-transform hover:scale-105"
-						on:click={() => showMovieDetail(item)}
-					>
-						<img src={item.poster} alt={item.title} class="h-[300px] w-full object-cover" />
-						<div class="absolute top-2 right-2 flex flex-col gap-2">
-							<button
-								class="hover:bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white transition-colors"
-								on:click|stopPropagation={() => toggleWatchlist(item)}
-							>
-								{#if isInWatchlist(item.id)}
-									<Check size={16} />
-								{:else}
-									<Plus size={16} />
-								{/if}
-							</button>
-						</div>
-						<div
-							class="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black to-transparent p-4"
-						>
-							<h4 class="font-bold text-white">{item.title}</h4>
-							<div class="mt-1 flex items-center gap-2 text-sm text-gray-300">
-								<span>{item.year}</span>
-								<span>•</span>
-								<span>{item.type === 'movie' ? 'Movie' : 'Series'}</span>
-							</div>
-							<div class="mt-1 flex items-center gap-1 text-sm text-yellow-400">
-								<Star size={14} />
-								<span>{item.rating}</span>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		</div>
+		<MovieSection
+			title="Trending Now"
+			movies={recommendations.trending}
+			{isInWatchlist}
+			on:showDetails={handleShowDetails}
+			on:toggleWatchlist={handleToggleWatchlist}
+		/>
 
-		<!-- New Releases -->
-		<div class="mb-8">
-			<h3 class="mb-4 text-xl font-bold">New Releases</h3>
-			<div
-				class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			>
-				{#each recommendations.newReleases as item}
-					<div
-						class="group relative cursor-pointer overflow-hidden rounded-lg transition-transform hover:scale-105"
-						on:click={() => showMovieDetail(item)}
-					>
-						<img src={item.poster} alt={item.title} class="h-[300px] w-full object-cover" />
-						<div class="absolute top-2 right-2 flex flex-col gap-2">
-							<button
-								class="hover:bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white transition-colors"
-								on:click|stopPropagation={() => toggleWatchlist(item)}
-							>
-								{#if isInWatchlist(item.id)}
-									<Check size={16} />
-								{:else}
-									<Plus size={16} />
-								{/if}
-							</button>
-						</div>
-						<div
-							class="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black to-transparent p-4"
-						>
-							<h4 class="font-bold text-white">{item.title}</h4>
-							<div class="mt-1 flex items-center gap-2 text-sm text-gray-300">
-								<span>{item.year}</span>
-								<span>•</span>
-								<span>{item.type === 'movie' ? 'Movie' : 'Series'}</span>
-							</div>
-							<div class="mt-1 flex items-center gap-1 text-sm text-yellow-400">
-								<Star size={14} />
-								<span>{item.rating}</span>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		</div>
+		<MovieSection
+			title="New Releases"
+			movies={recommendations.newReleases}
+			{isInWatchlist}
+			on:showDetails={handleShowDetails}
+			on:toggleWatchlist={handleToggleWatchlist}
+		/>
 	{/if}
 </div>
 
 <!-- Movie Detail Modal -->
-{#if showDetail && selectedMovie}
-	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-		transition:fade={{ duration: 200 }}
-		on:click={closeDetail}
-	>
-		<div
-			class="bg-surface-100-900 relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-xl"
-			transition:fly={{ y: 20, duration: 300 }}
-			on:click|stopPropagation={() => {}}
-		>
-			<button
-				class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-white"
-				on:click={closeDetail}
-			>
-				×
-			</button>
-
-			<div
-				class="relative h-[300px] w-full bg-cover bg-center sm:h-[400px]"
-				style="background-image: url('{selectedMovie.backdrop}');"
-			>
-				<div class="from-surface-100-900 absolute inset-0 bg-gradient-to-t to-transparent"></div>
-				<div class="absolute bottom-0 left-0 p-6 text-white">
-					<h2 class="text-3xl font-bold">{selectedMovie.title}</h2>
-					<div class="mt-2 flex flex-wrap items-center gap-3 text-sm">
-						<span class="flex items-center gap-1">
-							<Calendar size={14} />
-							{selectedMovie.year}
-						</span>
-						<span class="flex items-center gap-1">
-							<Star size={14} class="text-yellow-400" />
-							{selectedMovie.rating}
-						</span>
-						<span class="bg-surface-200-800 rounded-full px-2 py-0.5">
-							{selectedMovie.type === 'movie' ? 'Movie' : 'Series'}
-						</span>
-						{#each selectedMovie.genres as genre}
-							<span class="bg-surface-200-800 rounded-full px-2 py-0.5">{genre}</span>
-						{/each}
-					</div>
-				</div>
-			</div>
-
-			<div class="p-6">
-				<p class="mb-6">{selectedMovie.overview}</p>
-
-				<div class="mb-6 flex flex-wrap gap-2">
-					<button class="btn preset-filled-primary-500 flex items-center gap-2">
-						<Play size={16} />
-						<span>Watch Now</span>
-					</button>
-
-					<button
-						class="btn preset-outlined-surface-500 flex items-center gap-2"
-						on:click={() => toggleWatchlist(selectedMovie)}
-					>
-						{#if isInWatchlist(selectedMovie.id)}
-							<Check size={16} />
-							<span>In Watchlist</span>
-						{:else}
-							<Bookmark size={16} />
-							<span>Add to Watchlist</span>
-						{/if}
-					</button>
-
-					<button
-						class="btn preset-outlined-surface-500 flex items-center gap-2"
-						on:click={() => requestDownload(selectedMovie)}
-					>
-						<Calendar size={16} />
-						<span>Request Download</span>
-					</button>
-				</div>
-
-				<div class="border-surface-200-800 border-t pt-4">
-					<h3 class="mb-2 text-lg font-bold">Why we recommend this</h3>
-					<p class="text-sm opacity-80">
-						Based on your watching preferences and history, our AI found similarities with other
-						content you've enjoyed. You tend to watch {selectedMovie.genres.join(', ')} content frequently
-						and rate them highly.
-					</p>
-				</div>
-
-				<div class="mt-4 text-sm">
-					<p class="opacity-60">
-						Available on: <span class="text-primary-500 font-medium">{selectedMovie.source}</span>
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
-{/if}
-
-<style>
-	.loader {
-		border: 4px solid rgba(255, 255, 255, 0.1);
-		border-left-color: #646cff;
-		border-radius: 50%;
-		width: 40px;
-		height: 40px;
-		animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
-	}
-</style>
+<MovieDetailModal
+	movie={selectedMovie}
+	show={showDetail}
+	{isInWatchlist}
+	on:close={handleCloseModal}
+	on:toggleWatchlist={handleToggleWatchlist}
+	on:requestDownload={handleRequestDownload}
+/>
