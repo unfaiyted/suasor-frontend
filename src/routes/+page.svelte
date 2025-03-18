@@ -5,8 +5,10 @@
 	import { fade } from 'svelte/transition';
 	import { shortensStore, shortensLoading } from '$lib/stores/shortens';
 	import { ApiError } from '$lib/api/errors';
-	import { PORTUS_API_BASE_URL } from '$lib/api/client';
-	import { ModelsErrorType as ErrorType } from '$lib/api/portus.v1.d';
+
+	import { isAuthenticated, user } from '$lib/stores/auth';
+	import { API_BASE_URL } from '$lib/api/client';
+	import { ModelsErrorType as ErrorType } from '$lib/api/suasor.v1.d';
 	import IconTriangle from '$lib/components/icons/IconTriangle.svelte';
 
 	let longUrl = '';
@@ -16,7 +18,7 @@
 	let copied = false;
 	let error = '';
 	let customSectionExpanded = false; // Track whether custom section is expanded
-	let domain = PORTUS_API_BASE_URL.split('//')[1].split('/')[0];
+	let domain = API_BASE_URL.split('//')[1].split('/')[0];
 	// Mock database of already taken shortcodes
 	// let takenShortCodes = ['premium', 'admin', 'test123'];
 	$: isLoading = $shortensLoading;
@@ -81,6 +83,15 @@
 			Transform your lengthy URLs to concise, memorable destinations
 		</p>
 	</header>
+
+	<script>
+	</script>
+
+	{#if $isAuthenticated}
+		<p>Welcome, {$user.username}!</p>
+	{:else}
+		<p>Please log in</p>
+	{/if}
 
 	<!-- URL Shortener Form -->
 	<div class="card preset-filled-surface-100-900 relative mb-10 p-6 shadow-xl backdrop-blur-sm">

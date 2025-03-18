@@ -2,18 +2,36 @@
 	import IconTriangle from '$lib/components/icons/IconTriangle.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Eye, EyeOff, Github, Mail } from '@lucide/svelte';
+	import { onMount } from 'svelte';
+
+	// Import auth store
+	import { authStore, isAuthenticated, authLoading, authError } from '$lib/stores/auth';
 
 	let email = '';
 	let password = '';
 	let rememberMe = false;
 	let showPassword = false;
-	let isLoading = false;
 	let error = '';
 
+	// Use reactive stores for loading and errors
+	$: isLoading = $authLoading;
+
+	// Update error message when authError changes
+	$: if ($authError) {
+		error = $authError instanceof Error ? $authError.message : String($authError);
+	}
+
 	// Get return URL from query params if available
-	$: returnUrl = $page.url.searchParams.get('returnUrl') || '/';
+	$: returnUrl = page.url.searchParams.get('redirect') || '/';
+
+	// Redirect if already authenticated
+	onMount(() => {
+		if ($isAuthenticated) {
+			goto(returnUrl);
+		}
+	});
 
 	async function handleLogin() {
 		if (!email || !password) {
@@ -22,23 +40,22 @@
 		}
 
 		error = '';
-		isLoading = true;
 
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Use the auth store login method
+			const success = await authStore.login(email, password);
 
-			// Replace with actual authentication logic
-			if (email === 'demo@example.com' && password === 'password') {
+			if (success) {
 				goto(returnUrl);
 			} else {
-				error = 'Invalid email or password';
+				if (!error) {
+					// Only set this if no error was set by the store
+					error = 'Invalid email or password';
+				}
 			}
 		} catch (err) {
-			error = 'Login failed. Please try again.';
+			error = err instanceof Error ? err.message : 'Login failed. Please try again.';
 			console.error(err);
-		} finally {
-			isLoading = false;
 		}
 	}
 
@@ -47,12 +64,10 @@
 	}
 
 	function handleSocialLogin(provider: string) {
-		isLoading = true;
 		// Implement social login logic here
 		console.log(`Logging in with ${provider}`);
-		setTimeout(() => {
-			isLoading = false;
-		}, 1000);
+		// For now, just show a message that this isn't implemented
+		error = `${provider} login is not implemented yet`;
 	}
 </script>
 
@@ -143,6 +158,7 @@
 				<button
 					type="submit"
 					class="btn preset-filled-primary-500 w-full {isLoading ? 'loading' : ''}"
+					disabled={isLoading}
 				>
 					{isLoading ? 'Signing in...' : 'Sign In'}
 				</button>
@@ -162,7 +178,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialLogin('google')}
+						on:click={() => handleSocialLogin('Google')}
 						disabled={isLoading}
 					>
 						<Mail size={18} />
@@ -171,7 +187,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialLogin('github')}
+						on:click={() => handleSocialLogin('GitHub')}
 						disabled={isLoading}
 					>
 						<Github size={18} />

@@ -5,7 +5,25 @@
 	import SideBar from '$lib/components/layout/SideBar.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { ArrowRight, PanelRight } from '@lucide/svelte';
+
+	import { browser } from '$app/environment';
+	import { redirect } from '@sveltejs/kit';
+	import { get } from 'svelte/store';
+	import { isAuthenticated } from '$lib/stores/auth';
+
 	let { children } = $props();
+	export function load({ url }: { url: { pathname: string } }) {
+		if (browser) {
+			const protectedRoutes = ['/admin', '/profile', '/settings'];
+			const needsAuth = protectedRoutes.some((route) => url.pathname.startsWith(route));
+
+			if (needsAuth && !get(isAuthenticated)) {
+				throw redirect(307, `/login?redirect=${encodeURIComponent(url.pathname)}`);
+			}
+		}
+
+		return {};
+	}
 </script>
 
 <div class="mx-auto grid w-full 2xl:max-w-[2000px]">

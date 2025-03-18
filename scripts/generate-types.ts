@@ -26,9 +26,9 @@ interface ApiConfig {
 const API_CONFIGS = [
 	{
 		envVar: 'VITE_API_BASE_URL',
-		name: 'portus',
+		name: 'suasor',
 		version: 'v1',
-		outputFile: 'portus.v1.d.ts'
+		outputFile: 'suasor.v1.d.ts'
 	}
 ];
 

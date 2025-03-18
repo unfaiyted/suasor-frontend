@@ -1,0 +1,2713 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API Server for Suasor",
+    "title": "Suasor API",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Dane Miller",
+      "url": "http://www.swagger.io/support",
+      "email": "support@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "description": "Authenticates a user with email and password",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Log in a user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.LoginRequest"
+              }
+            }
+          },
+          "description": "User login data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_AuthData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials or inactive account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "description": "Invalidates the refresh token, effectively logging the user out",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Log out a user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.LogoutRequest"
+              }
+            }
+          },
+          "description": "Logout data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-any"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "Get a new access token using a refresh token",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Refresh access token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.RefreshTokenRequest"
+              }
+            }
+          },
+          "description": "Refresh token data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully refreshed token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_AuthData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Registers a new user with email, username, and password",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register a new user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.RegisterRequest"
+              }
+            }
+          },
+          "description": "User registration data",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully registered user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_AuthData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email or username already in use",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/config": {
+      "get": {
+        "description": "Returns the current system configuration",
+        "tags": [
+          "config"
+        ],
+        "summary": "Get current configuration",
+        "responses": {
+          "200": {
+            "description": "Configuration retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_Configuration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates the system-wide application configuration (admin only)",
+        "tags": [
+          "config"
+        ],
+        "summary": "Update application configuration",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/models.Configuration"
+        },
+        "responses": {
+          "200": {
+            "description": "Configuration updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-any"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/config/file": {
+      "get": {
+        "description": "Returns the file-based system configuration (admin only)",
+        "tags": [
+          "config"
+        ],
+        "summary": "Get file-based configuration",
+        "responses": {
+          "200": {
+            "description": "File configuration retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_Configuration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Saves the configuration to file only (admin only)",
+        "tags": [
+          "config"
+        ],
+        "summary": "Save configuration to file",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/models.Configuration"
+        },
+        "responses": {
+          "200": {
+            "description": "Configuration saved to file successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-any"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/config/reset": {
+      "post": {
+        "description": "Resets the system configuration to default values (admin only)",
+        "tags": [
+          "config"
+        ],
+        "summary": "Reset configuration to defaults",
+        "responses": {
+          "200": {
+            "description": "Configuration reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-any"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - admin access required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/config/user": {
+      "get": {
+        "description": "Returns the configuration for the current user",
+        "tags": [
+          "config"
+        ],
+        "summary": "Get user configuration",
+        "responses": {
+          "200": {
+            "description": "User configuration retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserConfig"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates the configuration for the current user",
+        "tags": [
+          "config"
+        ],
+        "summary": "Update user configuration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.UserConfig"
+              }
+            }
+          },
+          "description": "User configuration data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User configuration updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-any"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "returns JSON object with health statuses.",
+        "tags": [
+          "health"
+        ],
+        "summary": "checks app and database health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.HealthResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten": {
+      "post": {
+        "description": "Creates a new shortened URL from a long URL, with optional custom code and expiration. If no custom code is provided, one will be generated.",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Create a shortened URL",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ShortenRequest"
+              }
+            }
+          },
+          "description": "URL to shorten",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format or short code already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten/lookup": {
+      "post": {
+        "description": "Checks if an original URL already has a short code and optionally creates one if it doesn't exist",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Check if a URL is already shortened",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.GetByOriginalURLRequest"
+              }
+            }
+          },
+          "description": "Original URL to check",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved shortened URL information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successfully created new shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Original URL not found and createIfNotExists is false",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shorten/{code}": {
+      "get": {
+        "description": "Redirects to the original URL from a short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Redirect to original URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Found - Redirects to the original URL",
+            "headers": {
+              "Location": {
+                "description": "The URL to redirect to",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing code parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found or has expired",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates an existing shortened URL by its short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Update a shortened URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ShortenRequest"
+              }
+            }
+          },
+          "description": "Updated URL data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated shortened URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_ShortenData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes an existing shortened URL by its short code",
+        "tags": [
+          "shorten"
+        ],
+        "summary": "Delete a shortened URL",
+        "parameters": [
+          {
+            "description": "Short code identifier",
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - URL successfully deleted"
+          },
+          "400": {
+            "description": "Bad request - missing code parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Short URL not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/password": {
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Changes the password for the currently authenticated user",
+        "tags": [
+          "users"
+        ],
+        "summary": "Change user password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ChangePasswordRequest"
+              }
+            }
+          },
+          "description": "Password change information",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully changed password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format or incorrect current password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Retrieves the profile information for the currently authenticated user",
+        "tags": [
+          "users"
+        ],
+        "summary": "Get the current user's profile",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Updates the profile information for the currently authenticated user",
+        "tags": [
+          "users"
+        ],
+        "summary": "Update user profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.UpdateProfileRequest"
+              }
+            }
+          },
+          "description": "Updated profile information",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format or email/username already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/register": {
+      "post": {
+        "description": "Creates a new user account with the provided information",
+        "tags": [
+          "users"
+        ],
+        "summary": "Register a new user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.RegisterRequest"
+              }
+            }
+          },
+          "description": "User registration information",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully registered user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request format or email/username already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Retrieves a user by their ID (admin only)",
+        "tags": [
+          "users"
+        ],
+        "summary": "Get user by ID",
+        "parameters": [
+          {
+            "description": "User ID",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Deletes a user account (admin only)",
+        "tags": [
+          "users"
+        ],
+        "summary": "Delete a user account",
+        "parameters": [
+          {
+            "description": "User ID",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - User successfully deleted"
+          },
+          "400": {
+            "description": "Invalid user ID format",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not an admin",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/activate": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Activates a user account (admin only)",
+        "tags": [
+          "users"
+        ],
+        "summary": "Activate a user account",
+        "parameters": [
+          {
+            "description": "User ID",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully activated user account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/deactivate": {
+      "post": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Deactivates a user account (admin only)",
+        "tags": [
+          "users"
+        ],
+        "summary": "Deactivate a user account",
+        "parameters": [
+          {
+            "description": "User ID",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deactivated user account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/role": {
+      "put": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Changes a user's role (admin only)",
+        "tags": [
+          "users"
+        ],
+        "summary": "Change user role",
+        "parameters": [
+          {
+            "description": "User ID",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/models.ChangeRoleRequest"
+              }
+            }
+          },
+          "description": "New role information",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully changed user role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.APIResponse-models_UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID format or invalid role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/models.ErrorResponse-error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1"
+    }
+  ],
+  "components": {
+    "requestBodies": {
+      "models.Configuration": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/models.Configuration"
+            }
+          }
+        },
+        "description": "Configuration data",
+        "required": true
+      }
+    },
+    "schemas": {
+      "models.APIResponse-any": {
+        "type": "object",
+        "properties": {
+          "data": {},
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-models_AuthData": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.AuthData"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-models_Configuration": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.Configuration"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-models_ShortenData": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.ShortenData"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-models_UserConfig": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.UserConfig"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-models_UserResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/models.UserResponse"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.APIResponse-string": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "models.AuthData": {
+        "description": "Authentication data returned to client after successful authentication",
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "description": "AccessToken is the JWT token for API access\n@Description JWT access token for authenticated requests\n@Example \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
+            "type": "string"
+          },
+          "expiresAt": {
+            "description": "ExpiresAt indicates when the access token expires\n@Description UNIX timestamp when the access token expires\n@Example 1674140400",
+            "type": "integer"
+          },
+          "refreshToken": {
+            "description": "RefreshToken is used to get new access tokens\n@Description JWT refresh token for obtaining new access tokens\n@Example \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"",
+            "type": "string"
+          },
+          "user": {
+            "description": "User contains the user profile information\n@Description User profile data",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/models.UserResponse"
+              }
+            ]
+          }
+        }
+      },
+      "models.ChangePasswordRequest": {
+        "description": "Request payload for changing user password",
+        "type": "object",
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "properties": {
+          "currentPassword": {
+            "description": "CurrentPassword is the user's existing password for verification\n@Description User's current password for verification\n@Example \"oldpassword123\"",
+            "type": "string",
+            "example": "oldpassword123"
+          },
+          "newPassword": {
+            "description": "NewPassword is the password to change to\n@Description New password to set for the user\n@Example \"newpassword456\"",
+            "type": "string",
+            "example": "newpassword456"
+          }
+        }
+      },
+      "models.ChangeRoleRequest": {
+        "description": "Request payload for changing user role",
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "description": "Role is the new role to assign to the user\n@Description New role to assign to the user\n@Enum \"user\" \"admin\"\n@Example \"admin\"",
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ],
+            "example": "admin"
+          }
+        }
+      },
+      "models.Configuration": {
+        "description": "Complete application configuration settings",
+        "type": "object",
+        "properties": {
+          "app": {
+            "description": "App contains core application settings",
+            "type": "object",
+            "required": [
+              "apiBaseURL",
+              "appURL",
+              "environment",
+              "logLevel",
+              "maxPageSize",
+              "name"
+            ],
+            "properties": {
+              "apiBaseURL": {
+                "type": "string",
+                "example": "http://localhost:8080"
+              },
+              "appURL": {
+                "type": "string",
+                "example": "http://localhost:3000"
+              },
+              "environment": {
+                "type": "string",
+                "enum": [
+                  "development",
+                  "staging",
+                  "production"
+                ],
+                "example": "development"
+              },
+              "logLevel": {
+                "type": "string",
+                "enum": [
+                  "debug",
+                  "info",
+                  "warn",
+                  "error"
+                ],
+                "example": "info"
+              },
+              "maxPageSize": {
+                "type": "integer",
+                "maximum": 1000,
+                "minimum": 1,
+                "example": 100
+              },
+              "name": {
+                "type": "string",
+                "example": "suasor"
+              }
+            }
+          },
+          "auth": {
+            "description": "Auth contains authentication settings",
+            "type": "object",
+            "required": [
+              "accessExpiryMinutes",
+              "jwtSecret",
+              "refreshExpiryDays",
+              "sessionTimeout",
+              "tokenAudience",
+              "tokenExpiration",
+              "tokenIssuer"
+            ],
+            "properties": {
+              "accessExpiryMinutes": {
+                "description": "New fields to add",
+                "type": "integer",
+                "minimum": 1,
+                "example": 15
+              },
+              "allowedOrigins": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "http://localhost:3000"
+                ]
+              },
+              "enable2FA": {
+                "type": "boolean",
+                "example": false
+              },
+              "enableLocal": {
+                "type": "boolean",
+                "example": true
+              },
+              "jwtSecret": {
+                "type": "string",
+                "example": "your-secret-key"
+              },
+              "refreshExpiryDays": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 7
+              },
+              "sessionTimeout": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 60
+              },
+              "tokenAudience": {
+                "type": "string",
+                "example": "suasor-client"
+              },
+              "tokenExpiration": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 24
+              },
+              "tokenIssuer": {
+                "type": "string",
+                "example": "suasor-api"
+              }
+            }
+          },
+          "db": {
+            "description": "Database contains database connection settings",
+            "type": "object",
+            "required": [
+              "host",
+              "maxConns",
+              "name",
+              "password",
+              "port",
+              "timeout",
+              "user"
+            ],
+            "properties": {
+              "host": {
+                "type": "string",
+                "example": "localhost"
+              },
+              "maxConns": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 20
+              },
+              "name": {
+                "type": "string",
+                "example": "suasor"
+              },
+              "password": {
+                "type": "string",
+                "example": "yourpassword"
+              },
+              "port": {
+                "type": "string",
+                "example": "5432"
+              },
+              "timeout": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 30
+              },
+              "user": {
+                "type": "string",
+                "example": "postgres_user"
+              }
+            }
+          },
+          "http": {
+            "description": "HTTP contains HTTP server configuration",
+            "type": "object",
+            "required": [
+              "idleTimeout",
+              "port",
+              "readTimeout",
+              "writeTimeout"
+            ],
+            "properties": {
+              "enableSSL": {
+                "type": "boolean",
+                "example": false
+              },
+              "idleTimeout": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 60
+              },
+              "port": {
+                "type": "string",
+                "example": "8080"
+              },
+              "proxyEnabled": {
+                "type": "boolean",
+                "example": false
+              },
+              "proxyURL": {
+                "type": "string",
+                "example": "http://proxy:8080"
+              },
+              "rateLimitEnabled": {
+                "type": "boolean",
+                "example": true
+              },
+              "readTimeout": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 30
+              },
+              "requestsPerMin": {
+                "type": "integer",
+                "minimum": 0,
+                "example": 100
+              },
+              "sslCert": {
+                "type": "string",
+                "example": "/path/to/cert.pem"
+              },
+              "sslKey": {
+                "type": "string",
+                "example": "/path/to/key.pem"
+              },
+              "writeTimeout": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 30
+              }
+            }
+          },
+          "integrations": {
+            "description": "Integrations contains all third-party service configurations",
+            "type": "object",
+            "properties": {
+              "emby": {
+                "$ref": "#/components/schemas/models.EmbyConfig"
+              },
+              "jellyfin": {
+                "$ref": "#/components/schemas/models.JellyfinConfig"
+              },
+              "navidrome": {
+                "$ref": "#/components/schemas/models.NavidromeConfig"
+              },
+              "plex": {
+                "$ref": "#/components/schemas/models.PlexConfig"
+              },
+              "spotify": {
+                "$ref": "#/components/schemas/models.SpotifyConfig"
+              },
+              "trakt": {
+                "$ref": "#/components/schemas/models.TraktConfig"
+              }
+            }
+          }
+        }
+      },
+      "models.EmbyConfig": {
+        "description": "Emby media server configuration",
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "your-api-key"
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "host": {
+            "type": "string",
+            "example": "localhost"
+          },
+          "port": {
+            "type": "integer",
+            "example": 8096
+          },
+          "ssl": {
+            "type": "boolean",
+            "example": false
+          },
+          "username": {
+            "type": "string",
+            "example": "admin"
+          }
+        }
+      },
+      "models.ErrorResponse-error": {
+        "type": "object",
+        "properties": {
+          "details": {},
+          "message": {
+            "type": "string",
+            "example": "This is a pretty message"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "integer",
+            "example": 201
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/models.ErrorType"
+              }
+            ],
+            "example": "FAILED_CHECK"
+          }
+        }
+      },
+      "models.ErrorType": {
+        "type": "string",
+        "enum": [
+          "FAILED_CHECK",
+          "UNAUTHORIZED",
+          "NOT_FOUND",
+          "BAD_REQUEST",
+          "INTERNAL_ERROR",
+          "FORBIDDEN",
+          "CONFLICT",
+          "VALIDATION_ERROR",
+          "RATE_LIMITED",
+          "TIMEOUT",
+          "SERVICE_UNAVAILABLE",
+          "UNPROCESSABLE_ENTITY"
+        ],
+        "x-enum-varnames": [
+          "ErrorTypeFailedCheck",
+          "ErrorTypeUnauthorized",
+          "ErrorTypeNotFound",
+          "ErrorTypeBadRequest",
+          "ErrorTypeInternalError",
+          "ErrorTypeForbidden",
+          "ErrorTypeConflict",
+          "ErrorTypeValidation",
+          "ErrorTypeRateLimited",
+          "ErrorTypeTimeout",
+          "ErrorTypeServiceUnavailable",
+          "ErrorTypeUnprocessableEntity"
+        ]
+      },
+      "models.GetByOriginalURLRequest": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "createIfNotExists": {
+            "type": "boolean"
+          },
+          "customCode": {
+            "type": "string"
+          },
+          "expiresAfter": {
+            "type": "integer"
+          },
+          "originalUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "models.HealthResponse": {
+        "type": "object",
+        "required": [
+          "application",
+          "database",
+          "status"
+        ],
+        "properties": {
+          "application": {
+            "type": "boolean",
+            "example": true
+          },
+          "database": {
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "description": "Overall status of the system",
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "degraded"
+            ],
+            "example": "up"
+          }
+        }
+      },
+      "models.JellyfinConfig": {
+        "description": "Jellyfin media server configuration",
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "example": "your-api-key"
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "host": {
+            "type": "string",
+            "example": "localhost"
+          },
+          "port": {
+            "type": "integer",
+            "example": 8096
+          },
+          "ssl": {
+            "type": "boolean",
+            "example": false
+          },
+          "username": {
+            "type": "string",
+            "example": "admin"
+          }
+        }
+      },
+      "models.LoginRequest": {
+        "description": "Request payload for user login",
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "description": "Email is the user's email address\n@Description User's email address\n@Example \"user@example.com\"",
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "description": "Password is the user's chosen password\n@Description User's password (plain text in request)",
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      },
+      "models.LogoutRequest": {
+        "description": "Request payload for user logout",
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "description": "RefreshToken identifies the session to terminate\n@Description JWT refresh token to invalidate",
+            "type": "string"
+          }
+        }
+      },
+      "models.NavidromeConfig": {
+        "description": "Supersonic music server configuration",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "host": {
+            "type": "string",
+            "example": "localhost"
+          },
+          "password": {
+            "type": "string",
+            "example": "your-password"
+          },
+          "port": {
+            "type": "integer",
+            "example": 4533
+          },
+          "ssl": {
+            "type": "boolean",
+            "example": false
+          },
+          "username": {
+            "type": "string",
+            "example": "admin"
+          }
+        }
+      },
+      "models.PlexConfig": {
+        "description": "Plex media server configuration",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "host": {
+            "type": "string",
+            "example": "localhost"
+          },
+          "port": {
+            "type": "integer",
+            "example": 32400
+          },
+          "ssl": {
+            "type": "boolean",
+            "example": false
+          },
+          "token": {
+            "type": "string",
+            "example": "your-plex-token"
+          }
+        }
+      },
+      "models.RefreshTokenRequest": {
+        "description": "Request payload for refreshing access tokens",
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "description": "RefreshToken is used to generate a new access token\n@Description JWT refresh token to use for generating new access token",
+            "type": "string"
+          }
+        }
+      },
+      "models.RegisterRequest": {
+        "description": "Request payload for user registration",
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "username"
+        ],
+        "properties": {
+          "email": {
+            "description": "Email is the user's email address\n@Description User's email address\n@Example \"user@example.com\"",
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "description": "Password is the user's chosen password\n@Description User's password (plain text in request)",
+            "type": "string",
+            "minLength": 8
+          },
+          "username": {
+            "description": "Username is the user's desired username\n@Description User's chosen username\n@Example \"johndoe\"",
+            "type": "string",
+            "example": "johndoe"
+          }
+        }
+      },
+      "models.Shorten": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "clickCount": {
+            "type": "integer",
+            "example": 0
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "originalUrl": {
+            "type": "string",
+            "example": "https://example.com/some/long/path"
+          },
+          "shortCode": {
+            "type": "string",
+            "example": "abc123"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        }
+      },
+      "models.ShortenData": {
+        "type": "object",
+        "properties": {
+          "shortUrl": {
+            "type": "string"
+          },
+          "shorten": {
+            "$ref": "#/components/schemas/models.Shorten"
+          }
+        }
+      },
+      "models.ShortenRequest": {
+        "type": "object",
+        "required": [
+          "originalUrl"
+        ],
+        "properties": {
+          "customCode": {
+            "type": "string"
+          },
+          "expiresAfter": {
+            "description": "In days",
+            "type": "integer"
+          },
+          "originalUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "models.SpotifyConfig": {
+        "description": "Spotify configuration",
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "example": "your-client-id"
+          },
+          "clientSecret": {
+            "type": "string",
+            "example": "your-client-secret"
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "redirectUri": {
+            "type": "string",
+            "example": "http://localhost:8080/callback"
+          },
+          "scopes": {
+            "type": "string",
+            "example": "user-library-read playlist-read-private"
+          }
+        }
+      },
+      "models.TraktConfig": {
+        "description": "Trakt.tv configuration",
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "example": "your-client-id"
+          },
+          "clientSecret": {
+            "type": "string",
+            "example": "your-client-secret"
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "redirectUri": {
+            "type": "string",
+            "example": "http://localhost:8080/callback"
+          }
+        }
+      },
+      "models.UpdateProfileRequest": {
+        "description": "Request payload for updating user profile",
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "Email is the new email address\n@Description Updated email address for the user\n@Example \"newemail@example.com\"",
+            "type": "string",
+            "example": "newemail@example.com"
+          },
+          "username": {
+            "description": "Username is the new username\n@Description Updated username for the user\n@Example \"newusername\"",
+            "type": "string",
+            "example": "newusername"
+          }
+        }
+      },
+      "models.UserConfig": {
+        "description": "User-specific configuration stored in the database",
+        "type": "object",
+        "required": [
+          "language"
+        ],
+        "properties": {
+          "autoSyncRecommendations": {
+            "type": "boolean",
+            "example": true
+          },
+          "contentLanguages": {
+            "type": "string",
+            "example": "en,es,fr"
+          },
+          "createServerPlaylists": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "defaultCollection": {
+            "type": "string",
+            "example": "AI Picks"
+          },
+          "defaultMediaServer": {
+            "description": "Sync Preferences",
+            "type": "string",
+            "enum": [
+              "emby",
+              "jellyfin",
+              "plex"
+            ],
+            "example": "plex"
+          },
+          "deletedAt": {
+            "type": "string"
+          },
+          "digestFrequency": {
+            "type": "string",
+            "enum": [
+              "never",
+              "daily",
+              "weekly"
+            ],
+            "example": "weekly"
+          },
+          "emailNotifications": {
+            "type": "boolean",
+            "example": true
+          },
+          "enableAnimations": {
+            "type": "boolean",
+            "example": true
+          },
+          "enableExperimentalAI": {
+            "type": "boolean",
+            "example": false
+          },
+          "excludedGenres": {
+            "type": "string",
+            "example": "horror,war"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "includeUnratedContent": {
+            "type": "boolean",
+            "example": false
+          },
+          "itemsPerPage": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 5,
+            "example": 20
+          },
+          "language": {
+            "type": "string",
+            "example": "en-US"
+          },
+          "maxContentRating": {
+            "type": "string",
+            "example": "R"
+          },
+          "maxRecommendations": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 5,
+            "example": 20
+          },
+          "minContentRating": {
+            "type": "string",
+            "example": "PG-13"
+          },
+          "newContentWeight": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0,
+            "example": 0.7
+          },
+          "notificationsEnabled": {
+            "description": "Notification Settings",
+            "type": "boolean",
+            "example": true
+          },
+          "notifyOnNewRecommendations": {
+            "type": "boolean",
+            "example": true
+          },
+          "notifyOnSync": {
+            "type": "boolean",
+            "example": false
+          },
+          "personalHistoryWeight": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0,
+            "example": 0.8
+          },
+          "popularityWeight": {
+            "type": "number",
+            "maximum": 1,
+            "minimum": 0,
+            "example": 0.3
+          },
+          "preferredGenres": {
+            "type": "string",
+            "example": "action,comedy,drama"
+          },
+          "recommendationFrequency": {
+            "description": "Recommendation Preferences",
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "example": "daily"
+          },
+          "recommendationStrategy": {
+            "description": "AI Algorithm Settings",
+            "type": "string",
+            "enum": [
+              "similar",
+              "diverse",
+              "balanced"
+            ],
+            "example": "diverse"
+          },
+          "syncFrequency": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "daily",
+              "weekly"
+            ],
+            "example": "daily"
+          },
+          "theme": {
+            "description": "UI Preferences",
+            "type": "string",
+            "enum": [
+              "light",
+              "dark",
+              "system"
+            ],
+            "example": "dark"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "userId": {
+            "description": "UserID links this config to a specific user",
+            "type": "integer"
+          }
+        }
+      },
+      "models.UserResponse": {
+        "description": "User information returned in API responses",
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "Email is the unique email address of the user\n@Description User's email address\n@Example \"user@example.com\"",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID is the unique identifier for the user\n@Description User's unique identifier\n@Example 1",
+            "type": "integer"
+          },
+          "role": {
+            "description": "Role defines the user's permission level\n@Description User's role in the system\n@Enum \"user\" \"admin\"\n@Example \"user\"",
+            "type": "string"
+          },
+          "username": {
+            "description": "Username is the display name chosen by the user\n@Description User's chosen username\n@Example \"johndoe\"",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

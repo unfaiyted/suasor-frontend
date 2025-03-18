@@ -122,7 +122,6 @@ function createShortensStore() {
 					}
 				});
 
-				console.log(response);
 				if (response.error) {
 					const errorData = response.error as ShortenErrorResponse;
 					const status = response.response?.status || 500;

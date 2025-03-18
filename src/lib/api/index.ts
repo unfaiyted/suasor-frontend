@@ -1,1 +1,1 @@
-export * as portusApi from './portus.v1';
+export * as suasorApi from './suasor.v1';
