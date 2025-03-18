@@ -35,6 +35,8 @@ const createBasicClient = () => {
 export const createAuthenticatedClient = () => {
 	const token = localStorage.getItem('suasor_access_token');
 
+	console.log('created auth client with ', token);
+
 	return createClient<suasorPaths>({
 		baseUrl: API_BASE_URL,
 		headers: token
@@ -55,6 +57,7 @@ export const login = async (email: string, password: string) => {
 	if (response.data?.data) {
 		const { accessToken, refreshToken, expiresAt, user } = response.data.data;
 		if (accessToken && refreshToken) {
+			console.log('setting tokens', accessToken, refreshToken);
 			localStorage.setItem('suasor_access_token', accessToken);
 			localStorage.setItem('suasor_refresh_token', refreshToken);
 			localStorage.setItem('suasor_expires_at', expiresAt?.toString() || '0');
@@ -129,6 +132,7 @@ export const getCurrentUser = () => {
 export const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
 	// Check for token expiration
 	if (!isAuthenticated() && localStorage.getItem('suasor_refresh_token')) {
+		console.log('not-authenticationed', localStorage.getItem('suasor_refresh_token'));
 		try {
 			await refreshToken();
 		} catch (e) {
@@ -137,6 +141,7 @@ export const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
 			localStorage.removeItem('suasor_refresh_token');
 			localStorage.removeItem('suasor_expires_at');
 			localStorage.removeItem('suasor_user');
+			console.log('removing invalid item');
 			throw e;
 		}
 	}
@@ -164,6 +169,7 @@ export const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
 
 // Export authenticated API methods with proper path constraints
 export const GET = async <P extends PathWithGet>(path: P, params?: any, skipAuth = false) => {
+	console.log('GET', path, 'skipAuth', skipAuth);
 	if (skipAuth) {
 		return createBasicClient().GET(path, params);
 	}

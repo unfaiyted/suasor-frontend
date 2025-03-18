@@ -1,15 +1,12 @@
 // src/lib/stores/auth.ts
-import { writable, derived } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import { createBaseStore, type BaseApiState } from './base';
 import { ApiError } from '$lib/api/errors';
-import type { paths } from '$lib/api/suasor.v1';
-import type { AuthData } from '$lib/api/types';
+import { GET } from '$lib/api/client';
 
 // Import the updated client methods
 import {
-	POST,
-	createAuthenticatedClient,
 	isAuthenticated as clientIsAuthenticated,
 	getCurrentUser as clientGetCurrentUser
 } from '$lib/api/client';
@@ -72,20 +69,9 @@ function createAuthStore() {
 		async login(email: string, password: string): Promise<boolean> {
 			store.setLoading(true);
 			try {
-				// Using our updated client with skipAuth=true
-				const response = await POST(
-					'/auth/login',
-					{
-						body: { email, password }
-					},
-					true
-				);
+				// Use the client's login function which handles localStorage
+				const authData = await import('$lib/api/client').then((m) => m.login(email, password));
 
-				if (response.error) {
-					throw new ApiError(response.error, response.response?.status || 500);
-				}
-
-				const authData = response.data?.data as AuthData;
 				if (authData && authData.accessToken && authData.refreshToken) {
 					const newState: AuthState = {
 						isAuthenticated: true,
@@ -98,8 +84,6 @@ function createAuthStore() {
 					};
 
 					store.update(() => newState);
-
-					// Token storage is already handled by the client
 					return true;
 				}
 				return false;
@@ -112,20 +96,13 @@ function createAuthStore() {
 		},
 
 		async logout(): Promise<void> {
-			const currentState = getCurrentState();
 			store.setLoading(true);
 
 			try {
-				if (currentState.refreshToken) {
-					// Using updated client to logout
-					await POST('/auth/logout', {
-						body: { refreshToken: currentState.refreshToken }
-					});
-				}
-			} catch (e) {
-				// Continue with local logout even if API fails
-			} finally {
-				// Reset state
+				// Use the client's logout function
+				await import('$lib/api/client').then((m) => m.logout());
+
+				// Reset the store state
 				store.update(() => ({
 					isAuthenticated: false,
 					accessToken: null,
@@ -135,48 +112,27 @@ function createAuthStore() {
 					loading: false,
 					error: null
 				}));
-
-				// Remove tokens (already handled by client logout, but let's be thorough)
-				if (browser) {
-					localStorage.removeItem('suasor_access_token');
-					localStorage.removeItem('suasor_refresh_token');
-					localStorage.removeItem('suasor_expires_at');
-					localStorage.removeItem('suasor_user');
-				}
-
+			} catch (e) {
+				// Handle errors
+				console.error('Logout error:', e);
+			} finally {
 				store.setLoading(false);
 			}
 		},
 
 		async refreshToken(): Promise<boolean> {
-			const currentState = getCurrentState();
-			if (!currentState.refreshToken) return false;
-
 			store.setLoading(true);
 			try {
-				// Using updated client with skipAuth=true
-				const response = await POST(
-					'/auth/refresh',
-					{
-						body: { refreshToken: currentState.refreshToken }
-					},
-					true
-				);
+				// Use the client's refreshToken function
+				const authData = await import('$lib/api/client').then((m) => m.refreshToken());
 
-				if (response.error) {
-					throw new ApiError(response.error, response.response?.status || 500);
-				}
-
-				const authData = response.data?.data as AuthData;
 				if (authData && authData.accessToken && authData.refreshToken) {
 					store.update((state) => ({
 						...state,
-						accessToken: authData.accessToken,
-						refreshToken: authData.refreshToken,
+						accessToken: authData.accessToken || null,
+						refreshToken: authData.refreshToken || null,
 						expiresAt: authData.expiresAt || null
 					}));
-
-					// Updated tokens are already stored by the client
 					return true;
 				}
 				return false;
@@ -194,6 +150,38 @@ function createAuthStore() {
 
 		// Method to sync store state with client state (useful after page refresh)
 		syncWithClient(): void {
+			// First check localStorage directly
+			if (browser) {
+				const accessToken = localStorage.getItem('suasor_access_token');
+				const refreshToken = localStorage.getItem('suasor_refresh_token');
+				const expiresAtStr = localStorage.getItem('suasor_expires_at');
+				const userStr = localStorage.getItem('suasor_user');
+
+				if (accessToken && refreshToken && expiresAtStr && userStr) {
+					const expiresAt = parseInt(expiresAtStr, 10);
+					try {
+						const user = JSON.parse(userStr);
+
+						// Update store state with localStorage values
+						store.update((state) => ({
+							...state,
+							isAuthenticated: true,
+							accessToken,
+							refreshToken,
+							user,
+							expiresAt
+						}));
+
+						// Validate token is still valid with the server
+						this.validateSession();
+						return;
+					} catch (e) {
+						console.error('Error parsing user data from localStorage', e);
+					}
+				}
+			}
+
+			// Fallback to client check
 			if (clientIsAuthenticated()) {
 				const user = clientGetCurrentUser();
 				const accessToken = localStorage.getItem('suasor_access_token');
@@ -211,6 +199,7 @@ function createAuthStore() {
 					}));
 				}
 			} else {
+				// Reset state if not authenticated
 				store.update((state) => ({
 					...state,
 					isAuthenticated: false,
@@ -219,6 +208,33 @@ function createAuthStore() {
 					user: null,
 					expiresAt: null
 				}));
+			}
+		},
+
+		async validateSession(): Promise<boolean> {
+			console.log('Validating session');
+			try {
+				// Call a protected endpoint to validate the token
+				const response = await GET('/config/user');
+
+				if (response.error) {
+					await this.logout();
+					return false;
+				}
+				if (response.data?.data) {
+					store.update((state) => ({
+						...state,
+						user: response.data.data
+					}));
+					console.log('Session validated');
+					return true;
+				}
+
+				return false;
+			} catch (err) {
+				console.error('Session validation error:', err);
+				await this.logout();
+				return false;
 			}
 		}
 	};

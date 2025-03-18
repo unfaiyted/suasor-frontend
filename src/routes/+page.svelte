@@ -1,257 +1,315 @@
 <script lang="ts">
-	import IconLogo from '$lib/components/icons/IconLogo.svelte';
-	import IconDown from '$lib/components/icons/IconDown.svelte';
-	import IconUp from '$lib/components/icons/IconUp.svelte';
-	import { fade } from 'svelte/transition';
-	import { shortensStore, shortensLoading } from '$lib/stores/shortens';
-	import { ApiError } from '$lib/api/errors';
-
+	import { onMount } from 'svelte';
+	import { fade, slide } from 'svelte/transition';
 	import { isAuthenticated, user } from '$lib/stores/auth';
-	import { API_BASE_URL } from '$lib/api/client';
-	import { ModelsErrorType as ErrorType } from '$lib/api/suasor.v1.d';
-	import IconTriangle from '$lib/components/icons/IconTriangle.svelte';
 
-	let longUrl = '';
-	let shortUrl = '';
-	let customShortCode = ''; // New variable for custom shortcode
-	let isLoading = false;
-	let copied = false;
-	let error = '';
-	let customSectionExpanded = false; // Track whether custom section is expanded
-	let domain = API_BASE_URL.split('//')[1].split('/')[0];
-	// Mock database of already taken shortcodes
-	// let takenShortCodes = ['premium', 'admin', 'test123'];
-	$: isLoading = $shortensLoading;
+	// Mock data stores - would be replaced with actual API calls
+	let recommendations = {
+		movies: { count: 127, watched: 48 },
+		tvShows: { count: 89, watched: 32, episodes: 217 },
+		music: { count: 156, listened: 93 }
+	};
 
-	async function handleSubmit() {
-		if (!longUrl) {
-			error = 'Please enter a URL';
-			return;
+	let integrationStatus = {
+		mediaServers: [
+			{ name: 'Plex', status: 'connected', lastSync: '2023-10-15T14:30:00Z' },
+			{ name: 'Emby', status: 'disconnected', lastSync: null },
+			{ name: 'Jellyfin', status: 'connected', lastSync: '2023-10-14T09:15:00Z' }
+		],
+		aiModels: [
+			{ name: 'Claude', status: 'active', usageCount: 37 },
+			{ name: 'OpenAI', status: 'active', usageCount: 52 },
+			{ name: 'Ollama', status: 'inactive', usageCount: 0 }
+		],
+		automationTools: [
+			{ name: 'Sonarr', status: 'connected', pendingTasks: 3 },
+			{ name: 'Radarr', status: 'connected', pendingTasks: 1 },
+			{ name: 'Lidarr', status: 'connected', pendingTasks: 0 }
+		]
+	};
+
+	let recentActivity = [
+		{
+			type: 'movie',
+			title: 'Dune: Part Two',
+			date: '2023-10-14',
+			status: 'recommended',
+			source: 'Claude'
+		},
+		{ type: 'tv', title: 'Severance', date: '2023-10-13', status: 'added', source: 'OpenAI' },
+		{
+			type: 'music',
+			title: 'The Dark Side of the Moon',
+			date: '2023-10-12',
+			status: 'listened',
+			source: 'User'
+		},
+		{
+			type: 'movie',
+			title: 'Everything Everywhere All at Once',
+			date: '2023-10-10',
+			status: 'watched',
+			source: 'OpenAI'
 		}
+	];
 
-		error = '';
+	let discoveryRate = [
+		{ month: 'May', count: 23 },
+		{ month: 'Jun', count: 31 },
+		{ month: 'Jul', count: 28 },
+		{ month: 'Aug', count: 42 },
+		{ month: 'Sep', count: 38 },
+		{ month: 'Oct', count: 45 }
+	];
 
-		try {
-			// Use the API to create or fetch the shortened URL
-			const result = await shortensStore.fetchOrCreate(longUrl, customShortCode || undefined);
+	let selectedTab = 'overview';
 
-			if (result && result.shorten) {
-				// Construct the full shortened URL with the returned shortcode
-				shortUrl = result.shortUrl || 'Error producing short url';
-
-				// Clear inputs after successful submission
-				longUrl = '';
-				customShortCode = '';
-			} else {
-				error = 'Failed to create short URL. Please try again.';
-			}
-		} catch (err) {
-			if (err instanceof ApiError) {
-				console.log('err.message', err.message);
-				error = err.message || 'API Error occurred';
-
-				// Handle specific error types
-				if (err.type === ErrorType.ErrorTypeServiceUnavailable) {
-					error = 'This custom shortcode is already taken. Please try another.';
-				} else if (err.type === ErrorType.ErrorTypeBadRequest) {
-					error = 'Invalid URL or shortcode format. Please check your input.';
-				}
-			} else {
-				error = 'Failed to create short URL. Please try again.';
-				console.error(err);
-			}
-		}
+	function formatDate(dateString) {
+		return new Date(dateString).toLocaleDateString();
 	}
 
-	function copyToClipboard() {
-		if (!shortUrl) return;
-		navigator.clipboard.writeText(shortUrl);
-		copied = true;
-		setTimeout(() => (copied = false), 2000);
+	function getStatusColor(status) {
+		const statusMap = {
+			connected: 'text-green-500',
+			disconnected: 'text-red-500',
+			active: 'text-green-500',
+			inactive: 'text-gray-500',
+			recommended: 'text-blue-500',
+			watched: 'text-green-500',
+			added: 'text-purple-500',
+			listened: 'text-teal-500'
+		};
+		return statusMap[status] || 'text-gray-500';
 	}
 
-	function toggleCustomSection() {
-		customSectionExpanded = !customSectionExpanded;
-	}
+	onMount(async () => {
+		// Here you would fetch real data from your API
+		// For example:
+		// const userData = await fetch('/api/user/dashboard');
+		// const userDataJson = await userData.json();
+		// recommendations = userDataJson.recommendations;
+	});
 </script>
 
-<div class="container mx-auto max-w-4xl px-4 py-10">
-	<!-- Hero Section -->
-	<header class="mb-12 text-center">
-		<h1 class="h1 text-primary-500 mb-2 font-bold">A Shorter Trip</h1>
-		<p class="preset-typo-subtitle mb-6 text-lg">
-			Transform your lengthy URLs to concise, memorable destinations
-		</p>
-	</header>
-
-	<script>
-	</script>
-
+<div class="container mx-auto max-w-6xl px-4 py-8">
 	{#if $isAuthenticated}
-		<p>Welcome, {$user.username}!</p>
-	{:else}
-		<p>Please log in</p>
-	{/if}
+		<!-- Header Section -->
+		<header class="mb-8">
+			<div class="flex items-center justify-between">
+				<div>
+					<h1 class="text-primary-600 text-3xl font-bold">Media Compass</h1>
+					<p class="text-gray-600">Your personalized entertainment dashboard</p>
+				</div>
+				{#if $isAuthenticated}
+					<div class="flex items-center">
+						<div class="mr-3 text-right">
+							<p class="font-medium">Welcome, {$user.username}</p>
+							<p class="text-sm text-gray-500">Premium Member</p>
+						</div>
+						<div class="bg-primary-100 h-12 w-12 overflow-hidden rounded-full">
+							<!-- User avatar could go here -->
+						</div>
+					</div>
+				{/if}
+			</div>
+		</header>
 
-	<!-- URL Shortener Form -->
-	<div class="card preset-filled-surface-100-900 relative mb-10 p-6 shadow-xl backdrop-blur-sm">
-		<!-- Icon in top right corner -->
-		<div class="pointer-events-none absolute -top-0 -right-0 h-24 w-24 opacity-0 sm:opacity-80">
-			<IconLogo />
-		</div>
-		<div class="card-header">
-			<h3 class="h3 font-bold">Transform Your URL</h3>
-			<p class="preset-typo-cation">
-				Enter your long URL below and we'll instantly port it to a shorter dimension
-			</p>
-		</div>
-		<div class="card-body py-4">
-			{#if error}
-				<div class="alert alert-error mb-4" transition:fade>
+		<!-- Stats Overview -->
+		<div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+			<div class="rounded-lg bg-white p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold text-gray-700">Movies</h3>
+				<div class="flex items-end justify-between">
+					<div>
+						<p class="text-primary-600 text-3xl font-bold">{recommendations.movies.count}</p>
+						<p class="text-sm text-gray-500">Recommendations</p>
+					</div>
+					<div class="text-right">
+						<p class="text-xl font-medium text-green-500">{recommendations.movies.watched}</p>
+						<p class="text-sm text-gray-500">Watched</p>
+					</div>
+				</div>
+				<div class="mt-4 h-2 w-full rounded-full bg-gray-200">
 					<div
-						class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]"
-						transition:fade
-					>
-						<IconTriangle />
-						<div>
-							<p class="font-bold">Error</p>
-							<p class="text-xs opacity-60">{error}</p>
-						</div>
-						<div class="flex gap-1">
-							<!-- <button class="btn preset-tonal hover:preset-filled">Dismiss</button> -->
-						</div>
+						class="bg-primary-500 h-2 rounded-full"
+						style="width: {(recommendations.movies.watched / recommendations.movies.count) * 100}%"
+					></div>
+				</div>
+			</div>
+
+			<div class="rounded-lg bg-white p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold text-gray-700">TV Shows</h3>
+				<div class="flex items-end justify-between">
+					<div>
+						<p class="text-primary-600 text-3xl font-bold">{recommendations.tvShows.count}</p>
+						<p class="text-sm text-gray-500">Recommendations</p>
+					</div>
+					<div class="text-right">
+						<p class="text-xl font-medium text-green-500">{recommendations.tvShows.watched}</p>
+						<p class="text-sm text-gray-500">Watched</p>
 					</div>
 				</div>
-			{/if}
-
-			<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-				<label class="label">
-					<span class="label-text">Long URL</span>
-					<input
-						type="url"
-						class="input !bg-surface-200-800"
-						placeholder="https://example.com/very/long/url/that/needs/teleporting"
-						bind:value={longUrl}
-						required
-					/>
-				</label>
-
-				<div class="mt-4">
-					<button
-						type="button"
-						class="flex w-full items-center justify-between text-left font-medium"
-						on:click={toggleCustomSection}
-					>
-						<span class="text-secondary-900-100">Custom shortcode (optional)</span>
-						<span class="ml-2"
-							>{#if !customSectionExpanded}<IconDown />{:else}
-								<IconUp />{/if}</span
-						>
-					</button>
-
-					{#if customSectionExpanded}
-						<div transition:fade={{ duration: 150 }} class="mt-2">
-							<div class="mt-2 flex items-center gap-2">
-								<span class="label-text text-sm">{domain}/</span>
-								<input
-									type="text"
-									class="input !bg-surface-200-800 mb-4"
-									placeholder="e.g., myproduct"
-									bind:value={customShortCode}
-									pattern="[a-zA-Z0-9-_]+"
-									title="Alphanumeric characters, hyphens, and underscores only"
-								/>
-							</div>
-							<span class="text-surface-800-200 text-sm"
-								>Leave empty to generate a random shortcode</span
-							>
-							<div class="text-surface-700-300 text-sm">
-								<p>Create a memorable, easy-to-share link by choosing your own shortcode.</p>
-								<p class="text-surface-900-100 mt-4">For best results:</p>
-								<ul class="text-surface-800-200 ml-4 list-inside list-disc">
-									<li>Use alphanumeric characters, hyphens and underscores only</li>
-									<li>Keep it short and relevant to your content</li>
-									<li>Avoid common terms that might be reserved</li>
-								</ul>
-							</div>
-						</div>
-					{/if}
+				<div class="mt-2 text-sm text-gray-500">
+					<span class="font-medium">{recommendations.tvShows.episodes}</span> episodes tracked
 				</div>
+				<div class="mt-2 h-2 w-full rounded-full bg-gray-200">
+					<div
+						class="bg-primary-500 h-2 rounded-full"
+						style="width: {(recommendations.tvShows.watched / recommendations.tvShows.count) *
+							100}%"
+					></div>
+				</div>
+			</div>
 
-				<button
-					type="submit"
-					class="btn preset-filled-primary-500 w-full {isLoading ? 'loading' : ''}"
-				>
-					{isLoading ? 'Teleporting...' : 'Port My URL'}
-				</button>
-			</form>
+			<div class="rounded-lg bg-white p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold text-gray-700">Music</h3>
+				<div class="flex items-end justify-between">
+					<div>
+						<p class="text-primary-600 text-3xl font-bold">{recommendations.music.count}</p>
+						<p class="text-sm text-gray-500">Recommendations</p>
+					</div>
+					<div class="text-right">
+						<p class="text-xl font-medium text-green-500">{recommendations.music.listened}</p>
+						<p class="text-sm text-gray-500">Listened</p>
+					</div>
+				</div>
+				<div class="mt-4 h-2 w-full rounded-full bg-gray-200">
+					<div
+						class="bg-primary-500 h-2 rounded-full"
+						style="width: {(recommendations.music.listened / recommendations.music.count) * 100}%"
+					></div>
+				</div>
+			</div>
+		</div>
 
-			{#if shortUrl}
-				<div
-					class="border-primary-500/30 bg-primary-500/10 mt-6 rounded-lg border p-4"
-					transition:fade
-				>
-					<div class="flex items-center justify-between">
-						<div>
-							<p class="mb-1 text-sm font-semibold">Your Portus URL:</p>
-							<a
-								href={shortUrl}
-								class="text-primary-700 text-lg font-bold hover:underline"
-								target="_blank"
-							>
-								{shortUrl}
-							</a>
-							{#if shortUrl.includes(customShortCode) && customShortCode}
-								<p class="mt-1 text-xs text-emerald-600">
-									✓ Your custom shortcode was successfully reserved!
+		<!-- Main Dashboard Grid -->
+		<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+			<!-- Recent Activity -->
+			<div class="rounded-lg bg-white p-6 shadow-md lg:col-span-2">
+				<h3 class="mb-4 text-lg font-semibold text-gray-700">Recent Activity</h3>
+				<div class="divide-y divide-gray-200">
+					{#each recentActivity as activity}
+						<div class="flex items-center py-3">
+							<div class="mr-4 rounded-full bg-gray-100 p-2">
+								<!-- Icon based on media type -->
+								{#if activity.type === 'movie'}
+									<svg class="text-primary-500 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5zm8 0h2v4h-2V5zM7 13h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"
+										/>
+									</svg>
+								{:else if activity.type === 'tv'}
+									<svg class="text-primary-500 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											d="M2 4.5A2.5 2.5 0 014.5 2h11A2.5 2.5 0 0118 4.5v11a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 012 15.5v-11z"
+										/>
+									</svg>
+								{:else}
+									<svg class="text-primary-500 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"
+										/>
+									</svg>
+								{/if}
+							</div>
+							<div class="flex-grow">
+								<p class="font-medium">{activity.title}</p>
+								<p class="text-sm text-gray-500">
+									<span class={getStatusColor(activity.status)}>{activity.status}</span> • {formatDate(
+										activity.date
+									)}
 								</p>
-							{/if}
+							</div>
+							<div class="text-sm text-gray-500">
+								{activity.source}
+							</div>
 						</div>
-						<button class="btn preset-filled-primary-500" on:click={copyToClipboard}>
-							{copied ? '✓ Copied' : 'Copy'}
-						</button>
-					</div>
+					{/each}
 				</div>
-			{/if}
-		</div>
-	</div>
+				<button class="text-primary-600 mt-4 hover:underline">View all activity</button>
+			</div>
 
-	<!-- Features Section -->
-	<div class="mb-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-		<div class="card p-4">
-			<div class="card-header pb-2">
-				<h3 class="h4 font-bold">Instant Transport</h3>
-			</div>
-			<div class="card-body">
-				<p class="">Transform your links to their shorter form within milliseconds.</p>
+			<!-- Integrations Status -->
+			<div class="rounded-lg bg-white p-6 shadow-md">
+				<h3 class="mb-4 text-lg font-semibold text-gray-700">Integrations</h3>
+
+				<div class="mb-4">
+					<h4 class="mb-2 font-medium text-gray-600">Media Servers</h4>
+					<ul class="space-y-2">
+						{#each integrationStatus.mediaServers as server}
+							<li class="flex items-center justify-between">
+								<span>{server.name}</span>
+								<span class={getStatusColor(server.status)}>
+									{server.status}
+								</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+
+				<div class="mb-4">
+					<h4 class="mb-2 font-medium text-gray-600">AI Models</h4>
+					<ul class="space-y-2">
+						{#each integrationStatus.aiModels as model}
+							<li class="flex items-center justify-between">
+								<span>{model.name}</span>
+								<span class={getStatusColor(model.status)}>
+									{model.status}
+								</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+
+				<div>
+					<h4 class="mb-2 font-medium text-gray-600">Automation Tools</h4>
+					<ul class="space-y-2">
+						{#each integrationStatus.automationTools as tool}
+							<li class="flex items-center justify-between">
+								<span>{tool.name}</span>
+								<div>
+									<span class={getStatusColor(tool.status)}>
+										{tool.status}
+									</span>
+									{#if tool.pendingTasks > 0}
+										<span
+											class="ml-2 rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800"
+										>
+											{tool.pendingTasks} pending
+										</span>
+									{/if}
+								</div>
+							</li>
+						{/each}
+					</ul>
+				</div>
 			</div>
 		</div>
 
-		<div class="card p-4">
-			<div class="card-header pb-2">
-				<h3 class="h4 font-bold">Journey Tracking</h3>
-			</div>
-			<div class="card-body">
-				<p class="">
-					Follow your link's travels with comprehensive analytics and geographic insights.
-				</p>
-			</div>
-		</div>
-
-		<div class="card p-4">
-			<div class="card-header pb-2">
-				<h3 class="h4 font-bold">Open Source</h3>
-			</div>
-			<div class="card-body">
-				<p class="">Design your own destination with branded domains and personalized paths.</p>
+		<!-- Discovery Rate Chart -->
+		<div class="rounded-lg bg-white p-6 shadow-md">
+			<h3 class="mb-4 text-lg font-semibold text-gray-700">Media Discovery Rate</h3>
+			<div class="h-64">
+				<div class="flex h-full items-end">
+					{#each discoveryRate as month}
+						<div class="flex flex-1 flex-col items-center">
+							<div
+								class="bg-primary-500 w-full transition-all duration-500 ease-in-out"
+								style="height: {(month.count / 50) * 100}%"
+							></div>
+							<p class="mt-2 text-xs">{month.month}</p>
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
-	</div>
-
-	<footer class="text-center text-sm text-gray-500">
-		<p>© {new Date().getFullYear()} Prt.ad - Where URLs get teleported. All rights reserved.</p>
-	</footer>
+	{:else}
+		<div class="py-12 text-center">
+			<h2 class="mb-4 text-2xl font-bold">Please log in to access your dashboard</h2>
+			<a href="/login" class="btn btn-primary">Log In</a>
+		</div>
+	{/if}
 </div>
 
 <style lang="postcss">
+	/* Add any custom styles you need here */
 </style>
