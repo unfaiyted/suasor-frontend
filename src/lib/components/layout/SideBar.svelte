@@ -19,9 +19,7 @@
 	}
 </script>
 
-<div
-	class="card border-surface-100-900 sticky top-0 ml-0 grid h-dvh w-full grid-cols-[auto_1fr] rounded-tl-none border-[0px] border-t-0 border-r-0 border-l-0"
->
+<div class="card border-surface-100-900 sticky top-0 h-dvh w-full">
 	<!-- Component -->
 	<Navigation.Rail expanded={isExpansed} background="bg-surface-100-900/30">
 		{#snippet header()}

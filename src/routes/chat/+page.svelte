@@ -1,35 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
-	import { Plus, Play, Info, Star, Check, Send, List, MoreVertical } from '@lucide/svelte';
-	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import { fade } from 'svelte/transition';
+	import { Send, List, MoreVertical } from '@lucide/svelte';
 
-	// Types for movies and messages
-	interface Movie {
-		id: string;
-		title: string;
-		year: number;
-		type: 'movie' | 'series';
-		poster: string;
-		genres: string[];
-		rating: number;
-		overview: string;
-	}
-
-	interface MessageContent {
-		type: 'text' | 'movieList';
-		text?: string;
-		movies?: Movie[];
-	}
-
-	interface Message {
-		id: number;
-		sender: 'user' | 'ai';
-		avatar: number;
-		name: string;
-		timestamp: string;
-		content: MessageContent;
-	}
+	// Import types and components - use proper paths
+	import type { Movie, Message, MessageContent, Chat } from '$lib/components/chat/types';
+	import ChatMessage from '$lib/components/chat/ChatMessage.svelte';
+	import ChatInput from '$lib/components/chat/ChatInput.svelte';
+	import SelectedMoviesBar from '$lib/components/chat/SelectedMoviesBar.svelte';
+	import SidePanel from '$lib/components/chat/SidePanel.svelte';
 
 	// State
 	let elemChat: HTMLElement;
@@ -37,9 +16,14 @@
 	let selectedMovies: Movie[] = [];
 	let messages: Message[] = [];
 	let showActionsMenu = false;
+	let showSidePanel = true;
 
-	// Sample movies data
-	let sampleMovies = [
+	// Chat history state
+	let chats: Chat[] = [];
+	let currentChatId = crypto.randomUUID();
+
+	// Sample movies data (using the existing data)
+	let sampleMovies: Movie[] = [
 		{
 			id: 'air1',
 			title: 'Everything Everywhere All at Once',
@@ -73,8 +57,56 @@
 	];
 
 	onMount(() => {
-		// Add this for closing the dropdown when clicking outside
 		document.addEventListener('click', handleClickOutside);
+
+		// Initialize first chat
+		startNewChat();
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
+
+	// Utility functions
+	function getCurrentTimestamp(): string {
+		return new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+	}
+
+	function scrollChatBottom(behavior = 'smooth') {
+		if (elemChat) {
+			elemChat.scrollTo({ top: elemChat.scrollHeight, behavior: behavior as ScrollBehavior });
+		}
+	}
+
+	function handleClickOutside(event: MouseEvent) {
+		if (showActionsMenu && !event.target.closest('.actions-menu')) {
+			showActionsMenu = false;
+		}
+	}
+
+	// Chat management functions
+	function startNewChat() {
+		// Save current chat if it has messages
+		if (messages.length > 0) {
+			saveCurrentChat();
+		}
+
+		// Create new chat
+		currentChatId = crypto.randomUUID();
+		messages = [];
+		selectedMovies = [];
+
+		// Add to chat list
+		chats = [
+			{
+				id: currentChatId,
+				title: `Chat ${chats.length + 1}`,
+				timestamp: getCurrentTimestamp(),
+				messages: [],
+				recommendations: []
+			},
+			...chats
+		];
 
 		// Add welcome message
 		addMessageFromAI({
@@ -82,26 +114,59 @@
 			text: "Hi! I'm your movie recommendation assistant. What kind of movies do you enjoy watching?"
 		});
 
-		// Show some example movie
+		// Show example movies
 		addMessageFromAI({
 			type: 'movieList',
 			text: 'Here are some popular titles you might like:',
 			movies: sampleMovies
 		});
-
-		return () => {
-			document.removeEventListener('click', handleClickOutside);
-		};
-	});
-
-	function getCurrentTimestamp(): string {
-		return new Date().toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
 	}
 
-	function scrollChatBottom(behavior = 'smooth') {
-		elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
+	function saveCurrentChat() {
+		// Find the current chat and update it
+		const currentChatIndex = chats.findIndex((chat) => chat.id === currentChatId);
+		if (currentChatIndex !== -1) {
+			// Extract recommended movies from AI messages
+			const recommendations = messages
+				.filter((m) => m.sender === 'ai' && m.content.type === 'movieList' && m.content.movies)
+				.flatMap((m) => m.content.movies || []);
+
+			// Update chat
+			const updatedChat = {
+				...chats[currentChatIndex],
+				messages: [...messages],
+				recommendations: recommendations,
+				// Update title based on first user message if available
+				title:
+					messages
+						.find((m) => m.sender === 'user' && m.content.type === 'text')
+						?.content.text?.slice(0, 25) + '...' || chats[currentChatIndex].title
+			};
+
+			// Replace in array
+			chats = chats.map((chat) => (chat.id === currentChatId ? updatedChat : chat));
+		}
 	}
 
+	function selectChat(chatId: string) {
+		// Save current chat
+		if (messages.length > 0) {
+			saveCurrentChat();
+		}
+
+		// Find selected chat
+		const selectedChat = chats.find((chat) => chat.id === chatId);
+		if (selectedChat) {
+			currentChatId = chatId;
+			messages = [...selectedChat.messages];
+			selectedMovies = [];
+
+			// Scroll to bottom after render
+			setTimeout(() => scrollChatBottom(), 0);
+		}
+	}
+
+	// Message handling functions
 	function addMessageFromUser(content: MessageContent) {
 		messages = [
 			...messages,
@@ -157,6 +222,7 @@
 		}
 	}
 
+	// Message action functions
 	function sendMessage() {
 		if (currentMessage.trim()) {
 			addMessageFromUser({
@@ -174,23 +240,12 @@
 		}
 	}
 
-	function toggleMovieSelection(movie) {
+	function toggleMovieSelection(movie: Movie) {
 		const index = selectedMovies.findIndex((m) => m.id === movie.id);
 		if (index === -1) {
 			selectedMovies = [...selectedMovies, movie];
 		} else {
 			selectedMovies = selectedMovies.filter((m) => m.id !== movie.id);
-		}
-	}
-
-	function isMovieSelected(id) {
-		return selectedMovies.some((m) => m.id === id);
-	}
-
-	function onPromptKeydown(event) {
-		if (['Enter'].includes(event.code) && !event.shiftKey) {
-			event.preventDefault();
-			sendMessage();
 		}
 	}
 
@@ -216,229 +271,64 @@
 		}
 		showActionsMenu = false;
 	}
-
-	// Close the menu when clicking outside
-	function handleClickOutside(event) {
-		if (showActionsMenu && !event.target.closest('.actions-menu')) {
-			showActionsMenu = false;
-		}
-	}
 </script>
 
-<section
-	class="card bg-surface-100-900 rounded-container full-page mt-8 mr-4 ml-4 overflow-hidden p-4"
->
-	<div class="chat grid h-full w-full grid-rows-[1fr_auto_auto]">
-		<!-- Conversation -->
-		<section
-			bind:this={elemChat}
-			class="max-h-[600px] space-y-4 overflow-y-auto p-4 md:min-h-[500px]"
-		>
-			{#each messages as message (message.id)}
-				<div
-					class="grid gap-2"
-					class:grid-cols-[auto_1fr]={message.sender === 'ai'}
-					class:grid-cols-[1fr_auto]={message.sender === 'user'}
-					in:fade={{ duration: 200 }}
-				>
-					{#if message.sender === 'ai'}
-						<Avatar
-							src={`https://i.pravatar.cc/?img=${message.avatar}`}
-							name={message.name}
-							classes="w-16"
-						/>
-					{/if}
+<div class="mx-4 mt-8 flex h-full">
+	<!-- Side Panel -->
+	{#if showSidePanel}
+		<SidePanel
+			{chats}
+			{currentChatId}
+			on:selectChat={(e: CustomEvent<string>) => selectChat(e.detail)}
+		/>
+	{/if}
 
-					<div
-						class="card space-y-2 p-4"
-						class:preset-tonal={message.sender === 'ai'}
-						class:preset-tonal-primary={message.sender === 'user'}
-						class:rounded-tl-none={message.sender === 'ai'}
-						class:rounded-tr-none={message.sender === 'user'}
-					>
-						<header class="flex items-center justify-between">
-							<p class="font-bold">{message.name}</p>
-							<small class="opacity-50">{message.timestamp}</small>
-						</header>
+	<!-- Main Chat Area -->
+	<section class="card bg-surface-100-900 rounded-container flex-1 overflow-hidden p-4">
+		<div class="mb-2 flex justify-between">
+			<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
+				{showSidePanel ? 'Hide' : 'Show'} History
+			</button>
 
-						{#if message.content.type === 'text' && message.content.text}
-							<p>{message.content.text}</p>
-						{/if}
+			<button class="btn btn-sm preset-filled" on:click={startNewChat}> New Chat </button>
+		</div>
 
-						{#if message.content.type === 'movieList' && message.content.movies}
-							{#if message.content.text}
-								<p>{message.content.text}</p>
-							{/if}
-							<div class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
-								{#each message.content.movies as movie}
-									<div
-										class="card hover:ring-primary-500 w-full max-w-[150px] overflow-hidden transition-all hover:ring-2"
-									>
-										<div class="relative">
-											<img
-												src={movie.poster}
-												alt={movie.title}
-												class="h-[120px] w-full object-cover"
-											/>
-											<div
-												class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"
-											></div>
-											<div class="absolute bottom-0 left-0 p-2 text-white">
-												<h4 class="text-sm font-bold">{movie.title}</h4>
-												<div class="flex items-center gap-1 text-xs">
-													<span>{movie.year}</span>
-													<span class="flex items-center gap-1">
-														<Star size={10} class="text-yellow-400" />
-														{movie.rating}
-													</span>
-												</div>
-											</div>
-
-											<button
-												class="hover:bg-primary-500 absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full {isMovieSelected(
-													movie.id
-												)
-													? 'bg-primary-500'
-													: 'bg-black/70'} z-10 text-white"
-												on:click={() => toggleMovieSelection(movie)}
-											>
-												{#if isMovieSelected(movie.id)}
-													<Check size={14} />
-												{:else}
-													<Plus size={14} />
-												{/if}
-											</button>
-										</div>
-										<div class="p-2">
-											<div class="flex flex-wrap gap-1">
-												{#each movie.genres.slice(0, 2) as genre}
-													<span class="bg-surface-200-800 rounded-full p-1 px-1.5 py-0 text-xs"
-														>{genre}</span
-													>
-												{/each}
-											</div>
-										</div>
-									</div>
-								{/each}
-							</div>
-						{/if}
-					</div>
-
-					{#if message.sender === 'user'}
-						<Avatar
-							src={`https://i.pravatar.cc/?img=${message.avatar}`}
-							name={message.name}
-							classes="w-16"
-						/>
-					{/if}
-				</div>
-			{/each}
-		</section>
-
-		<!-- Selected movies -->
-		{#if selectedMovies.length > 0}
-			<div class="border-surface-200-800 flex items-center justify-between border-t p-2">
-				<div class="flex gap-2 overflow-x-auto">
-					{#each selectedMovies as movie}
-						<div class="relative w-16 flex-shrink-0">
-							<img src={movie.poster} alt={movie.title} class="h-24 w-16 rounded object-cover" />
-							<button
-								class="bg-primary-500 absolute flex h-5 w-5 items-center justify-center rounded-full text-white"
-								style={'top: 3px; left: 8px'}
-								on:click={() => toggleMovieSelection(movie)}
-							>
-								<Check size={12} />
-							</button>
-							<div class="absolute right-0 bottom-0 left-0 bg-black/80 p-1">
-								<p class="truncate text-xs text-white">{movie.title}</p>
-							</div>
-						</div>
-					{/each}
-				</div>
-
-				<div class="flex gap-2">
-					<nav class="btn-group preset-outlined-surface-200-800 flex-col p-1">
-						<button
-							type="button"
-							class="btn preset-filled flex items-center gap-1 p-2"
-							on:click={createListFromSelection}
-						>
-							<List size={16} />
-						</button>
-
-						<div class="relative">
-							<button
-								type="button"
-								class="btn hover:preset-tonal p-2"
-								on:click={() => (showActionsMenu = !showActionsMenu)}
-							>
-								<MoreVertical size={16} />
-							</button>
-
-							{#if showActionsMenu}
-								<div
-									class="bg-surface-100-800 actions-menu absolute right-0 bottom-full z-20 mb-1 w-48 rounded shadow-lg"
-									transition:fade
-								>
-									<ul class="py-1">
-										<li>
-											<button
-												class="hover:bg-primary-500/20 w-full px-4 py-2 text-left"
-												on:click={() => handleAction('watchlist')}
-											>
-												Add to Watchlist
-											</button>
-										</li>
-										<li>
-											<button
-												class="hover:bg-primary-500/20 w-full px-4 py-2 text-left"
-												on:click={() => handleAction('download')}
-											>
-												Request Downloads
-											</button>
-										</li>
-										<li>
-											<button
-												class="hover:bg-primary-500/20 w-full px-4 py-2 text-left"
-												on:click={() => handleAction('share')}
-											>
-												Share Selection
-											</button>
-										</li>
-									</ul>
-								</div>
-							{/if}
-						</div>
-					</nav>
-				</div>
-			</div>
-		{/if}
-
-		<!-- Input area -->
-		<section class="border-surface-200-800 border-t p-4">
-			<div
-				class="input-group divide-surface-200-800 rounded-container-token grid-cols-[1fr_auto] divide-x"
+		<div class="chat grid h-full w-full grid-rows-[1fr_auto_auto] pb-6">
+			<!-- Conversation -->
+			<section
+				bind:this={elemChat}
+				class="max-h-[600px] space-y-4 overflow-y-auto p-4 md:min-h-[500px]"
 			>
-				<textarea
-					bind:value={currentMessage}
-					class="textarea border-0 !bg-transparent !bg-none ring-0"
-					name="prompt"
-					placeholder="Ask about movies or select examples to get recommendations..."
-					rows="1"
-					on:keydown={onPromptKeydown}
-				></textarea>
-				<button
-					class="input-group-cell p-3 {currentMessage || selectedMovies.length > 0
-						? 'preset-filled-primary-500'
-						: 'preset-tonal'}"
-					on:click={sendMessage}
-				>
-					<Send size={18} />
-				</button>
-			</div>
-		</section>
-	</div>
-</section>
+				{#each messages as message (message.id)}
+					<ChatMessage
+						{message}
+						{selectedMovies}
+						on:toggleSelection={(e: CustomEvent<Movie>) => toggleMovieSelection(e.detail)}
+					/>
+				{/each}
+			</section>
+
+			<!-- Selected movies bar -->
+			{#if selectedMovies.length > 0}
+				<SelectedMoviesBar
+					{selectedMovies}
+					{showActionsMenu}
+					on:toggleSelection={(e: CustomEvent<Movie>) => toggleMovieSelection(e.detail)}
+					on:createList={createListFromSelection}
+					on:handleAction={(e: CustomEvent<string>) => handleAction(e.detail)}
+					on:toggleMenu={() => (showActionsMenu = !showActionsMenu)}
+				/>
+			{/if}
+
+			<!-- Input area -->
+			<ChatInput
+				bind:currentMessage
+				hasSelectedMovies={selectedMovies.length > 0}
+				on:sendMessage={sendMessage}
+			/>
+		</div>
+	</section>
+</div>
 
 <style>
 	:global(.full-page) {
