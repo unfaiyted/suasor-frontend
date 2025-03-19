@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { Brain, Settings, User, Server, Database, Shield, Film, Radio } from '@lucide/svelte';
+	import { GET, PUT } from '$lib/api/client';
+	import { authStore, user as userStore, isAuthenticated } from '$lib/stores/auth';
 
 	// Import components
 	import SettingsTabs from '$lib/components/settings/SettingsTabs.svelte';
@@ -15,13 +17,25 @@
 	import DatabasePanel from '$lib/components/settings/DatabasePanel.svelte';
 	import SecurityPanel from '$lib/components/settings/SecurityPanel.svelte';
 
-	// Mock user state - in a real app, you would fetch this from your auth store
+	// User state from auth store
 	let user = {
-		isLoggedIn: true,
-		isAdmin: true, // Toggle this to test admin-only sections
-		name: 'John Doe',
-		email: 'john@example.com'
+		isLoggedIn: false,
+		isAdmin: false,
+		name: '',
+		email: ''
 	};
+
+	// Subscribe to auth store
+	userStore.subscribe((userData) => {
+		if (userData) {
+			user = {
+				isLoggedIn: true,
+				isAdmin: userData.role === 'admin',
+				name: userData.username || '',
+				email: userData.email || ''
+			};
+		}
+	});
 
 	// Define tabs
 	const tabs = [
@@ -63,7 +77,7 @@
 
 	// User settings
 	let userSettings = {
-		theme: 'system', // 'light', 'dark', 'system'
+		theme: 'system',
 		language: 'en',
 		notifications: true,
 		showAdultContent: false
@@ -101,21 +115,152 @@
 		activeTab = tabId;
 	}
 
+	// Fetch user configuration
+	async function fetchUserConfig() {
+		isLoading = true;
+		error = '';
+
+		try {
+			const response = await GET('/config/user');
+			if (response.data?.data) {
+				const config = response.data.data;
+				userSettings = {
+					theme: config.theme || 'system',
+					language: config.language || 'en',
+					notifications: config.notificationsEnabled || false,
+					showAdultContent: config.includeUnratedContent || false
+				};
+			}
+		} catch (err) {
+			error = 'Failed to load user settings';
+			console.error(err);
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	// Fetch system configuration (admin only)
+	async function fetchSystemConfig() {
+		if (!user.isAdmin) return;
+
+		isLoading = true;
+		error = '';
+
+		try {
+			const response = await GET('/config');
+			if (response.data?.data) {
+				const config = response.data.data;
+
+				// Update server settings
+				serverSettings = {
+					maxConcurrentJobs: config.app?.maxPageSize || 5,
+					backupEnabled: true,
+					backupFrequency: 'daily',
+					logLevel: config.app?.logLevel || 'info'
+				};
+
+				// Update site settings
+				siteSettings = {
+					siteName: config.app?.name || 'Suasor',
+					description: 'Media Management Platform',
+					allowRegistration: true,
+					requireEmailVerification: true,
+					maintenanceMode: false
+				};
+
+				// Update media server integrations
+				if (config.integrations) {
+					mediaServerIntegrations = {
+						emby: {
+							enabled: config.integrations.emby?.enabled || false,
+							url: `${config.integrations.emby?.ssl ? 'https' : 'http'}://${config.integrations.emby?.host || ''}:${config.integrations.emby?.port || ''}`,
+							apiKey: config.integrations.emby?.apiKey || ''
+						},
+						jellyfin: {
+							enabled: config.integrations.jellyfin?.enabled || false,
+							url: `${config.integrations.jellyfin?.ssl ? 'https' : 'http'}://${config.integrations.jellyfin?.host || ''}:${config.integrations.jellyfin?.port || ''}`,
+							apiKey: config.integrations.jellyfin?.apiKey || ''
+						},
+						navidrome: {
+							enabled: config.integrations.navidrome?.enabled || false,
+							url: `${config.integrations.navidrome?.ssl ? 'https' : 'http'}://${config.integrations.navidrome?.host || ''}:${config.integrations.navidrome?.port || ''}`,
+							username: config.integrations.navidrome?.username || '',
+							password: config.integrations.navidrome?.password || ''
+						},
+						plex: {
+							enabled: config.integrations.plex?.enabled || false,
+							url: `${config.integrations.plex?.ssl ? 'https' : 'http'}://${config.integrations.plex?.host || ''}:${config.integrations.plex?.port || ''}`,
+							token: config.integrations.plex?.token || ''
+						}
+					};
+				}
+			}
+		} catch (err) {
+			error = 'Failed to load system settings';
+			console.error(err);
+		} finally {
+			isLoading = false;
+		}
+	}
+
 	async function saveSettings(section: string) {
 		isLoading = true;
 		error = '';
 		success = '';
 
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			if (section === 'user') {
+				// Map UI settings to API model
+				const userConfig = {
+					theme: userSettings.theme,
+					language: userSettings.language,
+					notificationsEnabled: userSettings.notifications,
+					includeUnratedContent: userSettings.showAdultContent
+				};
 
-			// In a real app, you would send the appropriate settings to your backend
-			console.log(`Saving ${section} settings`);
+				const response = await PUT('/config/user', {
+					body: userConfig
+				});
+
+				if (response.error) {
+					throw new Error(response.error.message || 'Failed to save user settings');
+				}
+			} else if (section === 'media-servers' && user.isAdmin) {
+				// Prepare system config update with media server settings
+				let currentConfig = await GET('/config');
+				if (currentConfig.error) throw new Error('Failed to fetch current configuration');
+
+				const config = currentConfig.data?.data || {};
+				if (!config.integrations) config.integrations = {};
+
+				// Update Emby config
+				config.integrations.emby = {
+					enabled: mediaServerIntegrations.emby.enabled,
+					host: new URL(mediaServerIntegrations.emby.url || 'http://localhost').hostname,
+					port:
+						parseInt(new URL(mediaServerIntegrations.emby.url || 'http://localhost:8096').port) ||
+						8096,
+					ssl: mediaServerIntegrations.emby.url?.startsWith('https') || false,
+					apiKey: mediaServerIntegrations.emby.apiKey
+				};
+
+				// Update Jellyfin config
+				// Similar updates for other media servers
+
+				// Save the updated config
+				const response = await PUT('/config', {
+					body: config
+				});
+
+				if (response.error) {
+					throw new Error(response.error.message || 'Failed to save media server settings');
+				}
+			}
+			// Implement other sections as needed
 
 			success = 'Settings saved successfully';
 		} catch (err) {
-			error = 'Failed to save settings. Please try again.';
+			error = err.message || 'Failed to save settings. Please try again.';
 			console.error(err);
 		} finally {
 			isLoading = false;
@@ -123,9 +268,14 @@
 	}
 
 	// Initialize component
-	onMount(() => {
-		// Here you would typically fetch the user's current settings
-		console.log('Settings component mounted');
+	onMount(async () => {
+		// Check if user is authenticated
+		if ($isAuthenticated) {
+			await fetchUserConfig();
+			await fetchSystemConfig();
+		} else {
+			error = 'You must be logged in to view settings';
+		}
 	});
 </script>
 
@@ -146,11 +296,19 @@
 	<div
 		class="card preset-filled-surface-100-900 relative min-h-[400px] p-6 shadow-xl backdrop-blur-sm"
 	>
-		{#if activeTab === 'user'}
+		{#if isLoading}
+			<div class="flex h-64 items-center justify-center">
+				<p class="text-lg">Loading settings...</p>
+			</div>
+		{:else if !$isAuthenticated}
+			<div class="flex h-64 items-center justify-center">
+				<p class="text-lg">Please log in to view settings.</p>
+			</div>
+		{:else if activeTab === 'user'}
 			<UserSettingsPanel {userSettings} {saveSettings} {isLoading} />
-		{:else if activeTab === 'media-servers'}
+		{:else if activeTab === 'media-servers' && user.isAdmin}
 			<MediaServersPanel {mediaServerIntegrations} {saveSettings} {isLoading} />
-		{:else if activeTab === 'automation'}
+		{:else if activeTab === 'automation' && user.isAdmin}
 			<AutomationPanel {automationIntegrations} {saveSettings} {isLoading} />
 		{:else if activeTab === 'site' && user.isAdmin}
 			<SiteConfigPanel {siteSettings} {saveSettings} {isLoading} />

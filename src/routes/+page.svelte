@@ -98,7 +98,7 @@
 			<div class="flex items-center justify-between">
 				<div>
 					<h1 class="text-primary-600 text-3xl font-bold">Media Compass</h1>
-					<p class="text-gray-600">Your personalized entertainment dashboard</p>
+					<p class="">Your personalized entertainment dashboard</p>
 				</div>
 				{#if $isAuthenticated}
 					<div class="flex items-center">
@@ -116,16 +116,16 @@
 
 		<!-- Stats Overview -->
 		<div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-			<div class="rounded-lg bg-white p-6 shadow-md">
-				<h3 class="mb-2 text-lg font-semibold text-gray-700">Movies</h3>
+			<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold">Movies</h3>
 				<div class="flex items-end justify-between">
 					<div>
 						<p class="text-primary-600 text-3xl font-bold">{recommendations.movies.count}</p>
-						<p class="text-sm text-gray-500">Recommendations</p>
+						<p class="text-sm">Recommendations</p>
 					</div>
 					<div class="text-right">
 						<p class="text-xl font-medium text-green-500">{recommendations.movies.watched}</p>
-						<p class="text-sm text-gray-500">Watched</p>
+						<p class="text-sm">Watched</p>
 					</div>
 				</div>
 				<div class="mt-4 h-2 w-full rounded-full bg-gray-200">
@@ -136,40 +136,41 @@
 				</div>
 			</div>
 
-			<div class="rounded-lg bg-white p-6 shadow-md">
-				<h3 class="mb-2 text-lg font-semibold text-gray-700">TV Shows</h3>
+			<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold">TV Shows</h3>
 				<div class="flex items-end justify-between">
 					<div>
 						<p class="text-primary-600 text-3xl font-bold">{recommendations.tvShows.count}</p>
-						<p class="text-sm text-gray-500">Recommendations</p>
+						<p class="text-sm">Recommendations</p>
 					</div>
 					<div class="text-right">
 						<p class="text-xl font-medium text-green-500">{recommendations.tvShows.watched}</p>
-						<p class="text-sm text-gray-500">Watched</p>
+						<p class="text-sm">Watched</p>
 					</div>
 				</div>
-				<div class="mt-2 text-sm text-gray-500">
-					<span class="font-medium">{recommendations.tvShows.episodes}</span> episodes tracked
-				</div>
-				<div class="mt-2 h-2 w-full rounded-full bg-gray-200">
+
+				<div class="mt-4 h-2 w-full rounded-full bg-gray-200">
 					<div
 						class="bg-primary-500 h-2 rounded-full"
 						style="width: {(recommendations.tvShows.watched / recommendations.tvShows.count) *
 							100}%"
 					></div>
 				</div>
+				<div class="mt-2 text-sm">
+					<span class="font-medium">{recommendations.tvShows.episodes}</span> episodes tracked
+				</div>
 			</div>
 
-			<div class="rounded-lg bg-white p-6 shadow-md">
-				<h3 class="mb-2 text-lg font-semibold text-gray-700">Music</h3>
+			<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
+				<h3 class="mb-2 text-lg font-semibold">Music</h3>
 				<div class="flex items-end justify-between">
 					<div>
 						<p class="text-primary-600 text-3xl font-bold">{recommendations.music.count}</p>
-						<p class="text-sm text-gray-500">Recommendations</p>
+						<p class="text-sm">Recommendations</p>
 					</div>
 					<div class="text-right">
 						<p class="text-xl font-medium text-green-500">{recommendations.music.listened}</p>
-						<p class="text-sm text-gray-500">Listened</p>
+						<p class="text-sm">Listened</p>
 					</div>
 				</div>
 				<div class="mt-4 h-2 w-full rounded-full bg-gray-200">
@@ -184,12 +185,12 @@
 		<!-- Main Dashboard Grid -->
 		<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
 			<!-- Recent Activity -->
-			<div class="rounded-lg bg-white p-6 shadow-md lg:col-span-2">
-				<h3 class="mb-4 text-lg font-semibold text-gray-700">Recent Activity</h3>
+			<div class="bg-surface-100-900 rounded-lg p-6 shadow-md lg:col-span-2">
+				<h3 class="mb-4 text-lg font-semibold">Recent Activity</h3>
 				<div class="divide-y divide-gray-200">
 					{#each recentActivity as activity}
 						<div class="flex items-center py-3">
-							<div class="mr-4 rounded-full bg-gray-100 p-2">
+							<div class="mr-4 rounded-full p-2">
 								<!-- Icon based on media type -->
 								{#if activity.type === 'movie'}
 									<svg class="text-primary-500 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -213,13 +214,13 @@
 							</div>
 							<div class="flex-grow">
 								<p class="font-medium">{activity.title}</p>
-								<p class="text-sm text-gray-500">
+								<p class="text-surface-700-300 text-sm">
 									<span class={getStatusColor(activity.status)}>{activity.status}</span> • {formatDate(
 										activity.date
 									)}
 								</p>
 							</div>
-							<div class="text-sm text-gray-500">
+							<div class="text-tertiary-500 text-sm">
 								{activity.source}
 							</div>
 						</div>
@@ -229,11 +230,11 @@
 			</div>
 
 			<!-- Integrations Status -->
-			<div class="rounded-lg bg-white p-6 shadow-md">
-				<h3 class="mb-4 text-lg font-semibold text-gray-700">Integrations</h3>
+			<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
+				<h3 class="mb-4 text-lg font-semibold">Integrations</h3>
 
 				<div class="mb-4">
-					<h4 class="mb-2 font-medium text-gray-600">Media Servers</h4>
+					<h4 class="text-tertiary-500 mb-2 font-medium">Media Servers</h4>
 					<ul class="space-y-2">
 						{#each integrationStatus.mediaServers as server}
 							<li class="flex items-center justify-between">
@@ -247,7 +248,7 @@
 				</div>
 
 				<div class="mb-4">
-					<h4 class="mb-2 font-medium text-gray-600">AI Models</h4>
+					<h4 class="text-tertiary-500 mb-2 font-medium">AI Models</h4>
 					<ul class="space-y-2">
 						{#each integrationStatus.aiModels as model}
 							<li class="flex items-center justify-between">
@@ -261,7 +262,7 @@
 				</div>
 
 				<div>
-					<h4 class="mb-2 font-medium text-gray-600">Automation Tools</h4>
+					<h4 class="text-tertiary-500 mb-2 font-medium">Automation Tools</h4>
 					<ul class="space-y-2">
 						{#each integrationStatus.automationTools as tool}
 							<li class="flex items-center justify-between">
@@ -286,8 +287,8 @@
 		</div>
 
 		<!-- Discovery Rate Chart -->
-		<div class="rounded-lg bg-white p-6 shadow-md">
-			<h3 class="mb-4 text-lg font-semibold text-gray-700">Media Discovery Rate</h3>
+		<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
+			<h3 class="mb-4 text-lg font-semibold">Media Discovery Rate</h3>
 			<div class="h-64">
 				<div class="flex h-full items-end">
 					{#each discoveryRate as month}

@@ -3,8 +3,10 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { Eye, EyeOff, Github, Mail } from '@lucide/svelte';
+	import { POST } from '$lib/api/client';
+	import { authStore } from '$lib/stores/auth';
 
-	let name = '';
+	let username = '';
 	let email = '';
 	let password = '';
 	let confirmPassword = '';
@@ -23,7 +25,7 @@
 	$: passwordsMatch = password === confirmPassword;
 
 	$: isPasswordValid = hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
-	$: isFormValid = name && email && isPasswordValid && passwordsMatch && agreeTerms;
+	$: isFormValid = username && email && isPasswordValid && passwordsMatch && agreeTerms;
 
 	function togglePasswordVisibility(field: 'password' | 'confirm') {
 		if (field === 'password') {
@@ -35,7 +37,7 @@
 
 	async function handleRegister() {
 		if (!isFormValid) {
-			if (!name || !email || !password || !confirmPassword) {
+			if (!username || !email || !password || !confirmPassword) {
 				error = 'Please fill in all required fields';
 			} else if (!passwordsMatch) {
 				error = 'Passwords do not match';
@@ -51,15 +53,37 @@
 		isLoading = true;
 
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Call the actual registration API endpoint
+			const response = await POST(
+				'/auth/register',
+				{
+					body: {
+						username,
+						email,
+						password
+					}
+				},
+				true
+			); // true means skipAuth - no need for auth on registration
 
-			// Replace with actual registration logic
-			console.log('Registering user:', { name, email });
-			goto('/login?registered=true');
-		} catch (err) {
-			error = 'Registration failed. Please try again.';
-			console.error(err);
+			if (response.error) {
+				// Handle API error response
+				error = response.error.message || 'Registration failed. Please try again.';
+				console.error('Registration error:', response.error);
+			} else {
+				// If registration returns auth data directly, we can log the user in
+				if (response.data?.data) {
+					// Some APIs return auth data directly on registration
+					// If that's the case, we could auto-login, but let's redirect to login for now
+					console.log('Registration successful');
+					goto('/login?registered=true');
+				} else {
+					goto('/login?registered=true');
+				}
+			}
+		} catch (err: any) {
+			error = err.message || 'Registration failed. Please try again.';
+			console.error('Registration error:', err);
 		} finally {
 			isLoading = false;
 		}
@@ -67,11 +91,10 @@
 
 	function handleSocialSignup(provider: string) {
 		isLoading = true;
-		// Implement social signup logic here
-		console.log(`Signing up with ${provider}`);
-		setTimeout(() => {
-			isLoading = false;
-		}, 1000);
+		// Social signup would be implemented here if supported by the API
+		console.log(`Signing up with ${provider} is not implemented yet`);
+		error = `${provider} authentication is not available at this time`;
+		isLoading = false;
 	}
 </script>
 
@@ -106,16 +129,16 @@
 			{/if}
 
 			<form on:submit|preventDefault={handleRegister} class="space-y-4">
-				<!-- Name Input -->
+				<!-- Username Input -->
 				<label class="label">
-					<span class="label-text">Full Name</span>
+					<span class="label-text">Username</span>
 					<input
 						type="text"
 						class="input !bg-surface-200-800"
-						placeholder="John Doe"
-						bind:value={name}
+						placeholder="johndoe"
+						bind:value={username}
 						required
-						autocomplete="name"
+						autocomplete="username"
 					/>
 				</label>
 
@@ -245,7 +268,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialSignup('google')}
+						on:click={() => handleSocialSignup('Google')}
 						disabled={isLoading}
 					>
 						<Mail size={18} />
@@ -254,7 +277,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialSignup('github')}
+						on:click={() => handleSocialSignup('GitHub')}
 						disabled={isLoading}
 					>
 						<Github size={18} />
