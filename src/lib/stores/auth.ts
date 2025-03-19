@@ -4,6 +4,7 @@ import { browser } from '$app/environment';
 import { createBaseStore, type BaseApiState } from './base';
 import { ApiError } from '$lib/api/errors';
 import { GET } from '$lib/api/client';
+import type { UserResponse } from '$lib/api/types';
 
 // Import the updated client methods
 import {
@@ -15,7 +16,7 @@ interface AuthState extends BaseApiState {
 	isAuthenticated: boolean;
 	accessToken: string | null;
 	refreshToken: string | null;
-	user: any | null;
+	user: UserResponse | null;
 	expiresAt: number | null;
 }
 
@@ -77,7 +78,7 @@ function createAuthStore() {
 						isAuthenticated: true,
 						accessToken: authData.accessToken,
 						refreshToken: authData.refreshToken,
-						user: authData.user,
+						user: authData.user as UserResponse,
 						expiresAt: authData.expiresAt || null,
 						loading: false,
 						error: null
@@ -215,13 +216,14 @@ function createAuthStore() {
 			console.log('Validating session');
 			try {
 				// Call a protected endpoint to validate the token
-				const response = await GET('/config/user');
+				const response = await GET('/auth/validate');
 
 				if (response.error) {
 					await this.logout();
 					return false;
 				}
 				if (response.data?.data) {
+					console.log('user', response.data?.data);
 					store.update((state) => ({
 						...state,
 						user: response.data.data
