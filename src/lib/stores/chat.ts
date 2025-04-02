@@ -1,6 +1,6 @@
 // src/lib/stores/chat.ts
 import { writable, derived, get } from 'svelte/store';
-import { createBaseStore, BaseApiState } from './base';
+import { createBaseStore } from './base';
 import { GET, POST } from '$lib/api/client';
 import type { 
   GenerateTextRequest, 
@@ -13,7 +13,9 @@ import type {
 import type { Movie, Chat, Message, MessageContent } from '$lib/components/chat/types';
 
 // Define the chat store state interface
-interface ChatState extends BaseApiState {
+interface ChatState {
+  loading: boolean;
+  error: ErrorResponse | null;
   chats: Chat[];
   currentChatId: string | null;
   messages: Message[];
