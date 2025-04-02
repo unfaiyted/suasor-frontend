@@ -1,24 +1,20 @@
 import { writable } from 'svelte/store';
-import createClient from 'openapi-fetch';
-import type { paths } from '$lib/api/portus.v1';
-import type { ShortenErrorResponse as ErrorResponse } from '$lib/api/types';
-
-// Base API configuration
-export const baseUrl = (import.meta.env.VITE_API_URL ?? 'http://localhost:8080') + '/api/v1';
-export const client = createClient<paths>({ baseUrl });
-
-// Helper for error handling
-export function handleApiError(err: unknown): ErrorResponse {
-	return {
-		message: err instanceof Error ? err.message : 'Unknown error',
-		type: err instanceof Error ? 'INTERNAL_ERROR' : 'INTERNAL_ERROR'
-	};
-}
+import { API_BASE_URL } from '$lib/api/client';
+import type { ErrorResponse } from '$lib/api/types';
 
 // Base state interface
 export interface BaseApiState {
 	loading: boolean;
 	error: ErrorResponse | null;
+}
+
+// Helper for error handling
+export function handleApiError(err: unknown): ErrorResponse {
+	return {
+		message: err instanceof Error ? err.message : 'Unknown error',
+		type: err instanceof Error ? 'BAD_REQUEST' : 'INTERNAL_ERROR',
+		details: err instanceof Error ? err.stack : undefined
+	};
 }
 
 // Create a base store with common functionality
@@ -28,8 +24,9 @@ export function createBaseStore<T extends BaseApiState>(initialState: T) {
 	return {
 		subscribe: store.subscribe,
 		update: store.update,
+		set: store.set,
 		setLoading: (loading: boolean) => {
-			store.update((state) => ({ ...state, loading, error: null }));
+			store.update((state) => ({ ...state, loading, ...(loading ? { error: null } : {}) }));
 		},
 		setError: (err: unknown) => {
 			const error = handleApiError(err);
