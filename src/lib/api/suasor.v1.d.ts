@@ -4,6 +4,243 @@
  */
 
 export interface paths {
+    "/admin/client/:clientType/:clientId/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Test media client connection
+         * @description Tests the connection to a media client using the provided configuration
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client type */
+                    clientType: string;
+                    /** @description Client ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Connection test result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_TestConnectionResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/generate-structured/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate structured data with AI
+         * @description Generates structured JSON data using the specified AI client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description Structured data generation request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.GenerateStructuredRequest"];
+                };
+            };
+            responses: {
+                /** @description Generated structured data */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_GenerateStructuredResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Client not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/generate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate text with AI
+         * @description Generates text using the specified AI client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description Text generation request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.GenerateTextRequest"];
+                };
+            };
+            responses: {
+                /** @description Generated text */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_GenerateTextResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Client not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -27,7 +264,7 @@ export interface paths {
             /** @description User login data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.LoginRequest"];
+                    "application/json": components["schemas"]["requests.LoginRequest"];
                 };
             };
             responses: {
@@ -37,7 +274,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_AuthData"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_AuthDataResponse"];
                     };
                 };
                 /** @description Invalid request format */
@@ -46,7 +283,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Invalid credentials or inactive account */
@@ -55,7 +292,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -64,7 +301,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -98,7 +335,7 @@ export interface paths {
             /** @description Logout data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.LogoutRequest"];
+                    "application/json": components["schemas"]["requests.LogoutRequest"];
                 };
             };
             responses: {
@@ -108,7 +345,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-any"];
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
                     };
                 };
                 /** @description Invalid request format */
@@ -117,7 +354,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Invalid refresh token */
@@ -126,7 +363,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -135,7 +372,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -169,7 +406,7 @@ export interface paths {
             /** @description Refresh token data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.RefreshTokenRequest"];
+                    "application/json": components["schemas"]["requests.RefreshTokenRequest"];
                 };
             };
             responses: {
@@ -179,7 +416,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_AuthData"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_AuthDataResponse"];
                     };
                 };
                 /** @description Invalid request format */
@@ -188,7 +425,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Invalid or expired refresh token */
@@ -197,7 +434,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -206,7 +443,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -240,7 +477,7 @@ export interface paths {
             /** @description User registration data */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.RegisterRequest"];
+                    "application/json": components["schemas"]["requests.RegisterRequest"];
                 };
             };
             responses: {
@@ -250,7 +487,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_AuthData"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_AuthDataResponse"];
                     };
                 };
                 /** @description Invalid request format */
@@ -259,7 +496,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Email or username already in use */
@@ -268,7 +505,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -277,7 +514,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -314,7 +551,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid or expired session token */
@@ -323,7 +560,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -332,7 +569,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -340,6 +577,2264 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get calendar from automation client
+         * @description Retrieves calendar events from the automation client
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Start date (YYYY-MM-DD) */
+                    start?: string;
+                    /** @description End date (YYYY-MM-DD) */
+                    end?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Calendar events retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID or dates */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/command": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Execute command on automation client
+         * @description Executes a command on the automation client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            /** @description Command details */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.ExecuteCommandRequest"];
+                };
+            };
+            responses: {
+                /** @description Command executed */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get library items from automation client
+         * @description Retrieves all library items from the automation client
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Limit */
+                    limit?: number;
+                    /** @description Offset */
+                    offset?: number;
+                    /** @description Sort by */
+                    sortBy?: string;
+                    /** @description Sort order */
+                    sortOrder?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Library items retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add media to automation client
+         * @description Adds a new media item to the automation client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            /** @description Media details */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.AddMediaRequest"];
+                };
+            };
+            responses: {
+                /** @description Media added */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/media/{mediaID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media by ID from automation client
+         * @description Retrieves a specific media item from the automation client
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Media ID */
+                    mediaID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client or media ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        /**
+         * Update media in automation client
+         * @description Updates an existing media item in the automation client
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Media ID */
+                    mediaID: string;
+                };
+                cookie?: never;
+            };
+            /** @description Media details */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.UpdateMediaRequest"];
+                };
+            };
+            responses: {
+                /** @description Media updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Delete media from automation client
+         * @description Deletes a media item from the automation client
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Media ID */
+                    mediaID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client or media ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/profiles/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get metadata profiles from automation client
+         * @description Retrieves all metadata profiles from the automation client
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Metadata profiles retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/profiles/quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get quality profiles from automation client
+         * @description Retrieves all quality profiles from the automation client
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Quality profiles retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search media in automation client
+         * @description Searches for media items in the automation client
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Search results */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID or query */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get automation client system status
+         * @description Retrieves system status information from the automation client
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description System status retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/automation/{clientID}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get tags from automation client
+         * @description Retrieves all tags from the automation client
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tags retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create tag in automation client
+         * @description Creates a new tag in the automation client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            /** @description Tag details */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.CreateTagRequest"];
+                };
+            };
+            responses: {
+                /** @description Tag created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.EmptyAPIResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all media clients
+         * @description Retrieves all media client configurations for the user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media clients retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_ClientResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create a new media client
+         * @description Creates a new media client configuration
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Media client data */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.SwaggerClientRequest"];
+                };
+            };
+            responses: {
+                /** @description Media client created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_ClientResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all collections
+         * @description Retrieves all collections from the client
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Maximum number of collections to return */
+                    count?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Collections retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/collections/{collectionID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get collection by ID
+         * @description Retrieves a specific collection from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Collection ID */
+                    collectionID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Collection retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/movies/{movieID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get movie by ID
+         * @description Retrieves a specific movie from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Movie ID */
+                    movieID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movie retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/music/albums/{albumID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get album by ID
+         * @description Retrieves a specific music album from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Album ID */
+                    albumID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Album retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/music/albums/{albumID}/tracks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get tracks by album
+         * @description Retrieves all tracks for a specific album
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Album ID */
+                    albumID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tracks retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Track"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/music/artists/{artistID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get artist by ID
+         * @description Retrieves a specific music artist from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Artist ID */
+                    artistID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Artist retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Artist"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/music/artists/{artistID}/albums": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get albums by artist
+         * @description Retrieves all albums for a specific artist
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Artist ID */
+                    artistID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Albums retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/music/tracks/{trackID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get track by ID
+         * @description Retrieves a specific music track from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Track ID */
+                    trackID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Track retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Track"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/playlists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all playlists
+         * @description Retrieves all playlists from the client
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Maximum number of playlists to return */
+                    count?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Playlists retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Playlist"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create a new playlist
+         * @description Creates a new playlist on the specified client
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                };
+                cookie?: never;
+            };
+            /** @description Playlist creation data */
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description Playlist created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Playlist"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/playlists/{playlistID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get playlist by ID
+         * @description Retrieves a specific playlist from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Playlist ID */
+                    playlistID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Playlist retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Playlist"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        /**
+         * Update a playlist
+         * @description Updates an existing playlist on the specified client
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Playlist ID */
+                    playlistID: string;
+                };
+                cookie?: never;
+            };
+            /** @description Playlist update data */
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description Playlist updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Playlist"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Delete a playlist
+         * @description Deletes a playlist from the specified client
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Playlist ID */
+                    playlistID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Playlist deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-string"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/playlists/{playlistID}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add an item to a playlist
+         * @description Adds a media item to an existing playlist
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Playlist ID */
+                    playlistID: string;
+                };
+                cookie?: never;
+            };
+            /** @description Item to add */
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description Item added to playlist */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-string"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/playlists/{playlistID}/items/{itemID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove an item from a playlist
+         * @description Removes a media item from an existing playlist
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Playlist ID */
+                    playlistID: string;
+                    /** @description Item ID to remove */
+                    itemID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Item removed from playlist */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-string"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/series/{seriesID}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by ID
+         * @description Retrieves a specific TV series from the client by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Series ID */
+                    seriesID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{clientID}/series/{seriesID}/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get seasons for a series
+         * @description Retrieves all seasons for a specific TV series
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientID: number;
+                    /** @description Series ID */
+                    seriesID: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Seasons retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete media client
+         * @description Deletes a media client configuration
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media client deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_EmptyResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Client not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -371,7 +2866,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_Configuration"];
+                        "application/json": components["schemas"]["responses.APIResponse-types_Configuration"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -380,7 +2875,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - admin access required */
@@ -389,7 +2884,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -398,7 +2893,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -414,7 +2909,7 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody: components["requestBodies"]["models.Configuration"];
+            requestBody: components["requestBodies"]["types.Configuration"];
             responses: {
                 /** @description Configuration updated successfully */
                 200: {
@@ -422,7 +2917,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-any"];
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
                     };
                 };
                 /** @description Invalid request format */
@@ -431,7 +2926,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -440,7 +2935,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - admin access required */
@@ -449,7 +2944,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -458,7 +2953,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -496,7 +2991,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_Configuration"];
+                        "application/json": components["schemas"]["responses.APIResponse-types_Configuration"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -505,7 +3000,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - admin access required */
@@ -514,7 +3009,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -523,7 +3018,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -539,7 +3034,7 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody: components["requestBodies"]["models.Configuration"];
+            requestBody: components["requestBodies"]["types.Configuration"];
             responses: {
                 /** @description Configuration saved to file successfully */
                 200: {
@@ -547,7 +3042,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-any"];
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
                     };
                 };
                 /** @description Invalid request format */
@@ -556,7 +3051,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -565,7 +3060,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - admin access required */
@@ -574,7 +3069,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -583,7 +3078,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -623,7 +3118,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-any"];
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -632,7 +3127,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - admin access required */
@@ -641,7 +3136,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -650,7 +3145,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -687,7 +3182,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserConfig"];
+                        "application/json": components["schemas"]["responses.APIResponse-models_UserConfig"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -696,7 +3191,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -705,7 +3200,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -734,7 +3229,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-any"];
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
                     };
                 };
                 /** @description Invalid request format */
@@ -743,7 +3238,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized access */
@@ -752,7 +3247,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -761,7 +3256,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -799,7 +3294,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.HealthResponse"];
+                        "application/json": components["schemas"]["responses.HealthResponse"];
                     };
                 };
                 /** @description Internal Server Error */
@@ -808,7 +3303,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -821,149 +3316,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/shorten": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create a shortened URL
-         * @description Creates a new shortened URL from a long URL, with optional custom code and expiration. If no custom code is provided, one will be generated.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description URL to shorten */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["models.ShortenRequest"];
-                };
-            };
-            responses: {
-                /** @description Successfully created shortened URL */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_ShortenData"];
-                    };
-                };
-                /** @description Invalid request format or short code already exists */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/shorten/lookup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Check if a URL is already shortened
-         * @description Checks if an original URL already has a short code and optionally creates one if it doesn't exist
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Original URL to check */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["models.GetByOriginalURLRequest"];
-                };
-            };
-            responses: {
-                /** @description Successfully retrieved shortened URL information */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_ShortenData"];
-                    };
-                };
-                /** @description Successfully created new shortened URL */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_ShortenData"];
-                    };
-                };
-                /** @description Invalid request format */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-                /** @description Original URL not found and createIfNotExists is false */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/shorten/{code}": {
+    "/movies/genre/{genre}": {
         parameters: {
             query?: never;
             header?: never;
@@ -971,96 +3324,37 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Redirect to original URL
-         * @description Redirects to the original URL from a short code
+         * Get movies by genre
+         * @description Retrieves movies from all connected clients that match the specified genre
          */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description Short code identifier */
-                    code: string;
+                    /** @description Genre name */
+                    genre: string;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Found - Redirects to the original URL */
-                302: {
-                    headers: {
-                        /** @description The URL to redirect to */
-                        Location?: string;
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Bad request - missing code parameter */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-                /** @description Short URL not found or has expired */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-            };
-        };
-        /**
-         * Update a shortened URL
-         * @description Updates an existing shortened URL by its short code
-         */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Short code identifier */
-                    code: string;
-                };
-                cookie?: never;
-            };
-            /** @description Updated URL data */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["models.ShortenRequest"];
-                };
-            };
-            responses: {
-                /** @description Successfully updated shortened URL */
+                /** @description Movies retrieved */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_ShortenData"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
                     };
                 };
-                /** @description Invalid request format */
-                400: {
+                /** @description Unauthorized */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
-                    };
-                };
-                /** @description Short URL not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1069,51 +3363,67 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
         };
+        put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/year/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         /**
-         * Delete a shortened URL
-         * @description Deletes an existing shortened URL by its short code
+         * Get movies by release year
+         * @description Retrieves movies from all connected clients that were released in the specified year
          */
-        delete: {
+        get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description Short code identifier */
-                    code: string;
+                    /** @description Release year */
+                    year: number;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description No Content - URL successfully deleted */
-                204: {
+                /** @description Movies retrieved */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
                 };
-                /** @description Bad request - missing code parameter */
+                /** @description Invalid year */
                 400: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
-                /** @description Short URL not found */
-                404: {
+                /** @description Unauthorized */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1122,11 +3432,1204 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
         };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/albums/genre/{genre}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get albums by genre
+         * @description Retrieves albums from all connected clients that match the specified genre
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Genre name */
+                    genre: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Albums retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/albums/latest/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get latest albums by added date
+         * @description Retrieves the most recently added albums
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of albums to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Albums retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/albums/popular/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get popular albums
+         * @description Retrieves most popular albums
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of albums to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Albums retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/albums/year/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get albums by release year
+         * @description Retrieves albums from all connected clients that were released in the specified year
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Release year */
+                    year: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Albums retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Album"];
+                    };
+                };
+                /** @description Invalid year */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/artists/genre/{genre}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get artists by genre
+         * @description Retrieves artists from all connected clients that match the specified genre
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Genre name */
+                    genre: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Artists retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Artist"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/artists/popular/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get popular artists
+         * @description Retrieves most popular artists
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of artists to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Artists retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Artist"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search music (artists, albums, tracks)
+         * @description Search for music across all connected clients
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Music search results retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid query */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/music/tracks/genre/{genre}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get tracks by genre
+         * @description Retrieves tracks from all connected clients that match the specified genre
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Genre name */
+                    genre: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tracks retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Track"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/playlists/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search playlists
+         * @description Searches for playlists matching the given query
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Playlists found */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Playlist"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/actor/{actor}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by actor
+         * @description Retrieves TV series featuring a specific actor
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Actor name */
+                    actor: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/creator/{creator}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by creator
+         * @description Retrieves TV series by a specific creator/director
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Creator name */
+                    creator: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/genre/{genre}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by genre
+         * @description Retrieves TV series from all connected clients that match the specified genre
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Genre name */
+                    genre: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/latest/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get latest series by added date
+         * @description Retrieves the most recently added TV series
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of series to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/popular/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get popular series
+         * @description Retrieves most popular TV series
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of series to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by rating range
+         * @description Retrieves TV series with ratings within the specified range
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Minimum rating */
+                    min: number;
+                    /** @description Maximum rating */
+                    max: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid rating parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search series
+         * @description Search for TV series across all connected clients
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid query */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/top-rated/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get top rated series
+         * @description Retrieves the highest rated TV series
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of series to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid count */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/year/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get series by release year
+         * @description Retrieves TV series from all connected clients that were released in the specified year
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Release year */
+                    year: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Series retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                    };
+                };
+                /** @description Invalid year */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1154,7 +4657,7 @@ export interface paths {
             /** @description Password change information */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.ChangePasswordRequest"];
+                    "application/json": components["schemas"]["requests.ChangePasswordRequest"];
                 };
             };
             responses: {
@@ -1164,7 +4667,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-string"];
+                        "application/json": components["schemas"]["responses.APIResponse-string"];
                     };
                 };
                 /** @description Invalid request format or incorrect current password */
@@ -1173,7 +4676,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1182,7 +4685,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1191,7 +4694,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1229,7 +4732,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1238,7 +4741,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1247,7 +4750,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1266,7 +4769,7 @@ export interface paths {
             /** @description Updated profile information */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.UpdateProfileRequest"];
+                    "application/json": components["schemas"]["requests.ProfileRequest"];
                 };
             };
             responses: {
@@ -1276,7 +4779,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid request format or email/username already exists */
@@ -1285,7 +4788,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1294,7 +4797,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1303,7 +4806,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1338,7 +4841,7 @@ export interface paths {
             /** @description User registration information */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.RegisterRequest"];
+                    "application/json": components["schemas"]["requests.RegisterRequest"];
                 };
             };
             responses: {
@@ -1348,7 +4851,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid request format or email/username already exists */
@@ -1357,7 +4860,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1366,7 +4869,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1406,7 +4909,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid user ID format */
@@ -1415,7 +4918,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1424,7 +4927,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - Not an admin */
@@ -1433,7 +4936,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description User not found */
@@ -1442,7 +4945,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1451,7 +4954,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1487,7 +4990,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1496,7 +4999,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - Not an admin */
@@ -1505,7 +5008,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description User not found */
@@ -1514,7 +5017,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1523,7 +5026,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": components["schemas"]["models.ErrorResponse-error"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1564,7 +5067,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid user ID format */
@@ -1573,7 +5076,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1582,7 +5085,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - Not an admin */
@@ -1591,7 +5094,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description User not found */
@@ -1600,7 +5103,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1609,7 +5112,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1651,7 +5154,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid user ID format */
@@ -1660,7 +5163,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1669,7 +5172,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - Not an admin */
@@ -1678,7 +5181,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description User not found */
@@ -1687,7 +5190,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1696,7 +5199,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1732,7 +5235,7 @@ export interface paths {
             /** @description New role information */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["models.ChangeRoleRequest"];
+                    "application/json": components["schemas"]["requests.ChangeRoleRequest"];
                 };
             };
             responses: {
@@ -1742,7 +5245,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.APIResponse-models_UserResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_UserResponse"];
                     };
                 };
                 /** @description Invalid user ID format or invalid role */
@@ -1751,7 +5254,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized - Not logged in */
@@ -1760,7 +5263,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Forbidden - Not an admin */
@@ -1769,7 +5272,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description User not found */
@@ -1778,7 +5281,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -1787,7 +5290,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["models.ErrorResponse-error"];
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -1803,402 +5306,79 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        "models.APIResponse-any": {
-            data?: unknown;
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-models_AuthData": {
-            data?: components["schemas"]["models.AuthData"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-models_Configuration": {
-            data?: components["schemas"]["models.Configuration"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-models_ShortenData": {
-            data?: components["schemas"]["models.ShortenData"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-models_UserConfig": {
-            data?: components["schemas"]["models.UserConfig"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-models_UserResponse": {
-            data?: components["schemas"]["models.UserResponse"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "models.APIResponse-string": {
-            data?: string;
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        /** @description Authentication data returned to client after successful authentication */
-        "models.AuthData": {
-            /** @description AccessToken is the JWT token for API access
-             *     @Description JWT access token for authenticated requests
-             *     @Example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." */
-            accessToken?: string;
-            /** @description ExpiresAt indicates when the access token expires
-             *     @Description UNIX timestamp when the access token expires
-             *     @Example 1674140400 */
-            expiresAt?: number;
-            /** @description RefreshToken is used to get new access tokens
-             *     @Description JWT refresh token for obtaining new access tokens
-             *     @Example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." */
-            refreshToken?: string;
-            /** @description User contains the user profile information
-             *     @Description User profile data */
-            user?: components["schemas"]["models.UserResponse"];
-        };
-        /** @description Request payload for changing user password */
-        "models.ChangePasswordRequest": {
-            /**
-             * @description CurrentPassword is the user's existing password for verification
-             *     @Description User's current password for verification
-             *     @Example "oldpassword123"
-             * @example oldpassword123
-             */
-            currentPassword: string;
-            /**
-             * @description NewPassword is the password to change to
-             *     @Description New password to set for the user
-             *     @Example "newpassword456"
-             * @example newpassword456
-             */
-            newPassword: string;
-        };
-        /** @description Request payload for changing user role */
-        "models.ChangeRoleRequest": {
-            /**
-             * @description Role is the new role to assign to the user
-             *     @Description New role to assign to the user
-             *     @Enum "user" "admin"
-             *     @Example "admin"
-             * @example admin
-             * @enum {string}
-             */
-            role: ModelsChangeRoleRequestRole;
-        };
-        /** @description Complete application configuration settings */
-        "models.Configuration": {
-            /** @description App contains core application settings */
-            app?: {
-                /** @example http://localhost:8080 */
-                apiBaseURL: string;
-                /** @example http://localhost:3000 */
-                appURL: string;
-                /**
-                 * @example development
-                 * @enum {string}
-                 */
-                environment: ModelsConfigurationAppEnvironment;
-                /**
-                 * @example info
-                 * @enum {string}
-                 */
-                logLevel: ModelsConfigurationAppLogLevel;
-                /** @example 100 */
-                maxPageSize: number;
-                /** @example suasor */
-                name: string;
-            };
-            /** @description Auth contains authentication settings */
-            auth?: {
-                /**
-                 * @description New fields to add
-                 * @example 15
-                 */
-                accessExpiryMinutes: number;
-                /** @example [
-                 *       "http://localhost:3000"
-                 *     ] */
-                allowedOrigins?: string[];
-                /** @example false */
-                enable2FA?: boolean;
-                /** @example true */
-                enableLocal?: boolean;
-                /** @example your-secret-key */
-                jwtSecret: string;
-                /** @example 7 */
-                refreshExpiryDays: number;
-                /** @example 60 */
-                sessionTimeout: number;
-                /** @example suasor-client */
-                tokenAudience: string;
-                /** @example 24 */
-                tokenExpiration: number;
-                /** @example suasor-api */
-                tokenIssuer: string;
-            };
-            /** @description Database contains database connection settings */
-            db?: {
-                /** @example localhost */
-                host: string;
-                /** @example 20 */
-                maxConns: number;
-                /** @example suasor */
-                name: string;
-                /** @example yourpassword */
-                password: string;
-                /** @example 5432 */
-                port: string;
-                /** @example 30 */
-                timeout: number;
-                /** @example postgres_user */
-                user: string;
-            };
-            /** @description HTTP contains HTTP server configuration */
-            http?: {
-                /** @example false */
-                enableSSL?: boolean;
-                /** @example 60 */
-                idleTimeout: number;
-                /** @example 8080 */
-                port: string;
-                /** @example false */
-                proxyEnabled?: boolean;
-                /** @example http://proxy:8080 */
-                proxyURL?: string;
-                /** @example true */
-                rateLimitEnabled?: boolean;
-                /** @example 30 */
-                readTimeout: number;
-                /** @example 100 */
-                requestsPerMin?: number;
-                /** @example /path/to/cert.pem */
-                sslCert?: string;
-                /** @example /path/to/key.pem */
-                sslKey?: string;
-                /** @example 30 */
-                writeTimeout: number;
-            };
-            /** @description Integrations contains all third-party service configurations */
-            integrations?: {
-                emby?: components["schemas"]["models.EmbyConfig"];
-                jellyfin?: components["schemas"]["models.JellyfinConfig"];
-                navidrome?: components["schemas"]["models.NavidromeConfig"];
-                plex?: components["schemas"]["models.PlexConfig"];
-                spotify?: components["schemas"]["models.SpotifyConfig"];
-                trakt?: components["schemas"]["models.TraktConfig"];
-            };
-        };
-        /** @description Emby media server configuration */
-        "models.EmbyConfig": {
-            /** @example your-api-key */
-            apiKey?: string;
-            /** @example false */
-            enabled?: boolean;
-            /** @example localhost */
-            host?: string;
-            /** @example 8096 */
-            port?: number;
-            /** @example false */
-            ssl?: boolean;
-            /** @example admin */
-            username?: string;
-        };
-        "models.ErrorResponse-error": {
-            details?: unknown;
-            /** @example This is a pretty message */
-            message?: string;
-            request_id?: string;
-            /** @example 201 */
-            statusCode?: number;
-            timestamp?: string;
-            /** @example FAILED_CHECK */
-            type?: components["schemas"]["models.ErrorType"];
-        };
         /** @enum {string} */
-        "models.ErrorType": ModelsErrorType;
-        "models.GetByOriginalURLRequest": {
-            createIfNotExists?: boolean;
-            customCode?: string;
-            expiresAfter?: number;
-            originalUrl: string;
-        };
-        "models.HealthResponse": {
-            /** @example true */
-            application: boolean;
-            /** @example true */
-            database: boolean;
-            /**
-             * @description Overall status of the system
-             * @example up
-             * @enum {string}
-             */
-            status: ModelsHealthResponseStatus;
-        };
-        /** @description Jellyfin media server configuration */
-        "models.JellyfinConfig": {
-            /** @example your-api-key */
-            apiKey?: string;
-            /** @example false */
-            enabled?: boolean;
-            /** @example localhost */
-            host?: string;
-            /** @example 8096 */
-            port?: number;
-            /** @example false */
-            ssl?: boolean;
-            /** @example admin */
-            username?: string;
-        };
-        /** @description Request payload for user login */
-        "models.LoginRequest": {
-            /**
-             * @description Email is the user's email address
-             *     @Description User's email address
-             *     @Example "user@example.com"
-             * @example user@example.com
-             */
-            email: string;
-            /** @description Password is the user's chosen password
-             *     @Description User's password (plain text in request) */
-            password: string;
-        };
-        /** @description Request payload for user logout */
-        "models.LogoutRequest": {
-            /** @description RefreshToken identifies the session to terminate
-             *     @Description JWT refresh token to invalidate */
-            refreshToken: string;
-        };
-        /** @description Supersonic music server configuration */
-        "models.NavidromeConfig": {
-            /** @example false */
-            enabled?: boolean;
-            /** @example localhost */
-            host?: string;
-            /** @example your-password */
-            password?: string;
-            /** @example 4533 */
-            port?: number;
-            /** @example false */
-            ssl?: boolean;
-            /** @example admin */
-            username?: string;
-        };
-        /** @description Plex media server configuration */
-        "models.PlexConfig": {
-            /** @example false */
-            enabled?: boolean;
-            /** @example localhost */
-            host?: string;
-            /** @example 32400 */
-            port?: number;
-            /** @example false */
-            ssl?: boolean;
-            /** @example your-plex-token */
-            token?: string;
-        };
-        /** @description Request payload for refreshing access tokens */
-        "models.RefreshTokenRequest": {
-            /** @description RefreshToken is used to generate a new access token
-             *     @Description JWT refresh token to use for generating new access token */
-            refreshToken: string;
-        };
-        /** @description Request payload for user registration */
-        "models.RegisterRequest": {
-            /**
-             * @description Email is the user's email address
-             *     @Description User's email address
-             *     @Example "user@example.com"
-             * @example user@example.com
-             */
-            email: string;
-            /** @description Password is the user's chosen password
-             *     @Description User's password (plain text in request) */
-            password: string;
-            /**
-             * @description Username is the user's desired username
-             *     @Description User's chosen username
-             *     @Example "johndoe"
-             * @example johndoe
-             */
-            username: string;
-        };
-        "models.Shorten": {
-            /** @example 0 */
-            clickCount?: number;
+        "errors.ErrorType": ErrorsErrorType;
+        "models.MediaItem-types_Album": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
             createdAt?: string;
-            expiresAt?: string;
-            /** @example 1 */
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Album"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
             id?: number;
-            /** @example https://example.com/some/long/path */
-            originalUrl: string;
-            /** @example abc123 */
-            shortCode?: string;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
             updatedAt?: string;
         };
-        "models.ShortenData": {
-            shortUrl?: string;
-            shorten?: components["schemas"]["models.Shorten"];
+        "models.MediaItem-types_Artist": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Artist"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
+            id?: number;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
         };
-        "models.ShortenRequest": {
-            customCode?: string;
-            /** @description In days */
-            expiresAfter?: number;
-            originalUrl: string;
+        "models.MediaItem-types_Playlist": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Playlist"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
+            id?: number;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
         };
-        /** @description Spotify configuration */
-        "models.SpotifyConfig": {
-            /** @example your-client-id */
-            clientId?: string;
-            /** @example your-client-secret */
-            clientSecret?: string;
-            /** @example false */
-            enabled?: boolean;
-            /** @example http://localhost:8080/callback */
-            redirectUri?: string;
-            /** @example user-library-read playlist-read-private */
-            scopes?: string;
-        };
-        /** @description Trakt.tv configuration */
-        "models.TraktConfig": {
-            /** @example your-client-id */
-            clientId?: string;
-            /** @example your-client-secret */
-            clientSecret?: string;
-            /** @example false */
-            enabled?: boolean;
-            /** @example http://localhost:8080/callback */
-            redirectUri?: string;
-        };
-        /** @description Request payload for updating user profile */
-        "models.UpdateProfileRequest": {
-            /**
-             * @description Email is the new email address
-             *     @Description Updated email address for the user
-             *     @Example "newemail@example.com"
-             * @example newemail@example.com
-             */
-            email?: string;
-            /**
-             * @description Username is the new username
-             *     @Description Updated username for the user
-             *     @Example "newusername"
-             * @example newusername
-             */
-            username?: string;
+        "models.MediaItem-types_Track": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Track"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
+            id?: number;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
         };
         /** @description User-specific configuration stored in the database */
         "models.UserConfig": {
@@ -2288,8 +5468,430 @@ export interface components {
             /** @description UserID links this config to a specific user */
             userId?: number;
         };
+        "requests.AddMediaRequest": {
+            /** @description For Lidarr */
+            metadataProfileID?: number;
+            monitored?: boolean;
+            /** @description For Lidarr (music) */
+            musicBrainzID?: string;
+            path?: string;
+            qualityProfileID?: number;
+            /** @description Whether to search for the media after adding */
+            searchForMedia?: boolean;
+            tags?: number[];
+            title?: string;
+            /** @description For Radarr (movies) */
+            tmdbid?: number;
+            /** @description For Sonarr (TV shows) */
+            tvdbid?: number;
+            year?: number;
+        };
+        /** @description Request payload for changing user password */
+        "requests.ChangePasswordRequest": {
+            /**
+             * @description CurrentPassword is the user's existing password for verification
+             *     @Description User's current password for verification
+             *     @Example "oldpassword123"
+             * @example oldpassword123
+             */
+            currentPassword: string;
+            /**
+             * @description NewPassword is the password to change to
+             *     @Description New password to set for the user
+             *     @Example "newpassword456"
+             * @example newpassword456
+             */
+            newPassword: string;
+        };
+        /** @description Request payload for changing user role */
+        "requests.ChangeRoleRequest": {
+            /**
+             * @description Role is the new role to assign to the user
+             *     @Description New role to assign to the user
+             *     @Enum "user" "admin"
+             *     @Example "admin"
+             * @example admin
+             * @enum {string}
+             */
+            role: RequestsChangeRoleRequestRole;
+        };
+        "requests.CreateTagRequest": {
+            name: string;
+        };
+        "requests.ExecuteCommandRequest": {
+            command: string;
+            parameters?: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description Request for generating structured JSON data with an AI client */
+        "requests.GenerateStructuredRequest": {
+            /** @description Maximum number of tokens to generate
+             *     example: 500 */
+            maxTokens?: number;
+            /** @description The prompt text to generate structured data from
+             *     required: true
+             *     example: Create a JSON object representing three programming languages */
+            prompt: string;
+            /** @description Optional system instructions to guide the AI
+             *     example: You are a helpful assistant specializing in structured data generation */
+            systemInstructions?: string;
+            /** @description Temperature for AI response (0.0 to 1.0)
+             *     example: 0.2 */
+            temperature?: number;
+        };
+        /** @description Request for generating text with an AI client */
+        "requests.GenerateTextRequest": {
+            /** @description Maximum number of tokens to generate
+             *     example: 500 */
+            maxTokens?: number;
+            /** @description The prompt text to generate from
+             *     required: true
+             *     example: Write a short poem about programming */
+            prompt: string;
+            /** @description Optional system instructions to guide the AI
+             *     example: You are a helpful assistant specializing in creative writing */
+            systemInstructions?: string;
+            /** @description Temperature for AI response (0.0 to 1.0)
+             *     example: 0.7 */
+            temperature?: number;
+        };
+        /** @description Request payload for user login */
+        "requests.LoginRequest": {
+            /**
+             * @description Email is the user's email address
+             *     @Description User's email address
+             *     @Example "user@example.com"
+             * @example user@example.com
+             */
+            email: string;
+            /** @description Password is the user's chosen password
+             *     @Description User's password (plain text in request) */
+            password: string;
+        };
+        /** @description Request payload for user logout */
+        "requests.LogoutRequest": {
+            /** @description RefreshToken identifies the session to terminate
+             *     @Description JWT refresh token to invalidate */
+            refreshToken: string;
+        };
+        /** @description Request payload for updating user profile */
+        "requests.ProfileRequest": {
+            /**
+             * @description Email is the new email address
+             *     @Description Updated email address for the user
+             *     @Example "newemail@example.com"
+             * @example newemail@example.com
+             */
+            email?: string;
+            /**
+             * @description Username is the new username
+             *     @Description Updated username for the user
+             *     @Example "newusername"
+             * @example newusername
+             */
+            username?: string;
+        };
+        /** @description Request payload for refreshing access tokens */
+        "requests.RefreshTokenRequest": {
+            /** @description RefreshToken is used to generate a new access token
+             *     @Description JWT refresh token to use for generating new access token */
+            refreshToken: string;
+        };
+        /** @description Request payload for user registration */
+        "requests.RegisterRequest": {
+            /**
+             * @description Email is the user's email address
+             *     @Description User's email address
+             *     @Example "user@example.com"
+             * @example user@example.com
+             */
+            email: string;
+            /** @description Password is the user's chosen password
+             *     @Description User's password (plain text in request) */
+            password: string;
+            /**
+             * @description Username is the user's desired username
+             *     @Description User's chosen username
+             *     @Example "johndoe"
+             * @example johndoe
+             */
+            username: string;
+        };
+        "requests.SwaggerClientRequest": {
+            client?: unknown;
+            clientID?: number;
+            clientType: components["schemas"]["types.ClientType"];
+            isEnabled?: boolean;
+            name: string;
+        };
+        "requests.UpdateMediaRequest": {
+            /** @description For Lidarr */
+            metadataProfileID?: number;
+            monitored?: boolean;
+            path?: string;
+            qualityProfileID?: number;
+            tags?: number[];
+        };
+        "responses.APIResponse-any": {
+            data?: unknown;
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaItem-types_Album": {
+            data?: components["schemas"]["models.MediaItem-types_Album"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaItem-types_Artist": {
+            data?: components["schemas"]["models.MediaItem-types_Artist"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaItem-types_Playlist": {
+            data?: components["schemas"]["models.MediaItem-types_Playlist"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaItem-types_Track": {
+            data?: components["schemas"]["models.MediaItem-types_Track"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_responses_ClientResponse": {
+            data?: components["schemas"]["responses.ClientResponse"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_responses_MediaItemResponse": {
+            data?: components["schemas"]["responses.MediaItemResponse"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaItem-types_Album": {
+            data?: components["schemas"]["models.MediaItem-types_Album"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaItem-types_Artist": {
+            data?: components["schemas"]["models.MediaItem-types_Artist"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaItem-types_Playlist": {
+            data?: components["schemas"]["models.MediaItem-types_Playlist"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaItem-types_Track": {
+            data?: components["schemas"]["models.MediaItem-types_Track"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_UserConfig": {
+            data?: components["schemas"]["models.UserConfig"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_AuthDataResponse": {
+            data?: components["schemas"]["responses.AuthDataResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_ClientResponse": {
+            data?: components["schemas"]["responses.ClientResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_EmptyResponse": {
+            data?: components["schemas"]["responses.EmptyResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_GenerateStructuredResponse": {
+            data?: components["schemas"]["responses.GenerateStructuredResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_GenerateTextResponse": {
+            data?: components["schemas"]["responses.GenerateTextResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_MediaItemResponse": {
+            data?: components["schemas"]["responses.MediaItemResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_TestConnectionResponse": {
+            data?: components["schemas"]["responses.TestConnectionResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_UserResponse": {
+            data?: components["schemas"]["responses.UserResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-string": {
+            data?: string;
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-types_Configuration": {
+            data?: components["schemas"]["types.Configuration"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        /** @description Authentication data returned to client after successful authentication */
+        "responses.AuthDataResponse": {
+            /** @description AccessToken is the JWT token for API access
+             *     @Description JWT access token for authenticated requests
+             *     @Example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." */
+            accessToken?: string;
+            /** @description ExpiresAt indicates when the access token expires
+             *     @Description UNIX timestamp when the access token expires
+             *     @Example 1674140400 */
+            expiresAt?: number;
+            /** @description RefreshToken is used to get new access tokens
+             *     @Description JWT refresh token for obtaining new access tokens
+             *     @Example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." */
+            refreshToken?: string;
+            /** @description User contains the user profile information
+             *     @Description User profile data */
+            user?: components["schemas"]["responses.UserResponse"];
+        };
+        "responses.ClientResponse": {
+            client?: unknown;
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            id?: number;
+            name?: string;
+            updatedAt?: string;
+            userId?: number;
+        };
+        "responses.EmptyAPIResponse": {
+            data?: unknown;
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.EmptyResponse": {
+            success?: boolean;
+        };
+        "responses.ErrorDetails": {
+            error?: string;
+            metadata?: {
+                [key: string]: unknown;
+            };
+            stackInfo?: string;
+        };
+        "responses.ErrorResponse-error": {
+            details?: unknown;
+            /** @example This is a pretty message */
+            message?: string;
+            request_id?: string;
+            /** @example 201 */
+            statusCode?: number;
+            timestamp?: string;
+            /** @example FAILED_CHECK */
+            type?: components["schemas"]["errors.ErrorType"];
+        };
+        "responses.ErrorResponse-responses_ErrorDetails": {
+            details?: components["schemas"]["responses.ErrorDetails"];
+            /** @example This is a pretty message */
+            message?: string;
+            request_id?: string;
+            /** @example 201 */
+            statusCode?: number;
+            timestamp?: string;
+            /** @example FAILED_CHECK */
+            type?: components["schemas"]["errors.ErrorType"];
+        };
+        /** @description Response containing structured data generated by the AI */
+        "responses.GenerateStructuredResponse": {
+            [key: string]: unknown;
+        };
+        /** @description Response containing the generated text from the AI */
+        "responses.GenerateTextResponse": {
+            /** @description The generated text content
+             *     example: "Bits and bytes in endless flow,\nBuilding worlds that softly grow.\nLogic woven, patterns tight,\nCreating order out of night." */
+            text?: string;
+        };
+        "responses.HealthResponse": {
+            /** @example true */
+            application: boolean;
+            /** @example true */
+            database: boolean;
+            /**
+             * @description Overall status of the system
+             * @example up
+             * @enum {string}
+             */
+            status: ResponsesHealthResponseStatus;
+        };
+        "responses.MediaItemResponse": {
+            clientId?: number;
+            clientType?: string;
+            createdAt?: string;
+            data?: unknown;
+            externalId?: string;
+            id?: number;
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
+        };
+        "responses.TestConnectionResponse": {
+            message?: string;
+            success?: boolean;
+            version?: string;
+        };
         /** @description User information returned in API responses */
-        "models.UserResponse": {
+        "responses.UserResponse": {
             /** @description Email is the unique email address of the user
              *     @Description User's email address
              *     @Example "user@example.com" */
@@ -2308,14 +5910,186 @@ export interface components {
              *     @Example "johndoe" */
             username?: string;
         };
+        "suasor_client_media_types.ExternalID": {
+            /** @description The actual ID */
+            id?: string;
+            /** @description e.g., "tmdb", "imdb", "trakt", "tvdb" */
+            source?: string;
+        };
+        "suasor_client_media_types.Rating": {
+            /** @description e.g., "tmdb", "imdb", "trakt", "tvdb" */
+            source?: string;
+            /** @description The actual ID */
+            value?: number;
+            /** @description For sources that might have how many people voted on an item */
+            votes?: number;
+        };
+        "types.Album": {
+            artistID?: string;
+            artistName?: string;
+            details?: components["schemas"]["types.MediaDetails"];
+            trackCount?: number;
+        };
+        "types.Artist": {
+            albumCount?: number;
+            albumIDs?: string[];
+            biography?: string;
+            details?: components["schemas"]["types.MediaDetails"];
+            similarArtists?: string[];
+        };
+        "types.Artwork": {
+            background?: string;
+            banner?: string;
+            logo?: string;
+            poster?: string;
+            thumbnail?: string;
+        };
+        /** @enum {string} */
+        "types.ClientType": TypesClientType;
+        /** @description Complete application configuration settings */
+        "types.Configuration": {
+            /** @description App contains core application settings */
+            app?: {
+                /** @example http://localhost:8080 */
+                apiBaseURL: string;
+                /** @example http://localhost:3000 */
+                appURL: string;
+                /**
+                 * @example development
+                 * @enum {string}
+                 */
+                environment: TypesConfigurationAppEnvironment;
+                /**
+                 * @example info
+                 * @enum {string}
+                 */
+                logLevel: TypesConfigurationAppLogLevel;
+                /** @example 100 */
+                maxPageSize: number;
+                /** @example suasor */
+                name: string;
+            };
+            /** @description Auth contains authentication settings */
+            auth?: {
+                /**
+                 * @description New fields to add
+                 * @example 15
+                 */
+                accessExpiryMinutes: number;
+                /** @example [
+                 *       "http://localhost:3000"
+                 *     ] */
+                allowedOrigins?: string[];
+                /** @example false */
+                enable2FA?: boolean;
+                /** @example true */
+                enableLocal?: boolean;
+                /** @example your-secret-key */
+                jwtSecret: string;
+                /** @example 7 */
+                refreshExpiryDays: number;
+                /** @example 60 */
+                sessionTimeout: number;
+                /** @example suasor-client */
+                tokenAudience: string;
+                /** @example 24 */
+                tokenExpiration: number;
+                /** @example suasor-api */
+                tokenIssuer: string;
+            };
+            /** @description Database contains database connection settings */
+            db?: {
+                /** @example localhost */
+                host: string;
+                /** @example 20 */
+                maxConns: number;
+                /** @example suasor */
+                name: string;
+                /** @example yourpassword */
+                password: string;
+                /** @example 5432 */
+                port: string;
+                /** @example 30 */
+                timeout: number;
+                /** @example postgres_user */
+                user: string;
+            };
+            /** @description HTTP contains HTTP server configuration */
+            http?: {
+                /** @example false */
+                enableSSL?: boolean;
+                /** @example 60 */
+                idleTimeout: number;
+                /** @example 8080 */
+                port: string;
+                /** @example false */
+                proxyEnabled?: boolean;
+                /** @example http://proxy:8080 */
+                proxyURL?: string;
+                /** @example true */
+                rateLimitEnabled?: boolean;
+                /** @example 30 */
+                readTimeout: number;
+                /** @example 100 */
+                requestsPerMin?: number;
+                /** @example /path/to/cert.pem */
+                sslCert?: string;
+                /** @example /path/to/key.pem */
+                sslKey?: string;
+                /** @example 30 */
+                writeTimeout: number;
+            };
+        };
+        /** @enum {string} */
+        "types.MediaClientType": TypesMediaClientType;
+        "types.MediaDetails": {
+            addedAt?: string;
+            artwork?: components["schemas"]["types.Artwork"];
+            contentRating?: string;
+            description?: string;
+            /** @description Changed from time.Duration to int64 for Swagger compatibility */
+            durationSeconds?: number;
+            externalIDs?: components["schemas"]["suasor_client_media_types.ExternalID"][];
+            genres?: string[];
+            isFavorite?: boolean;
+            ratings?: components["schemas"]["suasor_client_media_types.Rating"][];
+            releaseDate?: string;
+            releaseYear?: number;
+            studios?: string[];
+            tags?: string[];
+            title?: string;
+            updatedAt?: string;
+            userRating?: number;
+        };
+        /** @enum {string} */
+        "types.MediaType": TypesMediaType;
+        "types.Playlist": {
+            details?: components["schemas"]["types.MediaDetails"];
+            isPublic?: boolean;
+            itemCount?: number;
+            itemIDs?: string[];
+            owner?: string;
+        };
+        "types.Track": {
+            albumID?: string;
+            albumName?: string;
+            albumTitle?: string;
+            artistID?: string;
+            artistName?: string;
+            composer?: string;
+            details?: components["schemas"]["types.MediaDetails"];
+            discNumber?: number;
+            lyrics?: string;
+            trackNumber?: number;
+        };
     };
     responses: never;
     parameters: never;
     requestBodies: {
         /** @description Configuration data */
-        "models.Configuration": {
+        "types.Configuration": {
             content: {
-                "application/json": components["schemas"]["models.Configuration"];
+                "application/json": components["schemas"]["types.Configuration"];
             };
         };
     };
@@ -2323,22 +6097,7 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export enum ModelsChangeRoleRequestRole {
-    user = "user",
-    admin = "admin"
-}
-export enum ModelsConfigurationAppEnvironment {
-    development = "development",
-    staging = "staging",
-    production = "production"
-}
-export enum ModelsConfigurationAppLogLevel {
-    debug = "debug",
-    info = "info",
-    warn = "warn",
-    error = "error"
-}
-export enum ModelsErrorType {
+export enum ErrorsErrorType {
     ErrorTypeFailedCheck = "FAILED_CHECK",
     ErrorTypeUnauthorized = "UNAUTHORIZED",
     ErrorTypeNotFound = "NOT_FOUND",
@@ -2351,11 +6110,6 @@ export enum ModelsErrorType {
     ErrorTypeTimeout = "TIMEOUT",
     ErrorTypeServiceUnavailable = "SERVICE_UNAVAILABLE",
     ErrorTypeUnprocessableEntity = "UNPROCESSABLE_ENTITY"
-}
-export enum ModelsHealthResponseStatus {
-    up = "up",
-    down = "down",
-    degraded = "degraded"
 }
 export enum ModelsUserConfigDefaultMediaServer {
     emby = "emby",
@@ -2386,5 +6140,56 @@ export enum ModelsUserConfigTheme {
     light = "light",
     dark = "dark",
     system = "system"
+}
+export enum RequestsChangeRoleRequestRole {
+    user = "user",
+    admin = "admin"
+}
+export enum ResponsesHealthResponseStatus {
+    up = "up",
+    down = "down",
+    degraded = "degraded"
+}
+export enum TypesClientType {
+    ClientTypeEmby = "emby",
+    ClientTypeJellyfin = "jellyfin",
+    ClientTypePlex = "plex",
+    ClientTypeSubsonic = "subsonic",
+    ClientTypeRadarr = "radarr",
+    ClientTypeSonarr = "sonarr",
+    ClientTypeLidarr = "lidarr",
+    ClientTypeUnknown = "unknown",
+    ClientTypeClaude = "claude",
+    ClientTypeOpenAI = "openai",
+    ClientTypeOllama = "ollama"
+}
+export enum TypesConfigurationAppEnvironment {
+    development = "development",
+    staging = "staging",
+    production = "production"
+}
+export enum TypesConfigurationAppLogLevel {
+    debug = "debug",
+    info = "info",
+    warn = "warn",
+    error = "error"
+}
+export enum TypesMediaClientType {
+    MediaClientTypePlex = "plex",
+    MediaClientTypeJellyfin = "jellyfin",
+    MediaClientTypeEmby = "emby",
+    MediaClientTypeSubsonic = "subsonic",
+    MediaClientTypeUnknown = "unknown"
+}
+export enum TypesMediaType {
+    MediaTypeMovie = "movie",
+    MediaTypeSeries = "series",
+    MediaTypeSeason = "season",
+    MediaTypeEpisode = "episode",
+    MediaTypeArtist = "artist",
+    MediaTypeAlbum = "album",
+    MediaTypeTrack = "track",
+    MediaTypePlaylist = "playlist",
+    MediaTypeCollection = "collection"
 }
 export type operations = Record<string, never>;

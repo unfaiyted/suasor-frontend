@@ -12,7 +12,7 @@
 		dispatch('sendMessage');
 	}
 
-	function onPromptKeydown(event) {
+	function onPromptKeydown(event: any) {
 		if (['Enter'].includes(event.code) && !event.shiftKey) {
 			event.preventDefault();
 			sendMessage();

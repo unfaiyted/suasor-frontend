@@ -1,5 +1,5 @@
 // src/lib/api/errors.ts
-import type { ShortenErrorResponse } from './types';
+import type { ErrorResponse } from './types';
 import { ModelsErrorType } from './types';
 
 export class ApiError extends Error {
@@ -10,7 +10,7 @@ export class ApiError extends Error {
 	timestamp?: string;
 	status: number;
 
-	constructor(errorResponse: ShortenErrorResponse, status: number = 500) {
+	constructor(errorResponse: ErrorResponse, status: number = 500) {
 		super(errorResponse?.message || 'Unknown API error');
 		this.name = 'ApiError';
 		this.type = errorResponse?.type || ModelsErrorType.ErrorTypeInternalError;
