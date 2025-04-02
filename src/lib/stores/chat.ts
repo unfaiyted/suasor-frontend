@@ -4,8 +4,11 @@ import { createBaseStore } from './base';
 import { GET, POST } from '$lib/api/client';
 import type { 
   GenerateTextRequest, 
-  GenerateTextResponse, 
+  GenerateStructuredRequest,
+  GenerateTextResponse,
+  GenerateStructuredResponse,
   APIGenerateTextResponse,
+  APIGenerateStructuredResponse,
   ErrorResponse,
   ClientResponse,
   ClientType
@@ -352,6 +355,38 @@ const chatApi = {
     }
   },
   
+  // Convert structured AI response to movie objects
+  convertStructuredResponseToMovies(structuredData: any): Movie[] {
+    // Ensure we have a valid response
+    if (!structuredData || !Array.isArray(structuredData.recommendations)) {
+      console.warn('Invalid structured data format:', structuredData);
+      return [];
+    }
+    
+    try {
+      // Map the structured data to our Movie format
+      return structuredData.recommendations.map((rec: any, index: number) => {
+        // Generate a unique ID if none is provided
+        const id = rec.id || `recommendation-${index}-${Date.now()}`;
+        
+        // Create a properly formatted Movie object
+        return {
+          id,
+          title: rec.title || 'Unknown Title',
+          year: rec.year || new Date().getFullYear(),
+          type: rec.type || 'movie',
+          poster: rec.poster || `https://via.placeholder.com/300x450.png?text=${encodeURIComponent(rec.title || 'Movie')}`,
+          genres: rec.genres || [],
+          rating: rec.rating || 0,
+          overview: rec.overview || rec.description || rec.reason || 'No description available.'
+        };
+      });
+    } catch (error) {
+      console.error('Error converting structured data to movies:', error);
+      return [];
+    }
+  },
+  
   // Generate AI response based on chat history
   async generateAiResponse(latestMessage: MessageContent) {
     const state = get(chatStore);
@@ -387,71 +422,127 @@ const chatApi = {
         return `${role}: ${content}`;
       }).join('\n');
       
-      // Add the latest message if it's from the user
-      let prompt = '';
+      // Determine if we need text or structured response
+      let conversationalResponse = true;
+      let structuredRecommendations = false;
       
+      // Check user message to determine response type
       if (latestMessage.type === 'text') {
-        prompt = `${conversationHistory}\n\nPlease respond to the user's request for movie recommendations.`;
-      } else {
-        // For movie selections, create a more specific prompt
-        const movieTitles = latestMessage.movies?.map(m => m.title).join(', ');
-        prompt = `${conversationHistory}\n\nBased on the user's selected movies (${movieTitles}), suggest 3-5 similar movies with title, year, and a brief explanation of why they would enjoy each one. Format your response as natural text.`;
+        const text = latestMessage.text?.toLowerCase() || '';
+        if (text.includes('recommend') || text.includes('suggest') || 
+            text.includes('movie') || text.includes('similar') || 
+            text.includes('like') || text.includes('watch')) {
+          // This appears to be a recommendation request
+          structuredRecommendations = true;
+        }
+      } else if (latestMessage.type === 'movieList') {
+        // A list of movies was selected, definitely a recommendation request
+        structuredRecommendations = true;
+        // We might still want some conversational context
+        conversationalResponse = true;
       }
       
-      // Prepare the request
-      const request: GenerateTextRequest = {
-        prompt,
-        maxTokens: 1000,
-        systemInstructions: "You are a helpful movie recommendation assistant. You know about movies, actors, directors, and genres. When recommending movies, include their title, year, and a brief reason for the recommendation. Keep responses conversational and engaging."
-      };
-      
-      // In development, we'll simulate the response for testing
-      // In production, we would use the actual AI client with:
-      // const response = await POST(`/ai/generate/${state.currentAiClientId}`, { body: request });
-      
-      // Simulate AI response for development/testing
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
-      // For demonstration, provide a simulated movie recommendation
-      const simulatedAiResponse = this.simulateAiResponse(latestMessage);
-      
-      // Add the response to the chat
-      this.addMessageFromAI({
-        type: 'text',
-        text: simulatedAiResponse
-      });
-
-      // Add movie recommendations in a separate message
-      if (latestMessage.type === 'movieList' || latestMessage.type === 'text') {
-        // In development, provide sample movie recommendations
-        // In production, we would parse the AI response or use a structured endpoint
-        const sampleRecommendations: Movie[] = [
-          {
-            id: 'rec1',
-            title: 'Parasite',
-            year: 2019,
-            type: 'movie',
-            poster: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
-            genres: ['Comedy', 'Thriller', 'Drama'],
-            rating: 8.5,
-            overview: 'A poor family cons their way into becoming the servants of a rich family...'
-          },
-          {
-            id: 'rec2',
-            title: 'The Banshees of Inisherin',
-            year: 2022,
-            type: 'movie',
-            poster: 'https://image.tmdb.org/t/p/w500/4yFG6cSPaCaPhyJ1vtGOtMD1lgh.jpg',
-            genres: ['Comedy', 'Drama'],
-            rating: 7.7,
-            overview: 'Two lifelong friends find themselves at an impasse when one abruptly ends their relationship...'
-          }
-        ];
+      // First, get a conversational response if needed
+      if (conversationalResponse) {
+        let textPrompt = '';
         
+        if (latestMessage.type === 'text') {
+          textPrompt = `${conversationHistory}\n\nPlease respond to the user's message in a conversational way.`;
+          if (structuredRecommendations) {
+            textPrompt += " Don't list specific movie recommendations yet - you'll do that separately.";
+          }
+        } else {
+          // For movie selections, create a more specific prompt
+          const movieTitles = latestMessage.movies?.map(m => m.title).join(', ');
+          textPrompt = `${conversationHistory}\n\nThe user has selected these movies: ${movieTitles}. Acknowledge their selection and respond conversationally.`;
+        }
+        
+        // Prepare the text request
+        const textRequest: GenerateTextRequest = {
+          prompt: textPrompt,
+          maxTokens: 500,
+          systemInstructions: "You are a helpful movie recommendation assistant. Keep responses conversational, friendly, and brief."
+        };
+        
+        // In a real implementation, we would call the API
+        // const textResponse = await POST(`/ai/generate/${state.currentAiClientId}`, { body: textRequest });
+        
+        // For development, simulate a delay and response
+        await new Promise(resolve => setTimeout(resolve, 800));
+        const simulatedTextResponse = this.simulateAiResponse(latestMessage, false);
+        
+        // Add the conversational response to the chat
         this.addMessageFromAI({
-          type: 'movieList',
-          movies: sampleRecommendations
+          type: 'text',
+          text: simulatedTextResponse
         });
+      }
+      
+      // Next, if we need structured recommendations, get them
+      if (structuredRecommendations) {
+        // Create a structured request for movie recommendations
+        let structuredPrompt = '';
+        
+        if (latestMessage.type === 'text') {
+          structuredPrompt = `${conversationHistory}\n\nBased on the user's message, recommend 3-5 movies they might enjoy. Include title, year, genres, and a brief reason for each recommendation.`;
+        } else {
+          // For movie selections, create a more specific prompt
+          const movieDetails = latestMessage.movies?.map(m => 
+            `${m.title} (${m.year}): ${m.genres.join(', ')}`
+          ).join('\n');
+          
+          structuredPrompt = `The user has selected these movies:\n${movieDetails}\n\nRecommend 3-5 similar movies they might enjoy based on these selections.`;
+        }
+        
+        // Prepare the structured request with a schema
+        const structuredRequest: GenerateStructuredRequest = {
+          prompt: structuredPrompt,
+          maxTokens: 1500,
+          systemInstructions: `You are a movie recommendation API. Return a JSON object with an array of recommended movies.
+           Each movie should have: 
+           - title: string
+           - year: number
+           - genres: string[]
+           - overview: string (brief description)
+           - rating: number (1-10)
+           - reason: string (why this is recommended)
+           
+           Format your response as valid JSON like this:
+           {
+             "recommendations": [
+               {
+                 "title": "Movie Title",
+                 "year": 2023,
+                 "genres": ["Action", "Thriller"],
+                 "overview": "Brief description of the movie...",
+                 "rating": 8.5,
+                 "reason": "Why the user might like this based on their preferences"
+               },
+               ...more recommendations
+             ]
+           }`
+        };
+        
+        // In a real implementation, we would call the API
+        // const structuredResponse = await POST(`/ai/generate-structured/${state.currentAiClientId}`, { body: structuredRequest });
+        
+        // For development, simulate a delay and response
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Simulate a structured JSON response
+        const simulatedStructuredData = this.simulateStructuredResponse(latestMessage);
+        
+        // Convert the structured data to Movie objects
+        const recommendedMovies = this.convertStructuredResponseToMovies(simulatedStructuredData);
+        
+        // Add the movie recommendations as a movieList message
+        if (recommendedMovies.length > 0) {
+          this.addMessageFromAI({
+            type: 'movieList',
+            text: "Here are some recommendations based on your preferences:",
+            movies: recommendedMovies
+          });
+        }
       }
       
       chatStore.setLoading(false);
@@ -467,34 +558,221 @@ const chatApi = {
   },
   
   // Simulate AI response for development/testing
-  simulateAiResponse(latestMessage: MessageContent): string {
+  simulateAiResponse(latestMessage: MessageContent, forRecommendation: boolean = true): string {
+    if (latestMessage.type === 'text') {
+      const text = latestMessage.text?.toLowerCase() || '';
+      
+      if (forRecommendation) {
+        // Response when we're going to follow up with structured recommendations
+        if (text.includes('action') || text.includes('adventure')) {
+          return "I'd be happy to suggest some action and adventure films for you! I've put together a selection that I think you'll enjoy based on your preferences.";
+        } else if (text.includes('comedy') || text.includes('funny')) {
+          return "Looking for something to make you laugh? Great choice! I've selected some comedies that range from witty to hilarious that should be right up your alley.";
+        } else if (text.includes('horror') || text.includes('scary')) {
+          return "Horror fan, I see! I've found some chilling options that should give you the scares you're looking for. Check these out:";
+        } else {
+          return "I'd be happy to recommend some movies based on what you've told me! Here are some options I think you might enjoy:";
+        }
+      } else {
+        // More detailed responses when we're not following up with structured data
+        if (text.includes('action') || text.includes('adventure')) {
+          return "Based on your interest in action and adventure films, I'd recommend these movies:\n\n" +
+            "1. **Mad Max: Fury Road (2015)** - A high-octane post-apocalyptic adventure with stunning visuals and practical effects.\n\n" +
+            "2. **Top Gun: Maverick (2022)** - Not only does it deliver thrilling aerial sequences, but it also has emotional depth that the original lacked.\n\n" +
+            "3. **The Woman King (2022)** - Features incredible battle choreography and a powerful story based on the all-female warrior unit that protected the African Kingdom of Dahomey.";
+        } else if (text.includes('comedy') || text.includes('funny')) {
+          return "If you're looking for comedies, here are some great options:\n\n" +
+            "1. **Barbie (2023)** - A surprisingly thoughtful comedy that balances social commentary with genuine laughs.\n\n" +
+            "2. **The Grand Budapest Hotel (2014)** - Wes Anderson's meticulously crafted comedy with amazing performances by Ralph Fiennes and a stellar supporting cast.\n\n" +
+            "3. **What We Do in the Shadows (2014)** - This mockumentary about vampire roommates is consistently hilarious with its deadpan humor.";
+        } else if (text.includes('horror') || text.includes('scary')) {
+          return "For horror fans, I recommend:\n\n" +
+            "1. **Hereditary (2018)** - A deeply unsettling psychological horror that builds dread masterfully.\n\n" +
+            "2. **Get Out (2017)** - Jordan Peele's social thriller combines genuine scares with sharp social commentary.\n\n" +
+            "3. **The Witch (2015)** - A slow-burning period piece with incredible attention to historical detail and a truly haunting atmosphere.";
+        } else {
+          return "I'd be happy to recommend some movies! Could you tell me what genres or types of films you enjoy the most? For example, do you prefer action, comedy, drama, sci-fi, or something else? Or maybe you have some favorite directors or actors?";
+        }
+      }
+    } else if (latestMessage.type === 'movieList') {
+      // Recommendation based on selected movies
+      const movieCount = latestMessage.movies?.length || 0;
+      
+      if (movieCount === 1) {
+        const movie = latestMessage.movies![0];
+        return `Great choice with ${movie.title}! Based on this selection, I've found some similar movies you might enjoy.`;
+      } else {
+        return `Thanks for selecting these ${movieCount} movies! I've analyzed your choices and found some recommendations that match their themes and styles.`;
+      }
+    }
+    
+    return "I'm not sure what kind of movies you're looking for. Could you tell me more about your preferences?";
+  },
+  
+  // Simulate structured JSON response for development/testing
+  simulateStructuredResponse(latestMessage: MessageContent): any {
+    // Get genre preferences from the message
+    let genres: string[] = [];
+    
     if (latestMessage.type === 'text') {
       const text = latestMessage.text?.toLowerCase() || '';
       
       if (text.includes('action') || text.includes('adventure')) {
-        return "Based on your interest in action and adventure films, I'd recommend these movies:\n\n" +
-          "1. **Mad Max: Fury Road (2015)** - A high-octane post-apocalyptic adventure with stunning visuals and practical effects.\n\n" +
-          "2. **Top Gun: Maverick (2022)** - Not only does it deliver thrilling aerial sequences, but it also has emotional depth that the original lacked.\n\n" +
-          "3. **The Woman King (2022)** - Features incredible battle choreography and a powerful story based on the all-female warrior unit that protected the African Kingdom of Dahomey.";
+        genres = ['Action', 'Adventure', 'Thriller'];
       } else if (text.includes('comedy') || text.includes('funny')) {
-        return "If you're looking for comedies, here are some great options:\n\n" +
-          "1. **Barbie (2023)** - A surprisingly thoughtful comedy that balances social commentary with genuine laughs.\n\n" +
-          "2. **The Grand Budapest Hotel (2014)** - Wes Anderson's meticulously crafted comedy with amazing performances by Ralph Fiennes and a stellar supporting cast.\n\n" +
-          "3. **What We Do in the Shadows (2014)** - This mockumentary about vampire roommates is consistently hilarious with its deadpan humor.";
+        genres = ['Comedy', 'Romance'];
       } else if (text.includes('horror') || text.includes('scary')) {
-        return "For horror fans, I recommend:\n\n" +
-          "1. **Hereditary (2018)** - A deeply unsettling psychological horror that builds dread masterfully.\n\n" +
-          "2. **Get Out (2017)** - Jordan Peele's social thriller combines genuine scares with sharp social commentary.\n\n" +
-          "3. **The Witch (2015)** - A slow-burning period piece with incredible attention to historical detail and a truly haunting atmosphere.";
+        genres = ['Horror', 'Thriller'];
+      } else if (text.includes('drama')) {
+        genres = ['Drama'];
+      } else if (text.includes('sci-fi') || text.includes('science fiction')) {
+        genres = ['Science Fiction', 'Fantasy'];
       } else {
-        return "I'd be happy to recommend some movies! Could you tell me what genres or types of films you enjoy the most? For example, do you prefer action, comedy, drama, sci-fi, or something else? Or maybe you have some favorite directors or actors?";
+        // Default to a mix if no specific genre mentioned
+        genres = ['Drama', 'Thriller', 'Comedy'];
       }
-    } else if (latestMessage.type === 'movieList') {
-      // Recommendation based on selected movies
-      return "Based on your selected movies, I think you'd enjoy these films that share similar themes, visual styles, or narrative approaches:";
+    } else if (latestMessage.type === 'movieList' && latestMessage.movies?.length) {
+      // Extract genres from selected movies
+      const allGenres = latestMessage.movies.flatMap(m => m.genres);
+      const genreCount: Record<string, number> = {};
+      
+      // Count genre occurrences
+      allGenres.forEach(g => {
+        genreCount[g] = (genreCount[g] || 0) + 1;
+      });
+      
+      // Sort by frequency and take top 3
+      genres = Object.entries(genreCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([genre]) => genre);
     }
     
-    return "I'm not sure what kind of movies you're looking for. Could you tell me more about your preferences?";
+    // Generate movie recommendations based on genres
+    const recommendations = [];
+    
+    // Action/Adventure-oriented movies
+    if (genres.includes('Action') || genres.includes('Adventure')) {
+      recommendations.push({
+        title: "John Wick",
+        year: 2014,
+        genres: ["Action", "Thriller"],
+        overview: "An ex-hitman comes out of retirement to track down the gangsters who killed his dog and took his car.",
+        rating: 7.4,
+        poster: "https://image.tmdb.org/t/p/w500/fZPSd91yGE9fCcCe6OoQr6E3Pd8.jpg",
+        reason: "High-octane action sequences with stylish direction and world-building."
+      });
+      
+      recommendations.push({
+        title: "Mission: Impossible - Fallout",
+        year: 2018,
+        genres: ["Action", "Adventure", "Thriller"],
+        overview: "Ethan Hunt and his IMF team race against time after a mission gone wrong.",
+        rating: 7.7,
+        poster: "https://image.tmdb.org/t/p/w500/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg",
+        reason: "Features some of the most impressive practical stunts in recent action cinema."
+      });
+    }
+    
+    // Comedy-oriented movies
+    if (genres.includes('Comedy')) {
+      recommendations.push({
+        title: "The Nice Guys",
+        year: 2016,
+        genres: ["Comedy", "Crime", "Action"],
+        overview: "In 1970s Los Angeles, a mismatched pair of private eyes investigate a missing girl and the mysterious death of a porn star.",
+        rating: 7.3,
+        poster: "https://image.tmdb.org/t/p/w500/vNCeqxbKyDHL9LUza03V2Im16wB.jpg",
+        reason: "Sharp dialogue, great chemistry between the leads, and a nostalgic 70s setting."
+      });
+      
+      recommendations.push({
+        title: "Thor: Ragnarok",
+        year: 2017,
+        genres: ["Action", "Adventure", "Comedy", "Fantasy"],
+        overview: "Thor is imprisoned on the planet Sakaar and must race against time to return to Asgard and stop Ragnarök.",
+        rating: 7.9,
+        poster: "https://image.tmdb.org/t/p/w500/rzRwTcFvttcN1ZpX2xv4j3tSdJu.jpg",
+        reason: "Taika Waititi's direction brings a fresh, comedic take to the superhero genre."
+      });
+    }
+    
+    // Horror/Thriller-oriented movies
+    if (genres.includes('Horror') || genres.includes('Thriller')) {
+      recommendations.push({
+        title: "A Quiet Place",
+        year: 2018,
+        genres: ["Horror", "Thriller", "Science Fiction"],
+        overview: "A family struggles to survive in a world where most humans have been killed by blind but noise-sensitive creatures.",
+        rating: 7.5,
+        poster: "https://image.tmdb.org/t/p/w500/nAU74GmpUk7t5iklEp3bufwDq4n.jpg",
+        reason: "Creates tension through sound design and visual storytelling rather than jump scares."
+      });
+      
+      recommendations.push({
+        title: "The Lighthouse",
+        year: 2019,
+        genres: ["Horror", "Fantasy", "Drama"],
+        overview: "Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.",
+        rating: 7.5,
+        poster: "https://image.tmdb.org/t/p/w500/5Kb0KAP42CJJ8kH68Pz2GCNMwpF.jpg",
+        reason: "Robert Pattinson and Willem Dafoe deliver mesmerizing performances in this psychological horror."
+      });
+    }
+    
+    // Drama-oriented movies
+    if (genres.includes('Drama')) {
+      recommendations.push({
+        title: "The Father",
+        year: 2020,
+        genres: ["Drama"],
+        overview: "A man refuses all assistance from his daughter as he ages. As he tries to make sense of his changing circumstances, he begins to doubt his loved ones, his own mind and even the fabric of his reality.",
+        rating: 8.3,
+        poster: "https://image.tmdb.org/t/p/w500/uxWXW1YYQENSv7OzHB4Hds0bK3b.jpg",
+        reason: "Anthony Hopkins delivers an Oscar-winning performance in this poignant portrayal of dementia."
+      });
+    }
+    
+    // Sci-Fi-oriented movies
+    if (genres.includes('Science Fiction') || genres.includes('Fantasy')) {
+      recommendations.push({
+        title: "Dune",
+        year: 2021,
+        genres: ["Science Fiction", "Adventure"],
+        overview: "Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe to ensure the future of his family and his people.",
+        rating: 8.0,
+        poster: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
+        reason: "Denis Villeneuve's visually stunning adaptation of Frank Herbert's classic sci-fi novel."
+      });
+    }
+    
+    // If we still need more recommendations, add some highly-rated films
+    if (recommendations.length < 3) {
+      recommendations.push({
+        title: "The Shawshank Redemption",
+        year: 1994,
+        genres: ["Drama", "Crime"],
+        overview: "Framed in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden.",
+        rating: 8.7,
+        poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+        reason: "A timeless classic about hope and redemption, consistently rated as one of the greatest films ever made."
+      });
+      
+      recommendations.push({
+        title: "Whiplash",
+        year: 2014,
+        genres: ["Drama", "Music"],
+        overview: "A promising young drummer enrolls at a cut-throat music conservatory where his dreams of greatness are mentored by an instructor who will stop at nothing to realize a student's potential.",
+        rating: 8.5,
+        poster: "https://image.tmdb.org/t/p/w500/6uSPcdGMzZNawasVOOEu9YfnFPm.jpg",
+        reason: "Intense performances from Miles Teller and J.K. Simmons in this riveting examination of artistic perfection."
+      });
+    }
+    
+    // Create a structured response
+    return {
+      recommendations: recommendations.slice(0, 5) // Limit to 5 recommendations
+    };
   },
   
   // Create a list from selected movies
