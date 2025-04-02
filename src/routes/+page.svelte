@@ -1,7 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
-	import { isAuthenticated, user } from '$lib/stores/auth';
+	// import { fade, slide } from 'svelte/transition';
+	import { isAuthenticated, authUser } from '$lib/stores/auth';
+	import type { UserResponse } from '$lib/api/types';
+
+	let isAuth = $state(false);
+
+	let user = $state<UserResponse | null>(null);
+	isAuthenticated.subscribe((change: boolean) => {
+		isAuth = change;
+		console.log('isAuthenticated state changed:', change);
+	});
+
+	authUser.subscribe((change: UserResponse | null) => {
+		user = change;
+		console.log('user state changed:', change);
+	});
 
 	// Mock data stores - would be replaced with actual API calls
 	let recommendations = {
@@ -62,13 +76,13 @@
 		{ month: 'Oct', count: 45 }
 	];
 
-	let selectedTab = 'overview';
+	// let selectedTab = 'overview';
 
-	function formatDate(dateString) {
+	function formatDate(dateString: string) {
 		return new Date(dateString).toLocaleDateString();
 	}
 
-	function getStatusColor(status) {
+	function getStatusColor(status: string) {
 		const statusMap = {
 			connected: 'text-green-500',
 			disconnected: 'text-red-500',
@@ -79,11 +93,10 @@
 			added: 'text-purple-500',
 			listened: 'text-teal-500'
 		};
-		return statusMap[status] || 'text-gray-500';
+		return statusMap[status as keyof typeof statusMap] || 'text-gray-500';
 	}
 
 	onMount(async () => {
-		// Here you would fetch real data from your API
 		// For example:
 		// const userData = await fetch('/api/user/dashboard');
 		// const userDataJson = await userData.json();
@@ -92,7 +105,7 @@
 </script>
 
 <div class="container mx-auto max-w-6xl px-4 py-8">
-	{#if $isAuthenticated}
+	{#if isAuthenticated}
 		<!-- Header Section -->
 		<header class="mb-8">
 			<div class="flex items-center justify-between">
@@ -100,10 +113,10 @@
 					<h1 class="text-primary-600 text-3xl font-bold">Media Compass</h1>
 					<p class="">Your personalized entertainment dashboard</p>
 				</div>
-				{#if $isAuthenticated}
+				{#if isAuthenticated && user}
 					<div class="flex items-center">
 						<div class="mr-3 text-right">
-							<p class="font-medium">Welcome, {$user.username}</p>
+							<p class="font-medium">Welcome, {user.username}</p>
 							<p class="text-sm text-gray-500">Premium Member</p>
 						</div>
 						<div class="bg-primary-100 h-12 w-12 overflow-hidden rounded-full">

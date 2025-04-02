@@ -3,8 +3,9 @@
 	import { fade } from 'svelte/transition';
 	import { Brain, Settings, User, Server, Database, Shield, Film, Radio } from '@lucide/svelte';
 	import { GET, PUT } from '$lib/api/client';
-	import { authStore, user as userStore, isAuthenticated } from '$lib/stores/auth';
+	import { authStore, authUser, isAuthenticated } from '$lib/stores/auth';
 
+	import type { UserResponse } from '$lib/api/types';
 	// Import components
 	import SettingsTabs from '$lib/components/settings/SettingsTabs.svelte';
 	import AIIntegrationsPanel from '$lib/components/settings/AIIntegrationsPanel.svelte';
@@ -26,13 +27,13 @@
 	};
 
 	// Subscribe to auth store
-	userStore.subscribe((userData) => {
-		if (userData) {
+	authUser.subscribe((change: UserResponse | null) => {
+		if (change) {
 			user = {
 				isLoggedIn: true,
-				isAdmin: userData.role === 'admin',
-				name: userData.username || '',
-				email: userData.email || ''
+				isAdmin: change.role === 'admin',
+				name: change.username || '',
+				email: change.email || ''
 			};
 		}
 	});
@@ -270,7 +271,7 @@
 	// Initialize component
 	onMount(async () => {
 		// Check if user is authenticated
-		if ($isAuthenticated) {
+		if (isAuthenticated) {
 			await fetchUserConfig();
 			await fetchSystemConfig();
 		} else {
@@ -300,7 +301,7 @@
 			<div class="flex h-64 items-center justify-center">
 				<p class="text-lg">Loading settings...</p>
 			</div>
-		{:else if !$isAuthenticated}
+		{:else if !isAuthenticated}
 			<div class="flex h-64 items-center justify-center">
 				<p class="text-lg">Please log in to view settings.</p>
 			</div>

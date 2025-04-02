@@ -2,48 +2,99 @@
 <script lang="ts">
 	import IconTriangle from '$lib/components/icons/IconTriangle.svelte';
 	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { Eye, EyeOff, Github, Mail } from '@lucide/svelte';
-	import { createEventDispatcher } from 'svelte';
+	// import { createEventDispatcher } from 'svelte';
 
 	// Import auth store
-	import { authStore, authLoading, authError } from '$lib/stores/auth';
+	import { isAuthenticated, authStore, authLoading, authError } from '$lib/stores/auth';
+
+	let isAuth = $state(false);
+	isAuthenticated.subscribe((change) => {
+		console.log('isAuthenticated state changed:', change);
+		isAuth = change;
+	});
 
 	// Props with defaults
-	export let returnUrl = '/';
-	export let redirectAfterLogin = true;
-	export let showSocialLogins = true;
-	export let showSignUpLink = true;
-	export let showSecurityNote = true;
+	let {
+		returnUrl = '/',
+		redirectAfterLogin = true,
+		showSocialLogins = true,
+		showSignUpLink = true,
+		showSecurityNote = true
+	} = $props();
 
 	// Component state
-	let email = '';
-	let password = '';
-	let rememberMe = false;
-	let showPassword = false;
-	let error = '';
+	let email = $state('');
+	let password = $state('');
+	let rememberMe = $state(false);
+	let showPassword = $state(false);
+	let error = $state('');
+	let isLoading = $state(false);
+
+	authLoading.subscribe((change) => {
+		console.log('Auth loading changed:', change);
+		isLoading = change;
+	});
+
+	authStore.subscribe((change) => {
+		console.log('Auth store changed:', change);
+		isAuth = change.isAuthenticated;
+	});
+
+	authError.subscribe((change) => {
+		console.log('Auth error changed:', change);
+		if (change instanceof Error && change != null) {
+			error = change instanceof Error ? change.message : String(change);
+		}
+	});
 
 	// Setup event dispatcher
-	const dispatch = createEventDispatcher<{
-		success: { email: string };
-		error: { message: string };
-	}>();
+	// const dispatch = createEventDispatcher<{
+	// 	success: { email: string };
+	// 	error: { message: string };
+	// }>();
 
-	// Use reactive stores for loading and errors
-	$: isLoading = $authLoading;
+	onMount(async () => {
+		console.log('Login page mounted, auth state:', {
+			isAuth
+		});
 
-	// Update error message when authError changes
-	$: if ($authError) {
-		error = $authError instanceof Error ? $authError.message : String($authError);
-		if (error) {
-			dispatch('error', { message: error });
+		// If we're already authenticated, immediately redirect to the return URL
+		if (isAuth) {
+			console.log('Already authenticated on mount, redirecting to:', returnUrl);
+			goto(returnUrl);
 		}
-	}
 
-	async function handleLogin() {
+		// Use localStorage to check for tokens directly
+		const hasToken = localStorage.getItem('suasor_access_token') !== null;
+		const hasRefreshToken = localStorage.getItem('suasor_refresh_token') !== null;
+
+		if (hasToken && hasRefreshToken && !isAuth) {
+			console.log('Found tokens on login page but not authenticated, validating session...');
+			try {
+				// Force a validation check and wait for it
+				// const validated = await import('$lib/stores/auth').then((m) =>
+				// m.authStore.validateSession()
+				// );
+
+				if (validated) {
+					console.log('Session validated from login page, redirecting to:', returnUrl);
+					goto(returnUrl);
+				}
+			} catch (err) {
+				console.error('Error validating session from login page:', err);
+			}
+		}
+	});
+
+	async function handleLogin(event: Event) {
+		console.log('handleLogin called');
+
 		if (!email || !password) {
 			error = 'Please enter both email and password';
-			dispatch('error', { message: error });
+			// error.set('Please enter both email and password');
 			return;
 		}
 
@@ -54,7 +105,7 @@
 			const success = await authStore.login(email, password);
 
 			if (success) {
-				dispatch('success', { email });
+				// dispatch('success', { email });
 				if (redirectAfterLogin) {
 					goto(returnUrl);
 				}
@@ -62,12 +113,12 @@
 				if (!error) {
 					// Only set this if no error was set by the store
 					error = 'Invalid email or password';
-					dispatch('error', { message: error });
+					// dispatch('error', { message: error });
 				}
 			}
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Login failed. Please try again.';
-			dispatch('error', { message: error });
+			// dispatch('error', { message: error });
 			console.error(err);
 		}
 	}
@@ -81,7 +132,7 @@
 		console.log(`Logging in with ${provider}`);
 		// For now, just show a message that this isn't implemented
 		error = `${provider} login is not implemented yet`;
-		dispatch('error', { message: error });
+		// dispatch('error', { message: error });
 	}
 </script>
 
@@ -94,7 +145,7 @@
 	</div>
 
 	<div class="card-body flex flex-col py-4">
-		{#if error}
+		{#if error && error != ''}
 			<div class="alert alert-error mb-4" transition:fade>
 				<div
 					class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]"
@@ -109,7 +160,7 @@
 			</div>
 		{/if}
 
-		<form on:submit|preventDefault={handleLogin} class="space-y-4">
+		<div class="space-y-4">
 			<!-- Email Input -->
 			<label class="label">
 				<span class="label-text">Email</span>
@@ -138,7 +189,7 @@
 					<button
 						type="button"
 						class="absolute inset-y-0 right-0 flex items-center px-3 text-sm"
-						on:click={togglePasswordVisibility}
+						onclick={togglePasswordVisibility}
 						aria-label={showPassword ? 'Hide password' : 'Show password'}
 					>
 						{#if showPassword}
@@ -164,7 +215,8 @@
 
 			<!-- Login Button -->
 			<button
-				type="submit"
+				type="button"
+				onclick={handleLogin}
 				class="btn preset-filled-primary-500 w-full {isLoading ? 'loading' : ''}"
 				disabled={isLoading}
 			>
@@ -187,7 +239,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialLogin('Google')}
+						onclick={() => handleSocialLogin('Google')}
 						disabled={isLoading}
 					>
 						<Mail size={18} />
@@ -196,7 +248,7 @@
 					<button
 						type="button"
 						class="btn preset-outlined-surface-900 flex items-center justify-center gap-2"
-						on:click={() => handleSocialLogin('GitHub')}
+						onclick={() => handleSocialLogin('GitHub')}
 						disabled={isLoading}
 					>
 						<Github size={18} />
@@ -204,7 +256,7 @@
 					</button>
 				</div>
 			{/if}
-		</form>
+		</div>
 
 		{#if showSignUpLink}
 			<!-- Sign Up Link -->

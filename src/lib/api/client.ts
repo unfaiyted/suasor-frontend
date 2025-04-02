@@ -70,22 +70,56 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-	const refreshToken = localStorage.getItem('suasor_refresh_token');
+	console.log('Client logout called - clearing tokens');
+	
+	// Browser check to prevent server-side errors
+	if (typeof window === 'undefined') {
+		console.log('Running on server - skipping localStorage operations');
+		return;
+	}
+	
+	let refreshToken = null;
+	
+	// Get refreshToken safely
+	try {
+		refreshToken = localStorage.getItem('suasor_refresh_token');
+	} catch (err) {
+		console.error('Error accessing localStorage for refresh token:', err);
+	}
+	
+	// Clear localStorage first to prevent any race conditions
+	try {
+		console.log('Clearing localStorage items');
+		localStorage.removeItem('suasor_access_token');
+		localStorage.removeItem('suasor_refresh_token');
+		localStorage.removeItem('suasor_expires_at');
+		localStorage.removeItem('suasor_user');
+	} catch (err) {
+		console.error('Error clearing localStorage:', err);
+	}
+	
+	// Now attempt the API call if we had a token
 	if (refreshToken) {
 		try {
-			await createAuthenticatedClient().POST('/auth/logout', {
+			console.log('Calling logout API endpoint');
+			await createBasicClient().POST('/auth/logout', {
 				body: { refreshToken }
 			});
+			console.log('Logout API call successful');
 		} catch (e) {
 			// Continue with logout even if API call fails
 			console.error('Logout API call failed', e);
 		}
 	}
-
-	localStorage.removeItem('suasor_access_token');
-	localStorage.removeItem('suasor_refresh_token');
-	localStorage.removeItem('suasor_expires_at');
-	localStorage.removeItem('suasor_user');
+	
+	// Double-check that localStorage is cleared
+	try {
+		// Try to clear again just to be sure
+		localStorage.clear();
+		console.log('Logout complete, localStorage cleared');
+	} catch (err) {
+		console.error('Error in final localStorage cleanup:', err);
+	}
 };
 
 export const refreshToken = async () => {
@@ -114,8 +148,20 @@ export const refreshToken = async () => {
 };
 
 export const isAuthenticated = () => {
-	const token = localStorage.getItem('suasor_access_token');
-	const expiresAt = localStorage.getItem('suasor_expires_at');
+	// Check for browser environment first
+	if (typeof window === 'undefined') {
+		return false;
+	}
+	
+	let token, expiresAt;
+	
+	try {
+		token = localStorage.getItem('suasor_access_token');
+		expiresAt = localStorage.getItem('suasor_expires_at');
+	} catch (err) {
+		console.error('Error accessing localStorage in isAuthenticated:', err);
+		return false;
+	}
 
 	if (!token || !expiresAt) return false;
 
@@ -124,44 +170,74 @@ export const isAuthenticated = () => {
 };
 
 export const getCurrentUser = () => {
-	const userStr = localStorage.getItem('suasor_user');
-	return userStr ? JSON.parse(userStr) : null;
+	// Check for browser environment first
+	if (typeof window === 'undefined') {
+		return null;
+	}
+	
+	try {
+		const userStr = localStorage.getItem('suasor_user');
+		return userStr ? JSON.parse(userStr) : null;
+	} catch (err) {
+		console.error('Error accessing localStorage in getCurrentUser:', err);
+		return null;
+	}
 };
 
 // Auth wrapper for API calls
 export const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
-	// Check for token expiration
-	if (!isAuthenticated() && localStorage.getItem('suasor_refresh_token')) {
-		console.log('not-authenticationed', localStorage.getItem('suasor_refresh_token'));
-		try {
-			await refreshToken();
-		} catch (e) {
-			// If refresh fails, clear tokens
-			localStorage.removeItem('suasor_access_token');
-			localStorage.removeItem('suasor_refresh_token');
-			localStorage.removeItem('suasor_expires_at');
-			localStorage.removeItem('suasor_user');
-			console.log('removing invalid item');
-			throw e;
+	// Check for browser environment
+	if (typeof window === 'undefined') {
+		console.log('Running on server - skipping token operations');
+		return apiCall();
+	}
+	
+	let refreshTokenValue = null;
+	
+	try {
+		// Check for token expiration
+		refreshTokenValue = localStorage.getItem('suasor_refresh_token');
+		if (!isAuthenticated() && refreshTokenValue) {
+			console.log('Token expired but refresh token available, attempting refresh');
+			try {
+				await refreshToken();
+			} catch (e) {
+				// If refresh fails, clear tokens safely
+				try {
+					localStorage.clear();
+				} catch (clearErr) {
+					console.error('Error clearing localStorage after failed refresh:', clearErr);
+				}
+				console.log('Removed invalid tokens after failed refresh');
+				throw e;
+			}
 		}
+	} catch (err) {
+		console.error('Error checking authentication state:', err);
 	}
 
 	try {
 		return await apiCall();
 	} catch (error: any) {
 		// Handle 401 errors by trying to refresh the token
-		if (error.status === 401 && localStorage.getItem('suasor_refresh_token')) {
-			try {
-				await refreshToken();
-				return await apiCall();
-			} catch (refreshError) {
-				// If refresh fails, clear tokens
-				localStorage.removeItem('suasor_access_token');
-				localStorage.removeItem('suasor_refresh_token');
-				localStorage.removeItem('suasor_expires_at');
-				localStorage.removeItem('suasor_user');
-				throw refreshError;
+		try {
+			const hasRefreshToken = localStorage.getItem('suasor_refresh_token');
+			if (error.status === 401 && hasRefreshToken) {
+				try {
+					await refreshToken();
+					return await apiCall();
+				} catch (refreshError) {
+					// If refresh fails, clear tokens safely
+					try {
+						localStorage.clear();
+					} catch (clearErr) {
+						console.error('Error clearing localStorage after failed refresh retry:', clearErr);
+					}
+					throw refreshError;
+				}
 			}
+		} catch (storageErr) {
+			console.error('Error accessing localStorage in error handler:', storageErr);
 		}
 		throw error;
 	}

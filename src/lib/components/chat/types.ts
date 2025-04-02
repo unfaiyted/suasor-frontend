@@ -8,6 +8,7 @@ export interface Movie {
 	genres: string[];
 	rating: number;
 	overview: string;
+	reason?: string;
 }
 
 export interface MessageContent {

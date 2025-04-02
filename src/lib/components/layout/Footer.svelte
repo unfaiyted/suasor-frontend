@@ -71,8 +71,8 @@
 			<div class="space-y-3">
 				<h4 class="pb-1 font-semibold">Connect</h4>
 				<div class="flex gap-4">
-					<a href="#" class="btn btn-sm variant-soft rounded-full"><IconGithub /></a>
-					<a href="#" class="btn btn-sm variant-soft rounded-full"><IconTwitter /></a>
+					<a href="./" class="btn btn-sm variant-soft rounded-full"><IconGithub /></a>
+					<a href="./" class="btn btn-sm variant-soft rounded-full"><IconTwitter /></a>
 				</div>
 			</div>
 		</div>

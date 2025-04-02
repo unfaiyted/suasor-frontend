@@ -356,16 +356,19 @@ const chatApi = {
   },
   
   // Convert structured AI response to movie objects
-  convertStructuredResponseToMovies(structuredData: any): Movie[] {
+  convertStructuredResponseToMovies(structuredData: any): { movies: Movie[], agentMessage: string } {
     // Ensure we have a valid response
     if (!structuredData || !Array.isArray(structuredData.recommendations)) {
       console.warn('Invalid structured data format:', structuredData);
-      return [];
+      return { movies: [], agentMessage: "I couldn't find any relevant movie recommendations." };
     }
     
     try {
+      // Extract the agent message or use a default
+      const agentMessage = structuredData.agent_message || "Here are some movie recommendations for you:";
+      
       // Map the structured data to our Movie format
-      return structuredData.recommendations.map((rec: any, index: number) => {
+      const movies = structuredData.recommendations.map((rec: any, index: number) => {
         // Generate a unique ID if none is provided
         const id = rec.id || `recommendation-${index}-${Date.now()}`;
         
@@ -378,12 +381,15 @@ const chatApi = {
           poster: rec.poster || `https://via.placeholder.com/300x450.png?text=${encodeURIComponent(rec.title || 'Movie')}`,
           genres: rec.genres || [],
           rating: rec.rating || 0,
-          overview: rec.overview || rec.description || rec.reason || 'No description available.'
+          overview: rec.overview || rec.description || 'No description available.',
+          reason: rec.reason || ''
         };
       });
+      
+      return { movies, agentMessage };
     } catch (error) {
       console.error('Error converting structured data to movies:', error);
-      return [];
+      return { movies: [], agentMessage: "I encountered an error processing movie recommendations." };
     }
   },
   
@@ -464,17 +470,26 @@ const chatApi = {
           systemInstructions: "You are a helpful movie recommendation assistant. Keep responses conversational, friendly, and brief."
         };
         
-        // In a real implementation, we would call the API
-        // const textResponse = await POST(`/ai/generate/${state.currentAiClientId}`, { body: textRequest });
-        
-        // For development, simulate a delay and response
-        await new Promise(resolve => setTimeout(resolve, 800));
-        const simulatedTextResponse = this.simulateAiResponse(latestMessage, false);
+        // Try to call the API first, fall back to simulation if failed
+        let responseText = "";
+        try {
+          const textResponse = await POST(`/api/v1/ai/generate/${state.currentAiClientId}`, { body: textRequest });
+          if (textResponse.data) {
+            // Use the real API response
+            responseText = textResponse.data.text || this.simulateAiResponse(latestMessage, false);
+            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UI
+          }
+        } catch (error) {
+          console.warn('API call failed, using simulated response', error);
+          // Fall back to simulation
+          await new Promise(resolve => setTimeout(resolve, 800));
+          responseText = this.simulateAiResponse(latestMessage, false);
+        }
         
         // Add the conversational response to the chat
         this.addMessageFromAI({
           type: 'text',
-          text: simulatedTextResponse
+          text: responseText
         });
       }
       
@@ -498,7 +513,11 @@ const chatApi = {
         const structuredRequest: GenerateStructuredRequest = {
           prompt: structuredPrompt,
           maxTokens: 1500,
-          systemInstructions: `You are a movie recommendation API. Return a JSON object with an array of recommended movies.
+          systemInstructions: `You are a movie recommendation API. Return a JSON object with an agent message and an array of recommended movies.
+           Include:
+           - agent_message: string (a friendly message explaining the recommendations)
+           - recommendations: array of movie objects
+           
            Each movie should have: 
            - title: string
            - year: number
@@ -509,6 +528,7 @@ const chatApi = {
            
            Format your response as valid JSON like this:
            {
+             "agent_message": "Here are some movies I think you'll enjoy based on your interest in action films!",
              "recommendations": [
                {
                  "title": "Movie Title",
@@ -523,23 +543,41 @@ const chatApi = {
            }`
         };
         
-        // In a real implementation, we would call the API
-        // const structuredResponse = await POST(`/ai/generate-structured/${state.currentAiClientId}`, { body: structuredRequest });
+        // Try to call the API first, fall back to simulation if failed
+        try {
+          const structuredResponse = await POST(`/api/v1/ai/generate-structured/${state.currentAiClientId}`, { body: structuredRequest });
+          if (structuredResponse.data && structuredResponse.data.json) {
+            // Use the real API response
+            const structuredData = JSON.parse(structuredResponse.data.json);
+            // Convert and display the real data
+            const { movies: recommendedMovies, agentMessage } = this.convertStructuredResponseToMovies(structuredData);
+            if (recommendedMovies.length > 0) {
+              this.addMessageFromAI({
+                type: 'movieList',
+                text: agentMessage,
+                movies: recommendedMovies
+              });
+              return; // Exit early since we've processed the response
+            }
+          }
+        } catch (error) {
+          console.warn('API structured call failed, using simulated response', error);
+        }
         
-        // For development, simulate a delay and response
+        // Fall back to simulation
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Simulate a structured JSON response
         const simulatedStructuredData = this.simulateStructuredResponse(latestMessage);
         
-        // Convert the structured data to Movie objects
-        const recommendedMovies = this.convertStructuredResponseToMovies(simulatedStructuredData);
+        // Convert the structured data to Movie objects and get the agent message
+        const { movies: recommendedMovies, agentMessage } = this.convertStructuredResponseToMovies(simulatedStructuredData);
         
         // Add the movie recommendations as a movieList message
         if (recommendedMovies.length > 0) {
           this.addMessageFromAI({
             type: 'movieList',
-            text: "Here are some recommendations based on your preferences:",
+            text: agentMessage,
             movies: recommendedMovies
           });
         }
@@ -771,6 +809,7 @@ const chatApi = {
     
     // Create a structured response
     return {
+      agent_message: "Here are some personalized movie recommendations based on your preferences:",
       recommendations: recommendations.slice(0, 5) // Limit to 5 recommendations
     };
   },

@@ -2,13 +2,13 @@
 	import { Navigation } from '@skeletonlabs/skeleton-svelte';
 	// Icons
 	import IconMenu from '@lucide/svelte/icons/menu';
-	import IconHome from '@lucide/svelte/icons/home';
+	// import IconHome from '@lucide/svelte/icons/home';
 	import IconMessageSquare from '@lucide/svelte/icons/message-square';
 	import IconFilm from '@lucide/svelte/icons/film';
 	import IconTv from '@lucide/svelte/icons/tv';
 	import IconMusic from '@lucide/svelte/icons/music';
-	import IconGamepad from '@lucide/svelte/icons/gamepad';
-	import IconUser from '@lucide/svelte/icons/user';
+	// import IconGamepad from '@lucide/svelte/icons/gamepad';
+	// import IconUser from '@lucide/svelte/icons/user';
 	import IconSettings from '@lucide/svelte/icons/settings';
 	import IconSearch from '@lucide/svelte/icons/search';
 
