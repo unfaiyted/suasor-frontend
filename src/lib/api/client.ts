@@ -35,8 +35,6 @@ const createBasicClient = () => {
 export const createAuthenticatedClient = () => {
 	const token = localStorage.getItem('suasor_access_token');
 
-	console.log('created auth client with ', token);
-
 	return createClient<suasorPaths>({
 		baseUrl: API_BASE_URL,
 		headers: token
@@ -57,7 +55,7 @@ export const login = async (email: string, password: string) => {
 	if (response.data?.data) {
 		const { accessToken, refreshToken, expiresAt, user } = response.data.data;
 		if (accessToken && refreshToken) {
-			console.log('setting tokens', accessToken, refreshToken);
+			// console.log('setting tokens', accessToken, refreshToken);
 			localStorage.setItem('suasor_access_token', accessToken);
 			localStorage.setItem('suasor_refresh_token', refreshToken);
 			localStorage.setItem('suasor_expires_at', expiresAt?.toString() || '0');
@@ -71,22 +69,22 @@ export const login = async (email: string, password: string) => {
 
 export const logout = async () => {
 	console.log('Client logout called - clearing tokens');
-	
+
 	// Browser check to prevent server-side errors
 	if (typeof window === 'undefined') {
 		console.log('Running on server - skipping localStorage operations');
 		return;
 	}
-	
+
 	let refreshToken = null;
-	
+
 	// Get refreshToken safely
 	try {
 		refreshToken = localStorage.getItem('suasor_refresh_token');
 	} catch (err) {
 		console.error('Error accessing localStorage for refresh token:', err);
 	}
-	
+
 	// Clear localStorage first to prevent any race conditions
 	try {
 		console.log('Clearing localStorage items');
@@ -97,11 +95,11 @@ export const logout = async () => {
 	} catch (err) {
 		console.error('Error clearing localStorage:', err);
 	}
-	
+
 	// Now attempt the API call if we had a token
 	if (refreshToken) {
 		try {
-			console.log('Calling logout API endpoint');
+			// console.log('Calling logout API endpoint');
 			await createBasicClient().POST('/auth/logout', {
 				body: { refreshToken }
 			});
@@ -111,7 +109,7 @@ export const logout = async () => {
 			console.error('Logout API call failed', e);
 		}
 	}
-	
+
 	// Double-check that localStorage is cleared
 	try {
 		// Try to clear again just to be sure
@@ -152,9 +150,9 @@ export const isAuthenticated = () => {
 	if (typeof window === 'undefined') {
 		return false;
 	}
-	
+
 	let token, expiresAt;
-	
+
 	try {
 		token = localStorage.getItem('suasor_access_token');
 		expiresAt = localStorage.getItem('suasor_expires_at');
@@ -174,7 +172,7 @@ export const getCurrentUser = () => {
 	if (typeof window === 'undefined') {
 		return null;
 	}
-	
+
 	try {
 		const userStr = localStorage.getItem('suasor_user');
 		return userStr ? JSON.parse(userStr) : null;
@@ -191,9 +189,9 @@ export const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
 		console.log('Running on server - skipping token operations');
 		return apiCall();
 	}
-	
+
 	let refreshTokenValue = null;
-	
+
 	try {
 		// Check for token expiration
 		refreshTokenValue = localStorage.getItem('suasor_refresh_token');

@@ -129,6 +129,17 @@ export type RadarrConfig = components['schemas']['types.RadarrConfig'];
 export type SonarrConfig = components['schemas']['types.SonarrConfig'];
 
 export type ClaudeConfig = components['schemas']['types.ClaudeConfig'];
+export type OpenAIConfig = components['schemas']['types.OpenAIConfig'];
+export type OllamaConfig = components['schemas']['types.OllamaConfig'];
+// Gemini config defined manually since it's not in the schema yet
+export interface GeminiConfig {
+	apiKey?: string;
+	baseURL?: string;
+	category?: string; // Should match ClientCategoryAI
+	clientType?: TypesClientType;
+	maxContextTokens?: number;
+	maxTokens?: number;
+}
 
 export type ClientConfigTypes =
 	| PlexConfig
@@ -138,7 +149,10 @@ export type ClientConfigTypes =
 	| LidarrConfig
 	| RadarrConfig
 	| SonarrConfig
-	| ClaudeConfig;
+	| ClaudeConfig
+	| OpenAIConfig
+	| OllamaConfig
+	| GeminiConfig;
 
 // Chat/Movie interface types (from components/chat/types.ts)
 export interface Movie {

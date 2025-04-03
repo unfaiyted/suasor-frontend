@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	
+
 	// Import types and components
 	import type { Movie, Message } from '$lib/components/chat/types';
 	import ChatMessage from '$lib/components/chat/ChatMessage.svelte';
 	import ChatInput from '$lib/components/chat/ChatInput.svelte';
 	import SelectedMoviesBar from '$lib/components/chat/SelectedMoviesBar.svelte';
 	import SidePanel from '$lib/components/chat/SidePanel.svelte';
-	
+
 	// Import store
 	import chatStore, { chatLoading, chatError, selectedMovies } from '$lib/stores/chat';
 
@@ -55,13 +55,13 @@
 	onMount(async () => {
 		// Set up click handler for action menu
 		document.addEventListener('click', handleClickOutside);
-		
+
 		// Load AI clients
 		await chatStore.loadAiClients();
-		
+
 		// Initialize first chat
 		chatStore.startNewChat();
-		
+
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
 		};
@@ -156,7 +156,7 @@
 						on:toggleSelection={(e) => chatStore.toggleMovieSelection(e.detail)}
 					/>
 				{/each}
-				
+
 				{#if $chatLoading && $chatStore.messages.length === 0}
 					<div class="flex justify-center p-4">
 						<span class="loading loading-spinner loading-lg"></span>

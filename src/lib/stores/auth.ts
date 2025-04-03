@@ -115,7 +115,7 @@ function createAuthStore() {
 				}));
 			} catch (e) {
 				// Handle errors
-				console.error('Logout error:', e);
+				// console.error('Logout error:', e);
 			} finally {
 				store.setLoading(false);
 			}
@@ -188,10 +188,10 @@ function createAuthStore() {
 								expiresAt
 							}));
 
-							console.log('Updated auth state from localStorage: authenticated=true');
+							// console.log('Updated auth state from localStorage: authenticated=true');
 							return;
 						} catch (e) {
-							console.error('Error parsing user data from localStorage', e);
+							// console.error('Error parsing user data from localStorage', e);
 						}
 					} else {
 						console.log('Token is expired, attempting refresh');
@@ -237,18 +237,18 @@ function createAuthStore() {
 		},
 
 		async validateSession(): Promise<boolean> {
-			console.log('Validating session');
+			// console.log('Validating session');
 			try {
 				// Call a protected endpoint to validate the token
 				const response = await GET('/auth/validate');
 
 				if (response.error) {
-					console.log('Session validation failed due to API error');
+					// console.log('Session validation failed due to API error');
 					await this.logout();
 					return false;
 				}
 				if (response.data?.data) {
-					console.log('Validation successful, user data received:', response.data?.data);
+					// console.log('Validation successful, user data received:', response.data?.data);
 
 					// Ensure we update the isAuthenticated flag along with user data
 					store.update((state) => ({
@@ -257,8 +257,8 @@ function createAuthStore() {
 						user: response.data.data
 					}));
 
-					console.log('Session validated and isAuthenticated set to true');
-					
+					// console.log('Session validated and isAuthenticated set to true');
+
 					// Load client data after successful authentication
 					try {
 						// Use dynamic import to avoid circular dependencies
@@ -269,7 +269,7 @@ function createAuthStore() {
 						console.error('Failed to load client data:', err);
 						// Don't fail the session validation if client loading fails
 					}
-					
+
 					return true;
 				}
 

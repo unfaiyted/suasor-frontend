@@ -8,7 +8,7 @@
 
 </div>
 
-The frontend component of Suasor, a modern web application designed to allow users to genrerate AI Generated Recommendation lists for TV shows, Movies, and Music. Plans to integrate with various Self Hosted platformsincluding Sonarr, Radarr, Lidarr for collection and Emby,Jellyfin,Plex, and Navidrome for collection and playlist creations.  
+The frontend component of Suasor, a modern web application designed to allow users to genrerate AI Generated Recommendation lists for TV shows, Movies, and Music. Plans to integrate with various Self Hosted platformsincluding Sonarr, Radarr, Lidarr for collection and Emby,Jellyfin,Plex, and Navidrome for collection and playlist creations.
 
 ## Screenshots
 
