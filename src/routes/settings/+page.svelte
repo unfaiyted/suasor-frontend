@@ -57,7 +57,7 @@
 	let mediaServerIntegrations = {
 		emby: { enabled: false, url: '', apiKey: '' },
 		jellyfin: { enabled: false, url: '', apiKey: '' },
-		navidrome: { enabled: false, url: '', username: '', password: '' },
+		subsonic: { enabled: false, url: '', username: '', password: '' },
 		plex: { enabled: false, url: '', token: '' }
 	};
 
@@ -182,11 +182,11 @@
 							url: `${config.integrations.jellyfin?.ssl ? 'https' : 'http'}://${config.integrations.jellyfin?.host || ''}:${config.integrations.jellyfin?.port || ''}`,
 							apiKey: config.integrations.jellyfin?.apiKey || ''
 						},
-						navidrome: {
-							enabled: config.integrations.navidrome?.enabled || false,
-							url: `${config.integrations.navidrome?.ssl ? 'https' : 'http'}://${config.integrations.navidrome?.host || ''}:${config.integrations.navidrome?.port || ''}`,
-							username: config.integrations.navidrome?.username || '',
-							password: config.integrations.navidrome?.password || ''
+						subsonic: {
+							enabled: config.integrations.subsonic?.enabled || false,
+							url: `${config.integrations.subsonic?.ssl ? 'https' : 'http'}://${config.integrations.subsonic?.host || ''}:${config.integrations.subsonic?.port || ''}`,
+							username: config.integrations.subsonic?.username || '',
+							password: config.integrations.subsonic?.password || ''
 						},
 						plex: {
 							enabled: config.integrations.plex?.enabled || false,
@@ -268,12 +268,27 @@
 		}
 	}
 
+	// Load client data
+	async function loadClientData() {
+		if (!isAuthenticated) return;
+
+		// Import the clients API here to avoid circular dependencies
+		const { clientsApi } = await import('$lib/stores/api');
+
+		try {
+			// Load all clients - will be available in the store for child components
+			await clientsApi.loadClients();
+		} catch (err) {
+			error = 'Failed to load client integrations';
+			console.error(err);
+		}
+	}
+
 	// Initialize component
 	onMount(async () => {
 		// Check if user is authenticated
 		if (isAuthenticated) {
-			await fetchUserConfig();
-			await fetchSystemConfig();
+			await Promise.all([fetchUserConfig(), fetchSystemConfig(), loadClientData()]);
 		} else {
 			error = 'You must be logged in to view settings';
 		}

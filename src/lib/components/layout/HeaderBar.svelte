@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { AppBar } from '@skeletonlabs/skeleton-svelte';
 	import { isAuthenticated, authUser, authStore } from '$lib/stores/auth';
 	import type { UserResponse } from '$lib/api/types';
 	import {
@@ -13,9 +12,10 @@
 		Settings
 	} from '@lucide/svelte';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
-	let userInitials = $state('');
-	let user = $state<UserResponse | null>(null);
+	let userInitials = '';
+	let user: UserResponse | null = null;
 
 	authUser.subscribe((change: UserResponse | null) => {
 		console.log('authUser changed:', change);
@@ -31,62 +31,165 @@
 
 	function handleLogout() {
 		authStore.logout().then(() => {
-			goto('/login');
+			goto('/logout');
 		});
 	}
 
-	// TODO: Add a popup directive to the AppBar component
+	let userMenuVisible = false;
+	let mobileMenuVisible = false;
+
+	function toggleUserMenu() {
+		userMenuVisible = !userMenuVisible;
+		if (userMenuVisible) {
+			mobileMenuVisible = false;
+		}
+	}
+
+	function toggleMobileMenu() {
+		mobileMenuVisible = !mobileMenuVisible;
+		if (mobileMenuVisible) {
+			userMenuVisible = false;
+		}
+	}
+
+	// Close menus when clicking outside
+	function handleClickOutside(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+
+		if (!target.closest('.user-menu-container') && userMenuVisible) {
+			userMenuVisible = false;
+		}
+
+		if (!target.closest('.mobile-menu-container') && mobileMenuVisible) {
+			mobileMenuVisible = false;
+		}
+	}
+
+	onMount(() => {
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
-<AppBar
-	background="bg-surface-100-900/30"
-	headlineClasses="sm:hidden"
-	centerClasses="hidden sm:block"
->
-	{#snippet lead()}
+<div class="bg-surface-100-900/30 flex w-full items-center justify-between p-3">
+	<div class="flex items-center">
 		<ArrowLeft size={24} />
-	{/snippet}
-	{#snippet trail()}
+		<h2 class="h2 ml-3 sm:hidden">Movie Recommendations</h2>
+	</div>
+
+	<div class="hidden sm:block">
+		<span>Movie Recommendations</span>
+	</div>
+
+	<div class="flex items-center">
 		<div class="hidden space-x-4 sm:flex">
 			<Paperclip size={20} />
 			<Calendar size={20} />
 
 			<!-- User menu dropdown -->
-			<div class="relative">
-				<button class="btn-icon btn-sm variant-ghost-surface">
+			<div class="user-menu-container relative">
+				<button
+					class="hover:bg-surface-200-700/50 rounded-full p-2"
+					on:click|stopPropagation={toggleUserMenu}
+				>
 					{#if $isAuthenticated}
-						<div class="avatar placeholder h-8 w-8">
-							<div class="bg-primary-500 text-sm font-bold">
+						<div class="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full">
+							<span class="text-sm font-bold text-white">
 								{userInitials || 'U'}
-							</div>
+							</span>
 						</div>
 					{:else}
 						<CircleUser size={20} />
 					{/if}
 				</button>
 
-				<div class="card p-2 shadow-xl" data-popup="userMenu">
-					<div class="menu">
+				{#if userMenuVisible}
+					<div
+						class="bg-surface-100-800 absolute right-0 z-50 mt-2 min-w-40 rounded-md p-2 shadow-xl"
+					>
+						<div>
+							{#if $isAuthenticated}
+								<div class="px-4 py-2 text-sm font-medium">
+									{user?.username || 'User'}
+									<div class="text-xs opacity-70">{user?.email || ''}</div>
+								</div>
+								<div class="border-surface-300-600 my-1 border-t"></div>
+								<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/settings">
+									<span class="flex items-center gap-2">
+										<Settings size={16} />
+										<span>Settings</span>
+									</span>
+								</a>
+								<button
+									class="hover:bg-surface-200-700/50 block w-full rounded px-4 py-2 text-left"
+									on:click={handleLogout}
+								>
+									<span class="flex items-center gap-2">
+										<LogOut size={16} />
+										<span>Logout</span>
+									</span>
+								</button>
+							{:else}
+								<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/login">
+									<span class="flex items-center gap-2">
+										<LogIn size={16} />
+										<span>Log in</span>
+									</span>
+								</a>
+							{/if}
+						</div>
+					</div>
+				{/if}
+			</div>
+		</div>
+		<div class="mobile-menu-container block sm:hidden">
+			<button
+				class="hover:bg-surface-200-700/50 rounded-full p-2"
+				on:click|stopPropagation={toggleMobileMenu}
+			>
+				<Menu size={20} />
+			</button>
+
+			<!-- Mobile Menu -->
+			{#if mobileMenuVisible}
+				<div
+					class="bg-surface-100-800 absolute top-14 right-0 z-50 mt-2 w-48 rounded-md p-2 shadow-xl"
+				>
+					<div>
 						{#if $isAuthenticated}
-							<div class="px-4 py-2 text-sm font-medium">
-								{user?.username || 'User'}
-								<div class="text-xs opacity-70">{user?.email || ''}</div>
+							<div class="flex items-center gap-2 px-4 py-2 text-sm font-medium">
+								<div class="bg-primary-500 flex h-6 w-6 items-center justify-center rounded-full">
+									<span class="text-xs font-bold text-white">
+										{userInitials || 'U'}
+									</span>
+								</div>
+								<span>{user?.username || 'User'}</span>
 							</div>
-							<div class="divider my-1"></div>
-							<a class="menu-item" href="/settings">
-								<span class="flex items-center gap-2">
-									<Settings size={16} />
-									<span>Settings</span>
-								</span>
+							<div class="border-surface-300-600 my-1 border-t"></div>
+							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/movies">
+								<span>Movies</span>
 							</a>
-							<button class="menu-item" onclick={handleLogout}>
+							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/chat">
+								<span>Recommendations</span>
+							</a>
+							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/settings">
+								<span>Settings</span>
+							</a>
+							<div class="border-surface-300-600 my-1 border-t"></div>
+							<button
+								class="hover:bg-surface-200-700/50 block w-full rounded px-4 py-2 text-left"
+								on:click={handleLogout}
+							>
 								<span class="flex items-center gap-2">
 									<LogOut size={16} />
 									<span>Logout</span>
 								</span>
 							</button>
 						{:else}
-							<a class="menu-item" href="/login">
+							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/login">
 								<span class="flex items-center gap-2">
 									<LogIn size={16} />
 									<span>Log in</span>
@@ -95,56 +198,8 @@
 						{/if}
 					</div>
 				</div>
-			</div>
+			{/if}
 		</div>
-		<div class="block sm:hidden">
-			<button class="btn-icon btn-sm variant-ghost-surface">
-				<Menu size={20} />
-			</button>
+	</div>
+</div>
 
-			<!-- Mobile Menu -->
-			<div class="card w-48 p-2 shadow-xl" data-popup="mobileMenu">
-				<div class="menu">
-					{#if $isAuthenticated}
-						<div class="flex items-center gap-2 px-4 py-2 text-sm font-medium">
-							<div class="avatar placeholder h-6 w-6">
-								<div class="bg-primary-500 text-xs font-bold">
-									{userInitials || 'U'}
-								</div>
-							</div>
-							<span>{user?.username || 'User'}</span>
-						</div>
-						<div class="divider my-1"></div>
-						<a class="menu-item" href="/movies">
-							<span>Movies</span>
-						</a>
-						<a class="menu-item" href="/chat">
-							<span>Recommendations</span>
-						</a>
-						<a class="menu-item" href="/settings">
-							<span>Settings</span>
-						</a>
-						<div class="divider my-1"></div>
-						<button class="menu-item" onclick={handleLogout}>
-							<span class="flex items-center gap-2">
-								<LogOut size={16} />
-								<span>Logout</span>
-							</span>
-						</button>
-					{:else}
-						<a class="menu-item" href="/login">
-							<span class="flex items-center gap-2">
-								<LogIn size={16} />
-								<span>Log in</span>
-							</span>
-						</a>
-					{/if}
-				</div>
-			</div>
-		</div>
-	{/snippet}
-	{#snippet headline()}
-		<h2 class="h2">Movie Recommendations</h2>
-	{/snippet}
-	<span>Movie Recommendations</span>
-</AppBar>

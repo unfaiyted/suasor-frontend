@@ -258,6 +258,18 @@ function createAuthStore() {
 					}));
 
 					console.log('Session validated and isAuthenticated set to true');
+					
+					// Load client data after successful authentication
+					try {
+						// Use dynamic import to avoid circular dependencies
+						const { clientsApi } = await import('./api');
+						await clientsApi.loadClients();
+						console.log('Successfully loaded client data');
+					} catch (err) {
+						console.error('Failed to load client data:', err);
+						// Don't fail the session validation if client loading fails
+					}
+					
 					return true;
 				}
 

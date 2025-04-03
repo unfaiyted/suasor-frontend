@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Test media client connection
-         * @description Tests the connection to a media client using the provided configuration
+         * Test client connection
+         * @description Tests the connection to a client using the provided configuration
          */
         get: {
             parameters: {
@@ -75,7 +75,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ai/generate-structured/{id}": {
+    "/ai/analyze": {
         parameters: {
             query?: never;
             header?: never;
@@ -85,33 +85,30 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Generate structured data with AI
-         * @description Generates structured JSON data using the specified AI client
+         * Analyze content with AI
+         * @description Use AI to analyze provided content
          */
         post: {
             parameters: {
                 query?: never;
                 header?: never;
-                path: {
-                    /** @description Client ID */
-                    id: number;
-                };
+                path?: never;
                 cookie?: never;
             };
-            /** @description Structured data generation request */
+            /** @description Content analysis request */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["requests.GenerateStructuredRequest"];
+                    "application/json": components["schemas"]["requests.AiContentAnalysisRequest"];
                 };
             };
             responses: {
-                /** @description Generated structured data */
+                /** @description Analysis response */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_GenerateStructuredResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_AiContentAnalysisResponse"];
                     };
                 };
                 /** @description Invalid request */
@@ -132,7 +129,87 @@ export interface paths {
                         "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
-                /** @description Client not found */
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversation/message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a message in an existing AI conversation
+         * @description Continue a conversation with the AI by sending a new message
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Message request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.ConversationMessageRequest"];
+                };
+            };
+            responses: {
+                /** @description AI response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_ConversationMessageResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Conversation not owned by user */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Conversation not found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -158,7 +235,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ai/generate/{id}": {
+    "/ai/conversation/start": {
         parameters: {
             query?: never;
             header?: never;
@@ -168,33 +245,30 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Generate text with AI
-         * @description Generates text using the specified AI client
+         * Start a new AI conversation for recommendations
+         * @description Initialize a new conversational session with the AI for personalized recommendations
          */
         post: {
             parameters: {
                 query?: never;
                 header?: never;
-                path: {
-                    /** @description Client ID */
-                    id: number;
-                };
+                path?: never;
                 cookie?: never;
             };
-            /** @description Text generation request */
+            /** @description Conversation initialization request */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["requests.GenerateTextRequest"];
+                    "application/json": components["schemas"]["requests.StartConversationRequest"];
                 };
             };
             responses: {
-                /** @description Generated text */
+                /** @description Conversation started */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_GenerateTextResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-responses_ConversationResponse"];
                     };
                 };
                 /** @description Invalid request */
@@ -215,8 +289,70 @@ export interface paths {
                         "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
-                /** @description Client not found */
-                404: {
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get AI-powered content recommendations
+         * @description Get content recommendations from an AI service
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Recommendation request */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.AiRecommendationRequest"];
+                };
+            };
+            responses: {
+                /** @description Recommendation response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_AiRecommendationResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -577,6 +713,253 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/:clientType": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all clients
+         * @description Retrieves all client configurations for the user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Clients retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_Client-types_ClientConfig"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create a new client
+         * @description Creates a new client configuration
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description client data */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.ClientRequest-types_ClientConfig"];
+                };
+            };
+            responses: {
+                /** @description client created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_Client-types_ClientConfig"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all clients
+         * @description Retrieves all configured clients across different types for the user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description All user clients with various config types */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ClientsResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.BasicErrorResponse"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.BasicErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/:clientType/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete client
+         * @description Deletes a client configuration
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description client deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_EmptyResponse"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Client not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1437,118 +1820,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["responses.EmptyAPIResponse"];
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/clients/media": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get all media clients
-         * @description Retrieves all media client configurations for the user
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Media clients retrieved */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_ClientResponse"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /**
-         * Create a new media client
-         * @description Creates a new media client configuration
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Media client data */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["requests.SwaggerClientRequest"];
-                };
-            };
-            responses: {
-                /** @description Media client created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_ClientResponse"];
                     };
                 };
                 /** @description Invalid request */
@@ -2762,84 +3033,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/clients/media/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete media client
-         * @description Deletes a media client configuration
-         */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Client ID */
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Media client deleted */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_EmptyResponse"];
-                    };
-                };
-                /** @description Invalid client ID */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Client not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/config": {
         parameters: {
             query?: never;
@@ -3261,6 +3454,45 @@ export interface paths {
                 };
             };
         };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/docs/client-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reference for all client config types
+         * @description This endpoint doesn't exist but serves as a reference for all client config types
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ollama client config */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["types.OllamaConfig"];
+                    };
+                };
+            };
+        };
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -5308,6 +5540,21 @@ export interface components {
     schemas: {
         /** @enum {string} */
         "errors.ErrorType": ErrorsErrorType;
+        "models.Client-types_ClientConfig": {
+            category?: components["schemas"]["types.ClientCategory"];
+            config?: components["schemas"]["models.ClientConfigWrapper-types_ClientConfig"];
+            createdAt?: string;
+            deletedAt?: string;
+            id?: number;
+            isEnabled?: boolean;
+            name?: string;
+            type?: components["schemas"]["types.ClientType"];
+            updatedAt?: string;
+            userId?: number;
+        };
+        "models.ClientConfigWrapper-types_ClientConfig": {
+            data?: unknown;
+        };
         "models.MediaItem-types_Album": {
             /** @description Reference to the media client */
             clientId?: number;
@@ -5486,6 +5733,47 @@ export interface components {
             tvdbid?: number;
             year?: number;
         };
+        /** @description Request for AI-powered content analysis */
+        "requests.AiContentAnalysisRequest": {
+            /** @description Client ID to use for the conversation */
+            clientId?: number;
+            /** @description Specific AI client type to use (claude, openai, ollama)
+             *     example: claude */
+            clientType?: string;
+            /** @description The content to analyze
+             *     required: true
+             *     example: This is a sample text that needs analysis for sentiment and themes. */
+            content: string;
+            /** @description Type of content being analyzed (text, movie, etc)
+             *     required: true
+             *     example: text */
+            contentType: string;
+            /** @description Optional analysis options
+             *     example: {"includeThemes": true, "includeSentiment": true} */
+            options?: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description Request for AI-powered content recommendations */
+        "requests.AiRecommendationRequest": {
+            /** @description Client ID to use for the conversation */
+            clientId?: number;
+            /** @description Specific AI client type to use (claude, openai, ollama)
+             *     example: claude */
+            clientType?: string;
+            /** @description Type of content to recommend (movie, tv, music, etc)
+             *     required: true
+             *     example: movie */
+            contentType: string;
+            /** @description Number of recommendations to return
+             *     example: 5 */
+            count?: number;
+            /** @description Optional filters to apply to recommendations
+             *     example: {"genre": "sci-fi", "year": "2020-2023"} */
+            filters?: {
+                [key: string]: unknown;
+            };
+        };
         /** @description Request payload for changing user password */
         "requests.ChangePasswordRequest": {
             /**
@@ -5515,6 +5803,31 @@ export interface components {
              */
             role: RequestsChangeRoleRequestRole;
         };
+        "requests.ClientRequest-types_ClientConfig": {
+            client?: unknown;
+            clientID?: number;
+            clientType: components["schemas"]["types.ClientType"];
+            isEnabled?: boolean;
+            name: string;
+        };
+        /** @description Request to send a message in an existing AI conversation */
+        "requests.ConversationMessageRequest": {
+            /** @description Client ID to use for the conversation */
+            clientId?: number;
+            /** @description Optional context information for this message
+             *     example: {"includeRecommendations": true, "maxResults": 3} */
+            context?: {
+                [key: string]: unknown;
+            };
+            /** @description The conversation ID from a previous StartConversation call
+             *     required: true
+             *     example: conv-123-abcdef */
+            conversationId: string;
+            /** @description The user's message to the AI
+             *     required: true
+             *     example: I'm looking for sci-fi movies similar to Interstellar */
+            message: string;
+        };
         "requests.CreateTagRequest": {
             name: string;
         };
@@ -5523,38 +5836,6 @@ export interface components {
             parameters?: {
                 [key: string]: unknown;
             };
-        };
-        /** @description Request for generating structured JSON data with an AI client */
-        "requests.GenerateStructuredRequest": {
-            /** @description Maximum number of tokens to generate
-             *     example: 500 */
-            maxTokens?: number;
-            /** @description The prompt text to generate structured data from
-             *     required: true
-             *     example: Create a JSON object representing three programming languages */
-            prompt: string;
-            /** @description Optional system instructions to guide the AI
-             *     example: You are a helpful assistant specializing in structured data generation */
-            systemInstructions?: string;
-            /** @description Temperature for AI response (0.0 to 1.0)
-             *     example: 0.2 */
-            temperature?: number;
-        };
-        /** @description Request for generating text with an AI client */
-        "requests.GenerateTextRequest": {
-            /** @description Maximum number of tokens to generate
-             *     example: 500 */
-            maxTokens?: number;
-            /** @description The prompt text to generate from
-             *     required: true
-             *     example: Write a short poem about programming */
-            prompt: string;
-            /** @description Optional system instructions to guide the AI
-             *     example: You are a helpful assistant specializing in creative writing */
-            systemInstructions?: string;
-            /** @description Temperature for AI response (0.0 to 1.0)
-             *     example: 0.7 */
-            temperature?: number;
         };
         /** @description Request payload for user login */
         "requests.LoginRequest": {
@@ -5618,12 +5899,22 @@ export interface components {
              */
             username: string;
         };
-        "requests.SwaggerClientRequest": {
-            client?: unknown;
-            clientID?: number;
-            clientType: components["schemas"]["types.ClientType"];
-            isEnabled?: boolean;
-            name: string;
+        /** @description Request to start a new AI-powered conversation for recommendations */
+        "requests.StartConversationRequest": {
+            /** @description Client ID to use for the conversation */
+            clientId?: number;
+            /** @description Type of content to discuss (movie, tv, music, etc)
+             *     required: true
+             *     example: movie */
+            contentType: string;
+            /** @description Optional user preferences to initialize the conversation
+             *     example: {"favoriteGenres": ["sci-fi", "thriller"], "recentlyWatched": ["Inception", "Tenet"]} */
+            preferences?: {
+                [key: string]: unknown;
+            };
+            /** @description Optional custom system instructions
+             *     example: You are a helpful movie recommendation assistant */
+            systemInstructions?: string;
         };
         "requests.UpdateMediaRequest": {
             /** @description For Lidarr */
@@ -5635,6 +5926,13 @@ export interface components {
         };
         "responses.APIResponse-any": {
             data?: unknown;
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_Client-types_ClientConfig": {
+            data?: components["schemas"]["models.Client-types_ClientConfig"][];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -5668,15 +5966,15 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
-        "responses.APIResponse-array_responses_ClientResponse": {
-            data?: components["schemas"]["responses.ClientResponse"][];
+        "responses.APIResponse-array_responses_MediaItemResponse": {
+            data?: components["schemas"]["responses.MediaItemResponse"][];
             /** @example Operation successful */
             message?: string;
             /** @example true */
             success?: boolean;
         };
-        "responses.APIResponse-array_responses_MediaItemResponse": {
-            data?: components["schemas"]["responses.MediaItemResponse"][];
+        "responses.APIResponse-models_Client-types_ClientConfig": {
+            data?: components["schemas"]["models.Client-types_ClientConfig"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -5717,6 +6015,20 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-responses_AiContentAnalysisResponse": {
+            data?: components["schemas"]["responses.AiContentAnalysisResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_AiRecommendationResponse": {
+            data?: components["schemas"]["responses.AiRecommendationResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-responses_AuthDataResponse": {
             data?: components["schemas"]["responses.AuthDataResponse"];
             /** @example Operation successful */
@@ -5724,8 +6036,15 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
-        "responses.APIResponse-responses_ClientResponse": {
-            data?: components["schemas"]["responses.ClientResponse"];
+        "responses.APIResponse-responses_ConversationMessageResponse": {
+            data?: components["schemas"]["responses.ConversationMessageResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_ConversationResponse": {
+            data?: components["schemas"]["responses.ConversationResponse"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -5733,20 +6052,6 @@ export interface components {
         };
         "responses.APIResponse-responses_EmptyResponse": {
             data?: components["schemas"]["responses.EmptyResponse"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "responses.APIResponse-responses_GenerateStructuredResponse": {
-            data?: components["schemas"]["responses.GenerateStructuredResponse"];
-            /** @example Operation successful */
-            message?: string;
-            /** @example true */
-            success?: boolean;
-        };
-        "responses.APIResponse-responses_GenerateTextResponse": {
-            data?: components["schemas"]["responses.GenerateTextResponse"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -5787,6 +6092,20 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        /** @description Response containing AI-powered content analysis */
+        "responses.AiContentAnalysisResponse": {
+            /** @description Analysis results */
+            analysis?: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description Response containing AI-powered content recommendations */
+        "responses.AiRecommendationResponse": {
+            /** @description List of recommended items */
+            items?: {
+                [key: string]: unknown;
+            }[];
+        };
         /** @description Authentication data returned to client after successful authentication */
         "responses.AuthDataResponse": {
             /** @description AccessToken is the JWT token for API access
@@ -5805,14 +6124,69 @@ export interface components {
              *     @Description User profile data */
             user?: components["schemas"]["responses.UserResponse"];
         };
+        "responses.BasicErrorResponse": {
+            details?: components["schemas"]["responses.ErrorDetails"];
+            /** @example This is a pretty message */
+            message?: string;
+            request_id?: string;
+            /** @example 201 */
+            statusCode?: number;
+            timestamp?: string;
+            /** @example FAILED_CHECK */
+            type?: components["schemas"]["errors.ErrorType"];
+        };
         "responses.ClientResponse": {
+            /** @description Can be any of the config types */
             client?: unknown;
+            /** @example plex */
             clientType?: components["schemas"]["types.MediaClientType"];
+            /** @example 2023-01-01T12:00:00Z */
             createdAt?: string;
+            /** @example 1 */
             id?: number;
+            /** @example My Plex Server */
             name?: string;
+            /** @example 2023-01-01T12:00:00Z */
             updatedAt?: string;
+            /** @example 123 */
             userId?: number;
+        };
+        "responses.ClientsResponse": {
+            data?: components["schemas"]["responses.ClientResponse"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        /** @description Response to a message in an AI conversation */
+        "responses.ConversationMessageResponse": {
+            /** @description Additional message context
+             *     example: {"sentiment": "positive", "topicShift": false} */
+            context?: {
+                [key: string]: unknown;
+            };
+            /** @description The AI's response to the user message
+             *     example: "Based on your interest in Interstellar, I'd recommend checking out these sci-fi movies with similar themes of space exploration and time: 1. Arrival (2016), 2. The Martian (2015), 3. Ad Astra (2019). Would you like more recommendations or details about any of these?" */
+            message?: string;
+            /** @description Recommendations included in the response, if any
+             *     example: [{"title": "Arrival", "year": 2016, "genre": "Sci-Fi"}, {"title": "The Martian", "year": 2015, "genre": "Sci-Fi"}] */
+            recommendations?: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** @description Response containing conversation details */
+        "responses.ConversationResponse": {
+            /** @description Additional information about the conversation context
+             *     example: {"contentType": "movie", "session": "active"} */
+            context?: {
+                [key: string]: unknown;
+            };
+            /** @description Unique ID for the conversation
+             *     example: conv-123-abcdef */
+            conversationId?: string;
+            /** @description Initial greeting or message from the AI
+             *     example: "Hi there! I'm your movie recommendation assistant. What kind of movies do you enjoy watching?" */
+            welcome?: string;
         };
         "responses.EmptyAPIResponse": {
             data?: unknown;
@@ -5852,16 +6226,6 @@ export interface components {
             timestamp?: string;
             /** @example FAILED_CHECK */
             type?: components["schemas"]["errors.ErrorType"];
-        };
-        /** @description Response containing structured data generated by the AI */
-        "responses.GenerateStructuredResponse": {
-            [key: string]: unknown;
-        };
-        /** @description Response containing the generated text from the AI */
-        "responses.GenerateTextResponse": {
-            /** @description The generated text content
-             *     example: "Bits and bytes in endless flow,\nBuilding worlds that softly grow.\nLogic woven, patterns tight,\nCreating order out of night." */
-            text?: string;
         };
         "responses.HealthResponse": {
             /** @example true */
@@ -5924,6 +6288,8 @@ export interface components {
             /** @description For sources that might have how many people voted on an item */
             votes?: number;
         };
+        /** @enum {string} */
+        "types.AIClientType": TypesAIClientType;
         "types.Album": {
             artistID?: string;
             artistName?: string;
@@ -5944,6 +6310,28 @@ export interface components {
             poster?: string;
             thumbnail?: string;
         };
+        /** @enum {string} */
+        "types.AutomationClientType": TypesAutomationClientType;
+        /** @description Claude media server configuration */
+        "types.ClaudeConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AIClientType"];
+            /** @example 1000 */
+            maxContextTokens?: number;
+            /** @example 100 */
+            maxTokens?: number;
+            /** @example claude-2 */
+            model?: string;
+            /** @example 0.5 */
+            temperature?: number;
+            type?: components["schemas"]["types.ClientType"];
+        };
+        /** @enum {string} */
+        "types.ClientCategory": TypesClientCategory;
         /** @enum {string} */
         "types.ClientType": TypesClientType;
         /** @description Complete application configuration settings */
@@ -6040,6 +6428,50 @@ export interface components {
                 writeTimeout: number;
             };
         };
+        /** @description Emby media server configuration */
+        "types.EmbyConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.MediaClientType"];
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+            /** @example your-internal-user-id */
+            userID?: string;
+            /** @example admin */
+            username?: string;
+        };
+        /** @description Jellyfin media server configuration */
+        "types.JellyfinConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.MediaClientType"];
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+            /** @example your-internal-user-id */
+            userID?: string;
+            /** @example admin */
+            username?: string;
+        };
+        /** @description Jellyfin media server configuration */
+        "types.LidarrConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AutomationClientType"];
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+        };
         /** @enum {string} */
         "types.MediaClientType": TypesMediaClientType;
         "types.MediaDetails": {
@@ -6063,12 +6495,102 @@ export interface components {
         };
         /** @enum {string} */
         "types.MediaType": TypesMediaType;
+        /** @description Claude media server configuration */
+        "types.OllamaConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AIClientType"];
+            /** @example 1000 */
+            maxContextTokens?: number;
+            /** @example 100 */
+            maxTokens?: number;
+            /** @example claude-2 */
+            model?: string;
+            /** @example 0.5 */
+            temperature?: number;
+            type?: components["schemas"]["types.ClientType"];
+        };
+        /** @description Claude media server configuration */
+        "types.OpenAIConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AIClientType"];
+            /** @example 1000 */
+            maxContextTokens?: number;
+            /** @example 100 */
+            maxTokens?: number;
+            /** @example claude-2 */
+            model?: string;
+            /** @example 0.5 */
+            temperature?: number;
+            type?: components["schemas"]["types.ClientType"];
+        };
         "types.Playlist": {
             details?: components["schemas"]["types.MediaDetails"];
             isPublic?: boolean;
             itemCount?: number;
             itemIDs?: string[];
             owner?: string;
+        };
+        /** @description Plex media server configuration */
+        "types.PlexConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.MediaClientType"];
+            /** @example false */
+            ssl?: boolean;
+            /** @example your-plex-token */
+            token?: string;
+            type?: components["schemas"]["types.ClientType"];
+        };
+        /** @description Emby media server configuration */
+        "types.RadarrConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AutomationClientType"];
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+        };
+        /** @description Emby media server configuration */
+        "types.SonarrConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.AutomationClientType"];
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+        };
+        /** @description Supersonic music server configuration */
+        "types.SubsonicConfig": {
+            /** @example your-api-key */
+            apiKey?: string;
+            /** @example http://localhost:8096 */
+            baseURL?: string;
+            category?: components["schemas"]["types.ClientCategory"];
+            clientType?: components["schemas"]["types.MediaClientType"];
+            /** @example your-password */
+            password?: string;
+            /** @example false */
+            ssl?: boolean;
+            type?: components["schemas"]["types.ClientType"];
+            /** @example admin */
+            username?: string;
         };
         "types.Track": {
             albumID?: string;
@@ -6149,6 +6671,24 @@ export enum ResponsesHealthResponseStatus {
     up = "up",
     down = "down",
     degraded = "degraded"
+}
+export enum TypesAIClientType {
+    AIClientTypeClaude = "claude",
+    AIClientTypeOpenAI = "openai",
+    AIClientTypeOllama = "ollama",
+    AIClientTypeUnknown = "unknown"
+}
+export enum TypesAutomationClientType {
+    AutomationClientTypeRadarr = "radarr",
+    AutomationClientTypeSonarr = "sonarr",
+    AutomationClientTypeLidarr = "lidarr",
+    AutomationClientTypeUnknown = "unknown"
+}
+export enum TypesClientCategory {
+    ClientCategoryAutomation = "automation",
+    ClientCategoryMedia = "media",
+    ClientCategoryAI = "ai",
+    ClientCategoryUnknown = "unknown"
 }
 export enum TypesClientType {
     ClientTypeEmby = "emby",

@@ -17,6 +17,7 @@ export type LogoutRequest = components['schemas']['requests.LogoutRequest'];
 export type RefreshTokenRequest = components['schemas']['requests.RefreshTokenRequest'];
 export type RegisterRequest = components['schemas']['requests.RegisterRequest'];
 export type ChangePasswordRequest = components['schemas']['requests.ChangePasswordRequest'];
+// export type ClientType = components['schemas']['types.ClientType'];
 
 // Response wrapper types
 export type APIUserConfigResponse =
@@ -36,21 +37,28 @@ export type Configuration = components['schemas']['types.Configuration'];
 export type ClientType = TypesClientType;
 export type MediaClientType = TypesMediaClientType;
 export type ClientResponse = components['schemas']['responses.ClientResponse'];
+export type ClientRequest = components['schemas']['requests.ClientRequest-types_ClientConfig'];
+export type ClientConfig = components['schemas']['models.Client-types_ClientConfig'];
+export type ClientWithConfig = components['schemas']['models.Client-types_ClientConfig'];
 export type APIClientResponse =
-	components['schemas']['responses.APIResponse-responses_ClientResponse'];
+	components['schemas']['responses.APIResponse-models_Client-types_ClientConfig'];
 export type APIClientsResponse =
-	components['schemas']['responses.APIResponse-array_responses_ClientResponse'];
+	components['schemas']['responses.APIResponse-array_models_Client-types_ClientConfig'];
 
 // AI interaction types
-export type GenerateTextRequest = components['schemas']['requests.GenerateTextRequest'];
-export type GenerateStructuredRequest = components['schemas']['requests.GenerateStructuredRequest'];
-export type GenerateTextResponse = components['schemas']['responses.GenerateTextResponse'];
-export type GenerateStructuredResponse =
-	components['schemas']['responses.GenerateStructuredResponse'];
-export type APIGenerateTextResponse =
-	components['schemas']['responses.APIResponse-responses_GenerateTextResponse'];
-export type APIGenerateStructuredResponse =
-	components['schemas']['responses.APIResponse-responses_GenerateStructuredResponse'];
+export type AiRecommendationResponse = components['schemas']['responses.AiRecommendationResponse'];
+export type AiContentAnalysisResponse =
+	components['schemas']['responses.AiContentAnalysisResponse'];
+
+// export type GenerateTextRequest = components['schemas']['requests.GenerateTextRequest'];
+// export type GenerateStructuredRequest = components['schemas']['requests.GenerateStructuredRequest'];
+// export type GenerateTextResponse = components['schemas']['responses.GenerateTextResponse'];
+// export type GenerateStructuredResponse =
+// components['schemas']['responses.GenerateStructuredResponse'];
+// export type APIGenerateTextResponse =
+// components['schemas']['responses.APIResponse-responses_GenerateTextResponse'];
+// export type APIGenerateStructuredResponse =
+// components['schemas']['responses.APIResponse-responses_GenerateStructuredResponse'];
 
 // Automation client types
 export type ExecuteCommandRequest = components['schemas']['requests.ExecuteCommandRequest'];
@@ -111,12 +119,33 @@ export type ErrorResponse = components['schemas']['responses.ErrorResponse-respo
 export type ErrorDetailsResponse =
 	components['schemas']['responses.ErrorResponse-responses_ErrorDetails'];
 
+export type PlexConfig = components['schemas']['types.PlexConfig'];
+export type EmbyConfig = components['schemas']['types.EmbyConfig'];
+export type JellyfinConfig = components['schemas']['types.JellyfinConfig'];
+export type SubsonicConfig = components['schemas']['types.SubsonicConfig'];
+
+export type LidarrConfig = components['schemas']['types.LidarrConfig'];
+export type RadarrConfig = components['schemas']['types.RadarrConfig'];
+export type SonarrConfig = components['schemas']['types.SonarrConfig'];
+
+export type ClaudeConfig = components['schemas']['types.ClaudeConfig'];
+
+export type ClientConfigTypes =
+	| PlexConfig
+	| EmbyConfig
+	| JellyfinConfig
+	| SubsonicConfig
+	| LidarrConfig
+	| RadarrConfig
+	| SonarrConfig
+	| ClaudeConfig;
+
 // Chat/Movie interface types (from components/chat/types.ts)
 export interface Movie {
 	id: string;
 	title: string;
 	year: number;
-	type: 'movie' | 'series';
+	type: 'movie';
 	poster: string;
 	genres: string[];
 	rating: number;
@@ -149,4 +178,3 @@ export interface Chat {
 
 // Legacy type alias for backward compatibility
 export { ErrorsErrorType as ModelsErrorType };
-
