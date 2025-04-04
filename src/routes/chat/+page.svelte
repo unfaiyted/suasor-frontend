@@ -8,59 +8,45 @@
 	import ChatInput from '$lib/components/chat/ChatInput.svelte';
 	import SelectedMoviesBar from '$lib/components/chat/SelectedMoviesBar.svelte';
 	import SidePanel from '$lib/components/chat/SidePanel.svelte';
+	import TypingMessage from '$lib/components/chat/TypingMessage.svelte';
 
 	// Import store
-	import chatStore, { chatLoading, chatError, selectedMovies } from '$lib/stores/chat';
+	import chatStore, {
+		chatLoading,
+		chatError,
+		selectedMovies,
+		aiClients,
+		currentAiClient,
+		mediaClients
+	} from '$lib/stores/chat';
 
 	// Local state
 	let elemChat: HTMLElement;
 	let currentMessage = '';
 	let showActionsMenu = false;
 	let showSidePanel = true;
+	let showTypingIndicator = false;
 
-	// Sample movies data (used only for initial examples)
-	const sampleMovies: Movie[] = [
-		{
-			id: 'air1',
-			title: 'Everything Everywhere All at Once',
-			year: 2022,
-			type: 'movie',
-			poster: 'https://image.tmdb.org/t/p/original/u68AjlvlutfEIcpmbYpKcdi09ut.jpg',
-			genres: ['Action', 'Adventure', 'Science Fiction'],
-			rating: 8.0,
-			overview: 'An aging Chinese immigrant is swept up in an insane adventure...'
-		},
-		{
-			id: 't1',
-			title: 'Oppenheimer',
-			year: 2023,
-			type: 'movie',
-			poster: 'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-			genres: ['Drama', 'History'],
-			rating: 8.2,
-			overview: 'The story of American scientist J. Robert Oppenheimer...'
-		},
-		{
-			id: 't2',
-			title: 'Poor Things',
-			year: 2023,
-			type: 'movie',
-			poster: 'https://image.tmdb.org/t/p/w500/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg',
-			genres: ['Science Fiction', 'Comedy', 'Romance'],
-			rating: 8.0,
-			overview: 'Brought back to life by an unorthodox scientist...'
-		}
-	];
+	// State variables for chat functionality
+	let isInitializing = true;
 
 	onMount(async () => {
 		// Set up click handler for action menu
 		document.addEventListener('click', handleClickOutside);
 
-		// Load AI clients
-		await chatStore.loadAiClients();
+		isInitializing = true;
 
-		// Initialize first chat
-		chatStore.startNewChat();
+		try {
+			// Load AI clients first
+			await chatStore.loadAiClients();
+
+			// Initialize first chat using the conversation API
+			await chatStore.startNewChat();
+		} catch (error) {
+			console.error('Error initializing chat:', error);
+		} finally {
+			isInitializing = false;
+		}
 
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
@@ -106,6 +92,29 @@
 		showActionsMenu = false;
 	}
 
+	// Send a message and show the typing indicator while waiting
+	async function handleSendMessage() {
+		if (!currentMessage.trim() && $selectedMovies.length === 0) return;
+
+		// Show typing indicator
+		showTypingIndicator = true;
+		scrollChatBottom(); // Scroll immediately to show typing indicator
+
+		try {
+			// Add a minimum delay for the typing indicator (at least 1 second)
+			const messageProcessingPromise = chatStore.sendMessage(currentMessage);
+			const minTypingTimePromise = new Promise((resolve) => setTimeout(resolve, 1000));
+
+			// Wait for both the API response and minimum typing time
+			await Promise.all([messageProcessingPromise, minTypingTimePromise]);
+			currentMessage = '';
+		} finally {
+			// Hide typing indicator after response is received
+			showTypingIndicator = false;
+			scrollChatBottom();
+		}
+	}
+
 	// Reactive statements to handle updates
 	$: if ($chatStore.messages) {
 		// Scroll to bottom when messages change
@@ -126,9 +135,19 @@
 	<!-- Main Chat Area -->
 	<section class="card bg-surface-100-900 rounded-container flex-1 overflow-hidden p-4">
 		<div class="mb-2 flex justify-between">
-			<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
-				{showSidePanel ? 'Hide' : 'Show'} History
-			</button>
+			<div class="flex items-center gap-2">
+				<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
+					{showSidePanel ? 'Hide' : 'Show'} History
+				</button>
+
+				{#if $currentAiClient}
+					<span class="badge badge-primary">AI: {$currentAiClient.name}</span>
+				{/if}
+
+				{#if $mediaClients && $mediaClients.length > 0}
+					<span class="badge badge-secondary">Media: {$mediaClients.length} connected</span>
+				{/if}
+			</div>
 
 			<button class="btn btn-sm preset-filled" on:click={() => chatStore.startNewChat()}>
 				New Chat
@@ -149,15 +168,35 @@
 				bind:this={elemChat}
 				class="max-h-[600px] space-y-4 overflow-y-auto p-4 md:min-h-[500px]"
 			>
-				{#each $chatStore.messages as message (message.id)}
-					<ChatMessage
-						{message}
-						selectedMovies={$selectedMovies}
-						on:toggleSelection={(e) => chatStore.toggleMovieSelection(e.detail)}
-					/>
-				{/each}
+				{#if isInitializing}
+					<div class="flex flex-col items-center justify-center p-4 text-center">
+						<span class="loading loading-spinner loading-lg mb-2"></span>
+						<p>Initializing chat session...</p>
+					</div>
+				{:else if $chatStore.messages.length === 0}
+					<div class="flex h-full flex-col items-center justify-center p-4 text-center">
+						<p class="mb-4 text-lg">Welcome to the Movie Recommendation Chat</p>
+						<p class="text-sm opacity-70">Ask about movies, genres, or directors you enjoy</p>
+					</div>
+				{:else}
+					{#each $chatStore.messages as message (message.id)}
+						<ChatMessage
+							{message}
+							selectedMovies={$selectedMovies}
+							showTyping={showTypingIndicator &&
+								message.id === $chatStore.messages.length - 1 &&
+								message.sender === 'ai'}
+							on:toggleSelection={(e) => chatStore.toggleMovieSelection(e.detail)}
+						/>
+					{/each}
+				{/if}
 
-				{#if $chatLoading && $chatStore.messages.length === 0}
+				<!-- Show typing message when waiting for a response -->
+				{#if showTypingIndicator && $chatStore.messages.length > 0}
+					<TypingMessage />
+				{/if}
+
+				{#if $chatLoading && !isInitializing && $chatStore.messages.length === 0}
 					<div class="flex justify-center p-4">
 						<span class="loading loading-spinner loading-lg"></span>
 					</div>
@@ -169,7 +208,7 @@
 				<SelectedMoviesBar
 					selectedMovies={$selectedMovies}
 					{showActionsMenu}
-					on:toggleSelection={(e) => chatStore.toggleMovieSelection(e.detail)}
+					on:toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
 					on:createList={createListFromSelection}
 					on:handleAction={(e) => handleAction(e.detail)}
 					on:toggleMenu={() => (showActionsMenu = !showActionsMenu)}
@@ -180,7 +219,8 @@
 			<ChatInput
 				bind:currentMessage
 				hasSelectedMovies={$selectedMovies.length > 0}
-				on:sendMessage={() => scrollChatBottom()}
+				on:sendMessage={handleSendMessage}
+				disabled={showTypingIndicator || $chatLoading}
 			/>
 		</div>
 	</section>
@@ -191,3 +231,4 @@
 		min-height: calc(100dvh - 120px);
 	}
 </style>
+

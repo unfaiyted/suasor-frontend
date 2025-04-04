@@ -28,7 +28,13 @@
 	<div class="flex gap-2 overflow-x-auto">
 		{#each selectedMovies as movie}
 			<div class="relative w-16 flex-shrink-0">
-				<img src={movie.poster} alt={movie.title} class="h-24 w-16 rounded object-cover" />
+				<img
+					src={movie.poster ||
+						movie.details?.artwork?.poster ||
+						`https://via.placeholder.com/160x240?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`}
+					alt={movie.title || movie.details?.title || 'Movie'}
+					class="h-24 w-16 rounded object-cover"
+				/>
 				<button
 					class="bg-primary-500 absolute flex h-5 w-5 items-center justify-center rounded-full text-white"
 					style={'top: 3px; left: 8px'}
@@ -37,7 +43,9 @@
 					<Check size={12} />
 				</button>
 				<div class="absolute right-0 bottom-0 left-0 bg-black/80 p-1">
-					<p class="truncate text-xs text-white">{movie.title}</p>
+					<p class="truncate text-xs text-white">
+						{movie.title || movie.details?.title || 'Unknown'}
+					</p>
 				</div>
 			</div>
 		{/each}

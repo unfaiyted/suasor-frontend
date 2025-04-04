@@ -3,7 +3,8 @@
 	import HeaderBar from '$lib/components/layout/HeaderBar.svelte';
 	import SideBar from '$lib/components/layout/SideBar.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
-	// import { PanelRight } from '@lucide/svelte';
+	import GlobalMoviePopover from '$lib/components/chat/GlobalMoviePopover.svelte';
+		// import { PanelRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { navigating } from '$app/state';
 	import { page } from '$app/state';
@@ -121,4 +122,6 @@
 			<Footer />
 		</div>
 	{/if}
+	<!-- Global Movie Popover that's managed at the top level (outside any containers) -->
+	<GlobalMoviePopover />
 </div>

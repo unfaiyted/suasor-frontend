@@ -77,12 +77,17 @@ export type Album = components['schemas']['types.Album'];
 export type Artist = components['schemas']['types.Artist'];
 export type Playlist = components['schemas']['types.Playlist'];
 export type Track = components['schemas']['types.Track'];
+export type Movie = components['schemas']['types.Movie'];
+export type Series = components['schemas']['types.Series'];
+export type Person = components['schemas']['types.Person'];
 
 // MediaItem types
 export type MediaItemAlbum = components['schemas']['models.MediaItem-types_Album'];
 export type MediaItemArtist = components['schemas']['models.MediaItem-types_Artist'];
 export type MediaItemPlaylist = components['schemas']['models.MediaItem-types_Playlist'];
 export type MediaItemTrack = components['schemas']['models.MediaItem-types_Track'];
+export type MediaItemMovie = components['schemas']['models.MediaItem-types_Movie'];
+export type MediaItemSeries = components['schemas']['models.MediaItem-types_Series'];
 
 // API Response types for media items
 export type APIMediaItemAlbumResponse =
@@ -153,19 +158,6 @@ export type ClientConfigTypes =
 	| OpenAIConfig
 	| OllamaConfig
 	| GeminiConfig;
-
-// Chat/Movie interface types (from components/chat/types.ts)
-export interface Movie {
-	id: string;
-	title: string;
-	year: number;
-	type: 'movie';
-	poster: string;
-	genres: string[];
-	rating: number;
-	overview: string;
-	reason?: string;
-}
 
 export interface MessageContent {
 	type: 'text' | 'movieList';

@@ -50,6 +50,8 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^0.482.0",
+		"@types/marked": "^6.0.0",
+		"marked": "^15.0.7",
 		"openapi-fetch": "^0.13.5"
 	}
 }

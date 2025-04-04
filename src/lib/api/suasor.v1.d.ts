@@ -830,6 +830,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/{clientType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get clients by type
+         * @description Retrieves all clients of a specific type for the user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Client type (e.g. 'plex', 'jellyfin', 'emby') */
+                    clientType: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Clients retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_Client-types_ClientConfig"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients": {
         parameters: {
             query?: never;
@@ -843,7 +903,12 @@ export interface paths {
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Filter by client category (e.g. 'media') */
+                    type?: string;
+                    /** @description Filter by specific client type (e.g. 'jellyfin') */
+                    clientType?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -2025,13 +2090,13 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Movie retrieved */
+                /** @description Movies retrieved */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Movie"];
                     };
                 };
                 /** @description Invalid client ID */
@@ -2916,13 +2981,13 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Series retrieved */
+                /** @description Movies retrieved */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid client ID */
@@ -2987,13 +3052,13 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Seasons retrieved */
+                /** @description Series retrieved */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid client ID */
@@ -3548,6 +3613,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/movies/actor/{actor}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get movies by actor
+         * @description Retrieves movies from all connected clients featuring the specified actor
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Actor name */
+                    actor: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/director/{director}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get movies by director
+         * @description Retrieves movies from all connected clients directed by the specified director
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Director name */
+                    director: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/movies/genre/{genre}": {
         parameters: {
             query?: never;
@@ -3577,7 +3762,354 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/latest/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get latest added movies
+         * @description Retrieves the most recently added movies from all connected clients
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of movies to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Invalid count format */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/popular/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get popular movies
+         * @description Retrieves the most popular movies from all connected clients
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of movies to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Invalid count format */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get movies by rating range
+         * @description Retrieves movies from all connected clients with ratings in the specified range
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Minimum rating (e.g. 7.5) */
+                    min: number;
+                    /** @description Maximum rating (e.g. 10.0) */
+                    max: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Invalid rating format */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search for movies
+         * @description Searches for movies across all connected clients matching the query
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Missing search query */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/movies/top-rated/{count}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get top rated movies
+         * @description Retrieves the highest rated movies from all connected clients
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Number of movies to retrieve */
+                    count: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Movies retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Movie"];
+                    };
+                };
+                /** @description Invalid count format */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -3615,38 +4147,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get movies by release year
-         * @description Retrieves movies from all connected clients that were released in the specified year
-         */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path: {
-                    /** @description Release year */
-                    year: number;
-                };
+                path?: never;
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Movies retrieved */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
-                    };
-                };
                 /** @description Invalid year */
                 400: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -3655,7 +4171,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
                 /** @description Server error */
@@ -3664,7 +4180,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                        "*/*": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
                     };
                 };
             };
@@ -4300,7 +4816,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Unauthorized */
@@ -4360,7 +4876,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Unauthorized */
@@ -4480,7 +4996,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid count */
@@ -4549,7 +5065,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid count */
@@ -4620,7 +5136,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid rating parameters */
@@ -4689,7 +5205,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid query */
@@ -4758,7 +5274,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid count */
@@ -4827,7 +5343,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["responses.APIResponse-array_responses_MediaItemResponse"];
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-types_Series"];
                     };
                 };
                 /** @description Invalid year */
@@ -5591,6 +6107,24 @@ export interface components {
             type?: components["schemas"]["types.MediaType"];
             updatedAt?: string;
         };
+        "models.MediaItem-types_Movie": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Movie"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
+            id?: number;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
+        };
         "models.MediaItem-types_Playlist": {
             /** @description Reference to the media client */
             clientId?: number;
@@ -5599,6 +6133,24 @@ export interface components {
             createdAt?: string;
             /** @description Type-specific media data */
             data?: components["schemas"]["types.Playlist"];
+            downloadUrl?: string;
+            /** @description ID from external media client */
+            externalId?: string;
+            /** @description Internal ID */
+            id?: number;
+            streamUrl?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
+        };
+        "models.MediaItem-types_Series": {
+            /** @description Reference to the media client */
+            clientId?: number;
+            /** @description Type of client (plex, jellyfin, etc.) */
+            clientType?: components["schemas"]["types.MediaClientType"];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: components["schemas"]["types.Series"];
             downloadUrl?: string;
             /** @description ID from external media client */
             externalId?: string;
@@ -5952,8 +6504,22 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-array_models_MediaItem-types_Movie": {
+            data?: components["schemas"]["models.MediaItem-types_Movie"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-array_models_MediaItem-types_Playlist": {
             data?: components["schemas"]["models.MediaItem-types_Playlist"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaItem-types_Series": {
+            data?: components["schemas"]["models.MediaItem-types_Series"][];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -5994,8 +6560,22 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-models_MediaItem-types_Movie": {
+            data?: components["schemas"]["models.MediaItem-types_Movie"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-models_MediaItem-types_Playlist": {
             data?: components["schemas"]["models.MediaItem-types_Playlist"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaItem-types_Series": {
+            data?: components["schemas"]["models.MediaItem-types_Series"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -6496,6 +7076,17 @@ export interface components {
         };
         /** @enum {string} */
         "types.MediaType": TypesMediaType;
+        "types.Movie": {
+            audioCodec?: string;
+            cast?: components["schemas"]["types.Person"][];
+            crew?: components["schemas"]["types.Person"][];
+            details?: components["schemas"]["types.MediaDetails"];
+            /** @description e.g., "4K", "1080p" */
+            resolution?: string;
+            subtitleUrls?: string[];
+            trailerUrl?: string;
+            videoCodec?: string;
+        };
         /** @description Claude media server configuration */
         "types.OllamaConfig": {
             /** @example your-api-key */
@@ -6532,6 +7123,14 @@ export interface components {
             temperature?: number;
             type?: components["schemas"]["types.ClientType"];
         };
+        "types.Person": {
+            /** @description For actors */
+            character?: string;
+            name?: string;
+            photo?: string;
+            /** @description e.g., "Director", "Actor" */
+            role?: string;
+        };
         "types.Playlist": {
             details?: components["schemas"]["types.MediaDetails"];
             isPublic?: boolean;
@@ -6564,6 +7163,30 @@ export interface components {
             /** @example false */
             ssl?: boolean;
             type?: components["schemas"]["types.ClientType"];
+        };
+        "types.Season": {
+            artwork?: components["schemas"]["types.Artwork"];
+            details?: components["schemas"]["types.MediaDetails"];
+            episodeCount?: number;
+            overview?: string;
+            releaseDate?: string;
+            seasonNumber?: number;
+            seriesID?: string;
+            seriesName?: string;
+            title?: string;
+        };
+        "types.Series": {
+            contentRating?: string;
+            details?: components["schemas"]["types.MediaDetails"];
+            episodeCount?: number;
+            genres?: string[];
+            network?: string;
+            rating?: number;
+            releaseYear?: number;
+            seasonCount?: number;
+            seasons?: components["schemas"]["types.Season"][];
+            /** @description e.g., "Ended", "Continuing" */
+            status?: string;
         };
         /** @description Emby media server configuration */
         "types.SonarrConfig": {
