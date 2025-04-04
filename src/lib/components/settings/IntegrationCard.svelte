@@ -148,7 +148,9 @@
 
 		// Start with a new object to avoid reactivity issues
 		const newForm = {
-			isEnabled: isEnabled,
+			id: 0,
+			name: '',
+			isEnabled: isEnabled || false,
 			baseUrl: baseUrl,
 			apiKey: client?.apiKey || '',
 			username: client?.username || '',
@@ -207,7 +209,18 @@
 
 		try {
 			// Update the enabled status in the database
-			const result = await clientsApi.toggleClientEnabled(integration, formIntegration.isEnabled);
+			// const result = await clientsApi.toggleClientEnabled(integration, formIntegration.isEnabled);
+			const clientRequest: ClientRequest = {
+				clientID: integration.id,
+				clientType: integration.clientType as TypesClientType,
+				name: integration.name || '',
+				client: {
+					...(integration.client as any),
+					isEnabled: formIntegration.isEnabled
+				},
+				isEnabled: formIntegration.isEnabled
+			};
+			const result = await clientsApi.updateClient(clientRequest);
 
 			if (result) {
 				// Update was successful

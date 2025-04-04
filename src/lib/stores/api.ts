@@ -254,21 +254,21 @@ export const clientsApi = {
 	},
 
 	// Toggle client enabled status
-	toggleClientEnabled: async (client: ClientRequest, isEnabled: boolean) => {
+	toggleClientEnabled: async (client: ClientResponse, isEnabled: boolean) => {
 		clientsStore.setLoading(true);
 
 		try {
 			const clientTypeStr = client.clientType.toString().toLowerCase();
-			const clientId = client?.clientID?.toString();
+			const clientId = client?.id?.toString();
 
 			console.log('client:', client);
 			// Create updated client with new isEnabled status
 			const updatedClient: ClientRequest = {
-				...client,
+				// ...client,
 				clientType: client.clientType as TypesClientType,
-				clientID: client.clientID,
+				clientID: client.id,
 				name: client.name || '',
-				isEnabled
+				isEnabled: !client.isEnabled
 			};
 
 			console.log('updatedClient:', updatedClient);
