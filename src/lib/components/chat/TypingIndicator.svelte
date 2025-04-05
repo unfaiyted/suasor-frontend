@@ -16,10 +16,13 @@
 
 <style>
   .typing-indicator-container {
-    display: inline-block;
-    padding: 0.5rem 1rem;
+    display: inline-flex;
+    padding: 0.1rem 0.3rem;
     background-color: rgba(0, 0, 0, 0.04);
-    border-radius: 1rem;
+    border-radius: 0.5rem;
+    margin: 0;
+    vertical-align: baseline;
+    line-height: 1;
   }
 
   .typing-indicator {
@@ -29,8 +32,8 @@
   }
 
   .typing-indicator span {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 50%;
     display: inline-block;
@@ -59,7 +62,7 @@
       opacity: 0.5;
     }
     50% {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       opacity: 1;
     }
   }

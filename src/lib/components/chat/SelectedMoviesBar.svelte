@@ -4,22 +4,30 @@
 	import type { Movie } from './types';
 	import ActionMenu from './ActionMenu.svelte';
 
-	export let selectedMovies: Movie[] = [];
-	export let showActionsMenu = false;
+	interface SelectedMoviesBarProps {
+		selectedMovies: Movie[];
+		showActionsMenu: boolean;
+		toggleSelection: (movie: Movie) => void;
+		toggleMenu: () => void;
+		createList: () => void;
+		handleAction: (actionId: string) => void;
+	}
 
-	import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
+	let {
+		selectedMovies,
+		showActionsMenu,
+		toggleSelection,
+		handleAction,
+		toggleMenu,
+		createList
+	}: SelectedMoviesBarProps = $props();
 
 	function toggleMovieSelection(movie: Movie) {
-		dispatch('toggleSelection', movie);
+		toggleSelection(movie);
 	}
 
-	function createList() {
-		dispatch('createList');
-	}
-
-	function handleAction(actionId: string) {
-		dispatch('handleAction', actionId);
+	function handleActionBar(actionId: string) {
+		handleAction(actionId);
 		showActionsMenu = false;
 	}
 </script>
@@ -38,7 +46,7 @@
 				<button
 					class="bg-primary-500 absolute flex h-5 w-5 items-center justify-center rounded-full text-white"
 					style={'top: 3px; left: 8px'}
-					on:click={() => toggleMovieSelection(movie)}
+					onclick={() => toggleMovieSelection(movie)}
 				>
 					<Check size={12} />
 				</button>
@@ -56,21 +64,21 @@
 			<button
 				type="button"
 				class="btn preset-filled flex items-center gap-1 p-2"
-				on:click={createList}
+				onclick={createList}
 			>
 				<List size={16} />
 			</button>
 
 			<ActionMenu
 				show={showActionsMenu}
-				on:select={(e) => handleAction(e.detail)}
+				on:select={(e) => handleActionBar(e.detail)}
 				on:close={() => (showActionsMenu = false)}
 			>
 				<button
 					slot="trigger"
 					type="button"
 					class="btn hover:preset-tonal p-2"
-					on:click={() => (showActionsMenu = !showActionsMenu)}
+					onclick={() => (showActionsMenu = !showActionsMenu)}
 				>
 					<MoreVertical size={16} />
 				</button>

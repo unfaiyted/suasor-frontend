@@ -25,6 +25,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Code Style Guidelines
 
+- Svelte: Using Svelte 5, Use never svelte syntax and try to fix older syntax if you see it
 - **Naming**: PascalCase for components/types, camelCase for variables/functions
 - **Components**: .svelte extension, script tag with lang="ts", export let for props
 - **TypeScript**: Strong typing throughout, explicit interface definitions, avoid any

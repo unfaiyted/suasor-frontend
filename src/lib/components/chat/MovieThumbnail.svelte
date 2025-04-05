@@ -2,15 +2,12 @@
 	import { Star, Check, Plus } from '@lucide/svelte';
 	import type { Movie } from './types';
 
-	export let movie: Movie;
-	export let selected: boolean = false;
-
-	import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
-
-	function toggleSelection() {
-		dispatch('toggleSelection', movie);
+	interface AnimatedMovieThumbnailProps {
+		movie: Movie;
+		selected: boolean;
+		toggleSelection: (movie: Movie) => void;
 	}
+	let { toggleSelection, movie, selected }: AnimatedMovieThumbnailProps = $props();
 </script>
 
 <div
@@ -18,7 +15,7 @@
 >
 	<div class="relative">
 		<img
-			src={movie.poster || movie.details?.artwork?.poster}
+			src={$derived(movie.poster || movie.details?.artwork?.poster || `https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`)}
 			alt={movie.title || movie.details?.title || 'Movie'}
 			class="h-[120px] w-full object-cover"
 		/>
@@ -40,7 +37,7 @@
 			class="hover:bg-primary-500 absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full {selected
 				? 'bg-primary-500'
 				: 'bg-black/70'} z-100 text-white"
-			on:click={toggleSelection}
+			onclick={() => toggleSelection(movie)}
 		>
 			{#if selected}
 				<Check size={14} />

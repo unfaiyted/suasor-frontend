@@ -2,27 +2,22 @@
 import { writable, derived, get } from 'svelte/store';
 import { createBaseStore } from './base';
 import { GET, POST } from '$lib/api/client';
-import type {
-	ErrorResponse,
-	ClientResponse,
-	ClientType,
-	MediaType
-} from '$lib/api/types';
+import type { ErrorResponse, ClientResponse, ClientType, MediaType } from '$lib/api/types';
 
 // Define these interfaces locally since they're commented out in types.ts
-interface GenerateTextRequest {
-	prompt: string;
-	systemInstructions?: string;
-	maxTokens?: number;
-	temperature?: number;
-}
-
-interface GenerateStructuredRequest {
-	prompt: string;
-	systemInstructions?: string;
-	maxTokens?: number;
-	temperature?: number;
-}
+// interface GenerateTextRequest {
+// 	prompt: string;
+// 	systemInstructions?: string;
+// 	maxTokens?: number;
+// 	temperature?: number;
+// }
+//
+// interface GenerateStructuredRequest {
+// 	prompt: string;
+// 	systemInstructions?: string;
+// 	maxTokens?: number;
+// 	temperature?: number;
+// }
 import type { Movie, Chat, Message, MessageContent } from '$lib/components/chat/types';
 
 // Define the chat store state interface
@@ -36,6 +31,7 @@ interface ChatState {
 	aiClients: ClientResponse[];
 	currentAiClientId: number | null;
 	mediaClients: ClientResponse[];
+	pendingRecommendations: any | null; // Stores movie recommendations to show after text animation
 }
 
 // Initialize the chat store
@@ -48,7 +44,8 @@ const initialState: ChatState = {
 	selectedMovies: [],
 	aiClients: [],
 	currentAiClientId: null,
-	mediaClients: []
+	mediaClients: [],
+	pendingRecommendations: null
 };
 
 // Create the base store
@@ -120,7 +117,7 @@ const chatApi = {
 			chatStore.setError(error);
 		}
 	},
-	
+
 	// Set the current AI client
 	setCurrentAiClient(clientId: number) {
 		chatStore.update((state) => ({
@@ -144,15 +141,16 @@ const chatApi = {
 
 		try {
 			if (!state.currentAiClientId) {
-				throw new Error("No AI client is configured");
+				throw new Error('No AI client is configured');
 			}
-			
+
 			// Create a timestamp
 			const timestamp = new Date().toISOString();
-			
+
 			// Use the conversation store to start a new conversation
 			const result = await conversationStore.startConversation(state.currentAiClientId, {
-				favoriteGenres: ["sci-fi", "thriller", "drama"],
+				// TODO: Pull from the MediaClient Integrations details
+				favoriteGenres: ['sci-fi', 'thriller', 'drama'],
 				recentlyWatched: []
 			});
 
@@ -164,6 +162,7 @@ const chatApi = {
 				currentChatId: conversationId,
 				messages: [],
 				selectedMovies: [],
+				pendingRecommendations: null,
 				chats: [
 					{
 						id: conversationId,
@@ -179,12 +178,13 @@ const chatApi = {
 			// Add welcome message from the API
 			this.addMessageFromAI({
 				type: 'text',
-				text: welcome || "Hi! I'm your movie recommendation assistant. What kind of movies do you enjoy watching?"
+				text:
+					welcome ||
+					"Hi! I'm your movie recommendation assistant. What kind of movies do you enjoy watching?"
 			});
-
 		} catch (error) {
 			console.error('Error starting new chat:', error);
-			
+
 			// Fallback to creating a local chat if API fails
 			const newChatId = crypto.randomUUID();
 			const timestamp = new Date().toISOString();
@@ -194,6 +194,7 @@ const chatApi = {
 				currentChatId: newChatId,
 				messages: [],
 				selectedMovies: [],
+				pendingRecommendations: null,
 				chats: [
 					{
 						id: newChatId,
@@ -266,7 +267,8 @@ const chatApi = {
 				...state,
 				currentChatId: chatId,
 				messages: [...selectedChat.messages],
-				selectedMovies: []
+				selectedMovies: [],
+				pendingRecommendations: null
 			};
 		});
 	},
@@ -347,6 +349,36 @@ const chatApi = {
 			]
 		}));
 	},
+	
+	// Add an empty AI response placeholder for immediate display with typing indicator
+	addEmptyAIResponse() {
+		const timestamp = new Date().toLocaleString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: true
+		});
+
+		chatStore.update((state) => {
+			// Create a new empty AI message
+			const emptyAIMessage = {
+				id: state.messages.length,
+				sender: 'ai',
+				avatar: 14,
+				name: 'MovieAI',
+				timestamp: `Today @ ${timestamp}`,
+				content: {
+					type: 'text',
+					text: ''
+				}
+			};
+			
+			return {
+				...state,
+				messages: [...state.messages, emptyAIMessage],
+				pendingRecommendations: null
+			};
+		});
+	},
 
 	// Send a message to the AI and get a response
 	async sendMessage(message: string) {
@@ -372,9 +404,9 @@ const chatApi = {
 		} else {
 			// Movie selection - format as text for the API
 			const movieList = state.selectedMovies
-				.map(m => `${m.title} (${m.year}) - ${m.genres.join(', ')}`)
+				.map((m) => `${m.title} (${m.year}) - ${m.genres.join(', ')}`)
 				.join('\n');
-			
+
 			messageContent = {
 				type: 'movieList',
 				text: "I'd like recommendations based on these movies:",
@@ -395,34 +427,119 @@ const chatApi = {
 
 		try {
 			if (!state.currentChatId || !state.currentAiClientId) {
-				throw new Error("Chat session not initialized");
+				throw new Error('Chat session not initialized');
 			}
 
 			// Use the conversation store to send the message
 			const result = await conversationStore.sendMessage(apiMessage);
-			
+
 			const { message: aiMessage, recommendations } = result;
 
-			// First add the text message
-			this.addMessageFromAI({
-				type: 'text',
-				text: aiMessage
-			});
+			// Update the empty message with actual content instead of adding a new one
+			const emptyMessageIndex = state.messages.length - 1;
+			
+			// Check if last message is an empty AI message we can update
+			if (state.messages[emptyMessageIndex]?.sender === 'ai' && 
+				state.messages[emptyMessageIndex]?.content?.type === 'text' &&
+				state.messages[emptyMessageIndex]?.content?.text === '') {
+				
+				// Create a completely new message with the same ID
+				// This forces Svelte to detect the change
+				const existingMessage = state.messages[emptyMessageIndex];
+				
+				// Create a brand new message to trigger reactivity
+				const updatedMessage = {
+					...existingMessage,
+					content: {
+						type: 'text',
+						text: aiMessage  // update with actual text
+					}
+				};
+				
+				// Update the store with a new array
+				chatStore.update((state) => {
+					// Create a new array to ensure reactivity
+					const newMessages = [...state.messages];
+					// Replace the empty message with the updated one
+					newMessages[emptyMessageIndex] = updatedMessage;
+					
+					// Return a completely new state object
+					return { 
+						...state, 
+						messages: newMessages
+					};
+				});
+			} else {
+				// If no empty message exists, add a new one as before
+				this.addMessageFromAI({
+					type: 'text',
+					text: aiMessage
+				});
+			}
 
-			// If there are recommendations, add them as a separate message
+			// If there are recommendations, prepare them but don't show immediately
 			if (recommendations && recommendations.length > 0) {
 				// Convert API recommendations to our Movie format using the conversationStore helper
-				const movieRecommendations = conversationStore.convertRecommendationsToMovies(recommendations);
-
-				this.addMessageFromAI({
-					type: 'movieList',
-					text: 'Here are some movies you might enjoy:',
-					movies: movieRecommendations
+				const movieRecommendations =
+					conversationStore.convertRecommendationsToMovies(recommendations);
+					
+				// Limit to 1-3 recommendations unless explicitly asked for more
+				// We'll check the user message for phrases indicating they want many options
+				const userWantsMoreOptions = apiMessage.toLowerCase().includes('more options') || 
+					apiMessage.toLowerCase().includes('more recommendations') ||
+					apiMessage.toLowerCase().includes('many') ||
+					apiMessage.toLowerCase().includes('several') ||
+					apiMessage.toLowerCase().includes('lots');
+				
+				// For fewer options, aim for 1-3 movies based on confidence ranking
+				const minCount = 1;
+				const maxCount = userWantsMoreOptions ? movieRecommendations.length : 3;
+				const recommendationCount = Math.min(maxCount, movieRecommendations.length);
+				const limitedRecommendations = movieRecommendations.slice(0, recommendationCount);
+				
+				// Process each recommendation to ensure concise descriptions
+				limitedRecommendations.forEach(movie => {
+					// Ensure overview is concise (max 2 sentences)
+					if (movie.overview) {
+						const sentences = movie.overview.split(/[.!?]+/);
+						movie.overview = sentences.slice(0, 2).join('. ') + '.';
+					}
+					
+					// Keep the reason very concise, focused on user relevance
+					if (movie.reason && movie.reason.length > 100) {
+						movie.reason = movie.reason.substring(0, 100) + '...';
+					}
 				});
+				
+				// Store recommendations to be shown after text animation completes
+				// Find the message ID of the latest AI message
+				const messages = chatStore.getState().messages;
+				let latestAiMessageId = -1;
+				
+				for (let i = messages.length - 1; i >= 0; i--) {
+					if (messages[i].sender === 'ai') {
+						latestAiMessageId = messages[i].id;
+						break;
+					}
+				}
+				
+				console.log(`Setting pendingRecommendations with ${limitedRecommendations.length} movies for message ID ${latestAiMessageId}`);
+				
+				chatStore.update((state) => ({
+					...state,
+					pendingRecommendations: {
+						messageId: latestAiMessageId,
+						type: 'movieList',
+						text: 'Here are some movies you might enjoy:',
+						movies: limitedRecommendations
+					}
+				}));
+				
+				console.log(`pendingRecommendations set successfully for message ID ${latestAiMessageId}`);
 			}
 		} catch (error) {
 			console.error('Error sending message to conversation:', error);
-			
+
 			// Fallback to the previous implementation if the conversation API fails
 			try {
 				await this.generateAiResponse(messageContent);
@@ -435,6 +552,22 @@ const chatApi = {
 			}
 		} finally {
 			chatStore.setLoading(false);
+		}
+	},
+	
+	// Show pending movie recommendations after text animation completes
+	showPendingRecommendations() {
+		const state = get(chatStore);
+		
+		if (state.pendingRecommendations) {
+			// Add the pending recommendations as a new message
+			this.addMessageFromAI(state.pendingRecommendations);
+			
+			// Clear the pending recommendations
+			chatStore.update((state) => ({
+				...state,
+				pendingRecommendations: null
+			}));
 		}
 	},
 
@@ -508,9 +641,10 @@ const chatApi = {
 			});
 
 			// If this was a recommendation request, add some basic recommendations
-			if (latestMessage.type === 'movieList' || 
-			    (latestMessage.type === 'text' && latestMessage.text?.toLowerCase().includes('movie'))) {
-				
+			if (
+				latestMessage.type === 'movieList' ||
+				(latestMessage.type === 'text' && latestMessage.text?.toLowerCase().includes('movie'))
+			) {
 				// Try to call the direct API
 				try {
 					const textRequest = {
@@ -527,12 +661,13 @@ const chatApi = {
 						// Process the real API response
 						try {
 							const structuredData = JSON.parse(response.data.json);
-							const { movies, agentMessage } = this.convertStructuredResponseToMovies(structuredData);
-							
+							const { movies, agentMessage } =
+								this.convertStructuredResponseToMovies(structuredData);
+
 							if (movies.length > 0) {
 								this.addMessageFromAI({
 									type: 'movieList',
-									text: agentMessage || "Here are some recommendations:",
+									text: agentMessage || 'Here are some recommendations:',
 									movies: movies
 								});
 							}
@@ -556,29 +691,29 @@ const chatApi = {
 			chatStore.setLoading(false);
 		}
 	},
-	
+
 	// Enhance AI recommendations with data from media clients
 	async enhanceRecommendationsWithMediaData(recommendationData: any, mediaClientId: number) {
 		try {
 			if (!recommendationData || !recommendationData.recommendations || !mediaClientId) {
 				return null;
 			}
-			
+
 			// Extract titles from the AI recommendations
 			const titles = recommendationData.recommendations.map((rec: any) => rec.title);
-			
+
 			// Query the media client for these titles
 			const response = await POST(`/media/${mediaClientId}/search`, {
 				body: { query: titles.join(','), mediaType: 'movie', limit: 10 }
 			});
-			
+
 			if (!response.data || !response.data.data) {
 				return null;
 			}
-			
+
 			// Get the media search results
 			const mediaResults = response.data.data;
-			
+
 			// Create a map of title -> media item for fast lookup
 			const mediaMap = new Map();
 			mediaResults.forEach((item: any) => {
@@ -586,14 +721,14 @@ const chatApi = {
 				const normalizedTitle = item.title.toLowerCase().trim();
 				mediaMap.set(normalizedTitle, item);
 			});
-			
+
 			// Enhance each recommendation with real media data when available
 			const enhancedRecommendations = recommendationData.recommendations.map((rec: any) => {
 				const normalizedRecTitle = rec.title.toLowerCase().trim();
-				
+
 				// Look for exact or close matches
 				const mediaItem = mediaMap.get(normalizedRecTitle);
-				
+
 				if (mediaItem) {
 					// Enhance with real media data
 					return {
@@ -608,11 +743,11 @@ const chatApi = {
 						reason: rec.reason
 					};
 				}
-				
+
 				// If no match found, return the original recommendation
 				return rec;
 			});
-			
+
 			// Return the enhanced data structure
 			return {
 				...recommendationData,
@@ -691,9 +826,10 @@ export const selectedMovies = derived(chatStore, ($state) => $state.selectedMovi
 export const aiClients = derived(chatStore, ($state) => $state.aiClients);
 export const currentAiClient = derived(chatStore, ($state) => {
 	if (!$state.currentAiClientId) return null;
-	return $state.aiClients.find(client => client.id === $state.currentAiClientId) || null;
+	return $state.aiClients.find((client) => client.id === $state.currentAiClientId) || null;
 });
 export const mediaClients = derived(chatStore, ($state) => $state.mediaClients);
+export const pendingRecommendations = derived(chatStore, ($state) => $state.pendingRecommendations);
 
 // Export the chat store API
 export default chatApi;

@@ -30,22 +30,6 @@
 </script>
 
 <section class="border-surface-200-800 border-t p-4">
-	<!-- AI Client Selection -->
-	{#if $chatStore.aiClients.length > 0}
-		<div class="mb-2 flex items-center justify-end gap-2">
-			<span class="text-xs text-surface-600">AI Model:</span>
-			<select 
-				class="select select-sm bg-surface-200-700-token" 
-				value={$chatStore.currentAiClientId}
-				on:change={(e) => selectAiClient(Number(e.currentTarget.value))}
-				disabled={$chatLoading || disabled}
-			>
-				{#each $chatStore.aiClients as client}
-					<option value={client.id}>{client.name}</option>
-				{/each}
-			</select>
-		</div>
-	{/if}
 
 	<div
 		class="input-group divide-surface-200-800 rounded-container-token grid-cols-[1fr_auto] divide-x"

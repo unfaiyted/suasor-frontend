@@ -24,7 +24,7 @@
 	let elemChat: HTMLElement;
 	let currentMessage = '';
 	let showActionsMenu = false;
-	let showSidePanel = true;
+	let showSidePanel = false;
 	let showTypingIndicator = false;
 
 	// State variables for chat functionality
@@ -96,20 +96,26 @@
 	async function handleSendMessage() {
 		if (!currentMessage.trim() && $selectedMovies.length === 0) return;
 
-		// Show typing indicator
+		console.log('Sending message:', currentMessage);
+
+		// Create a blank AI response with typing indicator immediately
+		chatStore.addEmptyAIResponse();
 		showTypingIndicator = true;
 		scrollChatBottom(); // Scroll immediately to show typing indicator
 
 		try {
-			// Add a minimum delay for the typing indicator (at least 1 second)
+			// Add a minimum delay for the typing indicator (at least 500ms)
+			console.log('Processing message...');
 			const messageProcessingPromise = chatStore.sendMessage(currentMessage);
-			const minTypingTimePromise = new Promise((resolve) => setTimeout(resolve, 1000));
+			const minTypingTimePromise = new Promise((resolve) => setTimeout(resolve, 500));
 
 			// Wait for both the API response and minimum typing time
 			await Promise.all([messageProcessingPromise, minTypingTimePromise]);
+			console.log('Message processed, response received');
 			currentMessage = '';
 		} finally {
 			// Hide typing indicator after response is received
+			console.log('Hiding typing indicator');
 			showTypingIndicator = false;
 			scrollChatBottom();
 		}
@@ -122,26 +128,35 @@
 	}
 </script>
 
-<div class="mx-4 mt-8 flex h-full">
+<div class="mx-4 mt-4 flex h-full">
 	<!-- Side Panel -->
 	{#if showSidePanel}
 		<SidePanel
 			chats={$chatStore.chats}
-			currentChatId={$chatStore.currentChatId}
+			currentChatId={$chatStore.currentChatId || ''}
 			on:selectChat={(e) => chatStore.selectChat(e.detail)}
 		/>
 	{/if}
 
 	<!-- Main Chat Area -->
-	<section class="card bg-surface-100-900 rounded-container flex-1 overflow-hidden p-4">
+	<section class="card bg-surface-100-900 rounded-container mb-5 flex-1 overflow-hidden p-4 pb-6">
 		<div class="mb-2 flex justify-between">
 			<div class="flex items-center gap-2">
 				<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
 					{showSidePanel ? 'Hide' : 'Show'} History
 				</button>
 
-				{#if $currentAiClient}
-					<span class="badge badge-primary">AI: {$currentAiClient.name}</span>
+				{#if $chatStore.aiClients.length > 0}
+					<select
+						class="select select-xs bg-surface-200-700-token"
+						value={$chatStore.currentAiClientId}
+						on:change={(e) => chatStore.setCurrentAiClient(Number(e.currentTarget.value))}
+						disabled={$chatLoading}
+					>
+						{#each $chatStore.aiClients as client}
+							<option value={client.id}>{client.name}</option>
+						{/each}
+					</select>
 				{/if}
 
 				{#if $mediaClients && $mediaClients.length > 0}
@@ -162,11 +177,11 @@
 			</div>
 		{/if}
 
-		<div class="chat grid h-full w-full grid-rows-[1fr_auto_auto] pb-6">
+		<div class="chat mb-6 grid h-full h-full min-h-[100%] w-full grid-rows-[1fr_auto_auto] pb-10">
 			<!-- Conversation -->
 			<section
 				bind:this={elemChat}
-				class="max-h-[600px] space-y-4 overflow-y-auto p-4 md:min-h-[500px]"
+				class="max-h-[100%] space-y-4 overflow-y-auto p-4 md:min-h-[100%]"
 			>
 				{#if isInitializing}
 					<div class="flex flex-col items-center justify-center p-4 text-center">
@@ -185,16 +200,16 @@
 							selectedMovies={$selectedMovies}
 							showTyping={showTypingIndicator &&
 								message.id === $chatStore.messages.length - 1 &&
-								message.sender === 'ai'}
-							on:toggleSelection={(e) => chatStore.toggleMovieSelection(e.detail)}
+								message.sender === 'ai' &&
+								message.content.type === 'text' &&
+								!message.content.text}
+							toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
 						/>
 					{/each}
 				{/if}
 
-				<!-- Show typing message when waiting for a response -->
-				{#if showTypingIndicator && $chatStore.messages.length > 0}
-					<TypingMessage />
-				{/if}
+				<!-- We now show typing indicator directly in the chat message -->
+				<!-- Removed separate TypingMessage since we show the typing inside the empty AI message -->
 
 				{#if $chatLoading && !isInitializing && $chatStore.messages.length === 0}
 					<div class="flex justify-center p-4">
@@ -208,10 +223,10 @@
 				<SelectedMoviesBar
 					selectedMovies={$selectedMovies}
 					{showActionsMenu}
-					on:toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
-					on:createList={createListFromSelection}
-					on:handleAction={(e) => handleAction(e.detail)}
-					on:toggleMenu={() => (showActionsMenu = !showActionsMenu)}
+					toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
+					createList={createListFromSelection}
+					handleAction={(e) => handleAction(e)}
+					toggleMenu={() => (showActionsMenu = !showActionsMenu)}
 				/>
 			{/if}
 
@@ -231,4 +246,3 @@
 		min-height: calc(100dvh - 120px);
 	}
 </style>
-

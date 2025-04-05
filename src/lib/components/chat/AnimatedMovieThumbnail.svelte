@@ -1,23 +1,19 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { onDestroy } from 'svelte';
 	import type { Movie } from './types';
 	import { showMoviePopover, hideMoviePopover } from './MoviePopoverService';
 
-	// export let movie: Movie;
-	// export let selected = false;
-	// export let index = 0;
-	// export let inLibrary = false;
-	// export let onToggleSelection: () => void;
-	//
-	type AnimatedMovieThumbnailProps = {
+	interface AnimatedMovieThumbnailProps {
 		movie: Movie;
 		selected: boolean;
 		index: number;
 		inLibrary: boolean;
 		onToggleSelection: (movie: Movie) => void;
-	};
+	}
 
+	// Props using Svelte 5 $props syntax with proper typing
 	let { movie, selected, index, inLibrary, onToggleSelection }: AnimatedMovieThumbnailProps =
 		$props();
 
@@ -25,14 +21,15 @@
 	const animationDelay = 100 * index;
 	const animationDuration = 400;
 
-	// Track thumbnail element and popover state
-	let thumbElement: HTMLElement;
-	let hoverTimeout: number;
+	// Track thumbnail element and popover state using $state
+	let thumbElement = $state<HTMLElement | null>(null);
+	let hoverTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
 
 	// Functions to handle hover state with global popover
 	function handleMouseEnter() {
-		clearTimeout(hoverTimeout);
-		hoverTimeout = window.setTimeout(() => {
+		if (hoverTimeout) clearTimeout(hoverTimeout);
+
+		hoverTimeout = setTimeout(() => {
 			if (thumbElement) {
 				const rect = thumbElement.getBoundingClientRect();
 				showMoviePopover(movie, rect.right, rect.top);
@@ -41,8 +38,9 @@
 	}
 
 	function handleMouseLeave() {
-		clearTimeout(hoverTimeout);
-		hoverTimeout = window.setTimeout(() => {
+		if (hoverTimeout) clearTimeout(hoverTimeout);
+
+		hoverTimeout = setTimeout(() => {
 			hideMoviePopover();
 		}, 300); // Small delay before hiding popover
 	}
@@ -53,27 +51,24 @@
 		event.stopPropagation();
 
 		// Get position for the popover
-		const rect = thumbElement.getBoundingClientRect();
-		// Show the popover
-		showMoviePopover(movie, rect.right, rect.top);
+		if (thumbElement) {
+			const rect = thumbElement.getBoundingClientRect();
+			// Show the popover
+			showMoviePopover(movie, rect.right, rect.top);
+		}
 	}
 
 	// We need to ensure the movie can be selected by clicking it
-	// This will allow it to be added to the SelectedMoviesBar
-
-	import { onDestroy } from 'svelte';
-
 	function handleClick(event: MouseEvent | KeyboardEvent) {
 		// Prevent duplicated events
 		event.stopPropagation();
 		// Toggle selection for this movie to add/remove it from selectedMovies
 		onToggleSelection(movie);
-		selected = !selected;
 	}
 
 	// Clean up timeout on component destroy
 	onDestroy(() => {
-		clearTimeout(hoverTimeout);
+		if (hoverTimeout) clearTimeout(hoverTimeout);
 	});
 </script>
 
@@ -103,9 +98,9 @@
 		aria-pressed={selected}
 	>
 		<img
-			src={movie.poster ||
+			src={$derived(movie.poster ||
 				movie.details?.artwork?.poster ||
-				`https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`}
+				`https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`)}
 			alt={movie.title || movie.details?.title || 'Movie'}
 			class="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
 			loading="lazy"
@@ -142,8 +137,6 @@
 			<div class="text-xs text-white/70">{movie.year || movie.details?.releaseYear || 'N/A'}</div>
 		</div>
 	</div>
-
-	<!-- Movie popover is now managed by GlobalMoviePopover -->
 </div>
 
 <style>
@@ -152,3 +145,4 @@
 		position: relative;
 	}
 </style>
+

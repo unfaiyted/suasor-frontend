@@ -4,7 +4,7 @@
 	import SideBar from '$lib/components/layout/SideBar.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import GlobalMoviePopover from '$lib/components/chat/GlobalMoviePopover.svelte';
-		// import { PanelRight } from '@lucide/svelte';
+	// import { PanelRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { navigating } from '$app/state';
 	import { page } from '$app/state';
@@ -107,7 +107,7 @@
 			<!-- Page -->
 			<div class="mx-auto grid w-full grid-cols-[auto_1fr]">
 				<SideBar />
-				<div class="container w-full">
+				<div class=" w-full">
 					<!-- Header -->
 					<header><HeaderBar /></header>
 					<!-- Main -->

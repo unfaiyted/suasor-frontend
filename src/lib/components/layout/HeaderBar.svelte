@@ -74,14 +74,14 @@
 	});
 </script>
 
-<div class="bg-surface-100-900/30 flex w-full items-center justify-between p-3">
+<div class="flex w-full items-center justify-between bg-transparent p-2 pb-2">
 	<div class="flex items-center">
 		<ArrowLeft size={24} />
-		<h2 class="h2 ml-3 sm:hidden">Movie Recommendations</h2>
+		<!-- <h2 class="h2 ml-3 sm:hidden">Movie Recommendations</h2> -->
 	</div>
 
 	<div class="hidden sm:block">
-		<span>Movie Recommendations</span>
+		<!-- <span>Movie Recommendations</span> -->
 	</div>
 
 	<div class="flex items-center">
@@ -90,7 +90,7 @@
 			<Calendar size={20} />
 
 			<!-- User menu dropdown -->
-			<div class="user-menu-container relative">
+			<div class="user-menu-container relative bg-transparent">
 				<button
 					class="hover:bg-surface-200-700/50 rounded-full p-2"
 					on:click|stopPropagation={toggleUserMenu}
@@ -108,7 +108,7 @@
 
 				{#if userMenuVisible}
 					<div
-						class="bg-surface-100-800 absolute right-0 z-50 mt-2 min-w-40 rounded-md p-2 shadow-xl"
+						class="absolute right-0 z-50 mt-2 min-w-40 rounded-md bg-transparent p-2 pb-0 shadow-xl"
 					>
 						<div>
 							{#if $isAuthenticated}
@@ -156,7 +156,7 @@
 			<!-- Mobile Menu -->
 			{#if mobileMenuVisible}
 				<div
-					class="bg-surface-100-800 absolute top-14 right-0 z-50 mt-2 w-48 rounded-md p-2 shadow-xl"
+					class="absolute top-14 right-0 z-50 mt-2 w-48 rounded-md bg-transparent p-2 pb-0 shadow-xl"
 				>
 					<div>
 						{#if $isAuthenticated}

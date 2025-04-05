@@ -88,6 +88,7 @@ export type MediaItemPlaylist = components['schemas']['models.MediaItem-types_Pl
 export type MediaItemTrack = components['schemas']['models.MediaItem-types_Track'];
 export type MediaItemMovie = components['schemas']['models.MediaItem-types_Movie'];
 export type MediaItemSeries = components['schemas']['models.MediaItem-types_Series'];
+export type MediaClient = components['schemas']['models.Client-types_ClientConfig'];
 
 // API Response types for media items
 export type APIMediaItemAlbumResponse =
