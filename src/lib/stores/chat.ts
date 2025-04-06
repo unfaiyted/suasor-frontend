@@ -76,13 +76,14 @@ const chatApi = {
 				// Filter for AI clients (type claude, openai, ollama)
 				const aiClientTypes: string[] = ['claude', 'openai', 'ollama', 'gemini'];
 				const aiClients = response.data.data.filter(
-					(client) => client.clientType && aiClientTypes.includes(client.clientType)
+					(client: ClientResponse) => client.clientType && aiClientTypes.includes(client.clientType)
 				);
 
 				// Filter for media clients (plex, emby, etc.)
 				const mediaClientTypes: string[] = ['plex', 'emby', 'jellyfin', 'subsonic'];
 				const mediaClients = response.data.data.filter(
-					(client) => client.clientType && mediaClientTypes.includes(client.clientType)
+					(client: ClientResponse) =>
+						client.clientType && mediaClientTypes.includes(client.clientType)
 				);
 
 				chatStore.update((state) => ({
@@ -273,8 +274,24 @@ const chatApi = {
 		});
 	},
 
-	// Toggle movie selection
+	// Toggle movie selection - simple version
 	toggleMovieSelection(movie: Movie) {
+		// Track whether this movie is in the latest message before updating state
+		let isInLatestMessage = false;
+		
+		// Get all messages
+		const messages = chatStore.getState().messages;
+		if (messages.length > 0) {
+			// Get the last message
+			const lastMessage = messages[messages.length - 1];
+			
+			// Check if this movie appears in the latest message's movie lists
+			if (lastMessage.content.type === 'movieList' && lastMessage.content.movies) {
+				isInLatestMessage = lastMessage.content.movies.some(m => m.id === movie.id);
+			}
+		}
+		
+		// Update the state
 		chatStore.update((state) => {
 			const selectedIndex = state.selectedMovies.findIndex((m) => m.id === movie.id);
 
@@ -292,6 +309,19 @@ const chatApi = {
 				};
 			}
 		});
+		
+		// Only scroll if the movie was in the latest message
+		setTimeout(() => {
+			if (isInLatestMessage) {
+				const chatContainer = document.querySelector('.chat-container');
+				if (chatContainer) {
+					chatContainer.scrollTop = chatContainer.scrollHeight;
+					console.log(`Scrolling for ${movie.title} - it was in the latest message`);
+				}
+			} else {
+				console.log(`Not scrolling for ${movie.title} - it was in an older message`);
+			}
+		}, 50);
 	},
 
 	// Clear selected movies
@@ -317,13 +347,30 @@ const chatApi = {
 				{
 					id: state.messages.length,
 					sender: 'user',
-					avatar: 48, // Can be customized later
+					avatar: '/suasorer.png',
 					name: 'You',
 					timestamp: `Today @ ${timestamp}`,
 					content
 				}
 			]
 		}));
+		
+		// Scroll both container and page to bottom when user sends a message
+		setTimeout(() => {
+			const chatContainer = document.querySelector('.chat-container');
+			if (chatContainer) {
+				// Scroll the chat container
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+				
+				// Also scroll the entire page
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: 'smooth'
+				});
+				
+				console.log('Scrolling container and page to bottom after user message');
+			}
+		}, 50);
 	},
 
 	// Add an AI message to the chat
@@ -341,15 +388,15 @@ const chatApi = {
 				{
 					id: state.messages.length,
 					sender: 'ai',
-					avatar: 14, // Can be customized later
-					name: 'MovieAI',
+					avatar: '/lumen.png',
+					name: 'Lumen',
 					timestamp: `Today @ ${timestamp}`,
 					content
 				}
 			]
 		}));
 	},
-	
+
 	// Add an empty AI response placeholder for immediate display with typing indicator
 	addEmptyAIResponse() {
 		const timestamp = new Date().toLocaleString('en-US', {
@@ -363,15 +410,15 @@ const chatApi = {
 			const emptyAIMessage = {
 				id: state.messages.length,
 				sender: 'ai',
-				avatar: 14,
-				name: 'MovieAI',
+				avatar: '/lumen.png',
+				name: 'Lumen',
 				timestamp: `Today @ ${timestamp}`,
 				content: {
 					type: 'text',
 					text: ''
 				}
 			};
-			
+
 			return {
 				...state,
 				messages: [...state.messages, emptyAIMessage],
@@ -381,7 +428,7 @@ const chatApi = {
 	},
 
 	// Send a message to the AI and get a response
-	async sendMessage(message: string) {
+	async sendMessage(message: string, sendMovieRecommendations = false) {
 		const state = get(chatStore);
 		// Import the conversation store
 		const conversationStore = (await import('./conversation')).default;
@@ -391,18 +438,18 @@ const chatApi = {
 		}
 
 		// Prepare message content
-		let messageContent: MessageContent;
-		let apiMessage: string;
+		let messageContent: MessageContent = {
+			type: 'text',
+			text: message
+		};
+
+		let apiMessage: string = message;
 
 		if (message.trim()) {
 			// Text message
-			messageContent = {
-				type: 'text',
-				text: message
-			};
 			apiMessage = message;
-		} else {
-			// Movie selection - format as text for the API
+		} else if (sendMovieRecommendations && state.selectedMovies.length > 0) {
+			// Only process movie selections if sendMovieRecommendations is true
 			const movieList = state.selectedMovies
 				.map((m) => `${m.title} (${m.year}) - ${m.genres.join(', ')}`)
 				.join('\n');
@@ -412,16 +459,13 @@ const chatApi = {
 				text: "I'd like recommendations based on these movies:",
 				movies: [...state.selectedMovies]
 			};
+
+			// Clear selected movies after sending
+			this.clearSelectedMovies();
 			apiMessage = `I'd like recommendations based on these movies:\n${movieList}`;
 		}
 
-		// Add user message to chat
 		this.addMessageFromUser(messageContent);
-
-		// Clear input and selected movies after sending
-		if (state.selectedMovies.length > 0) {
-			this.clearSelectedMovies();
-		}
 
 		chatStore.setLoading(true);
 
@@ -437,35 +481,36 @@ const chatApi = {
 
 			// Update the empty message with actual content instead of adding a new one
 			const emptyMessageIndex = state.messages.length - 1;
-			
+
 			// Check if last message is an empty AI message we can update
-			if (state.messages[emptyMessageIndex]?.sender === 'ai' && 
+			if (
+				state.messages[emptyMessageIndex]?.sender === 'ai' &&
 				state.messages[emptyMessageIndex]?.content?.type === 'text' &&
-				state.messages[emptyMessageIndex]?.content?.text === '') {
-				
+				state.messages[emptyMessageIndex]?.content?.text === ''
+			) {
 				// Create a completely new message with the same ID
 				// This forces Svelte to detect the change
 				const existingMessage = state.messages[emptyMessageIndex];
-				
+
 				// Create a brand new message to trigger reactivity
 				const updatedMessage = {
 					...existingMessage,
 					content: {
 						type: 'text',
-						text: aiMessage  // update with actual text
+						text: aiMessage // update with actual text
 					}
 				};
-				
+
 				// Update the store with a new array
 				chatStore.update((state) => {
 					// Create a new array to ensure reactivity
 					const newMessages = [...state.messages];
 					// Replace the empty message with the updated one
 					newMessages[emptyMessageIndex] = updatedMessage;
-					
+
 					// Return a completely new state object
-					return { 
-						...state, 
+					return {
+						...state,
 						messages: newMessages
 					};
 				});
@@ -482,49 +527,52 @@ const chatApi = {
 				// Convert API recommendations to our Movie format using the conversationStore helper
 				const movieRecommendations =
 					conversationStore.convertRecommendationsToMovies(recommendations);
-					
+
 				// Limit to 1-3 recommendations unless explicitly asked for more
 				// We'll check the user message for phrases indicating they want many options
-				const userWantsMoreOptions = apiMessage.toLowerCase().includes('more options') || 
+				const userWantsMoreOptions =
+					apiMessage.toLowerCase().includes('more options') ||
 					apiMessage.toLowerCase().includes('more recommendations') ||
 					apiMessage.toLowerCase().includes('many') ||
 					apiMessage.toLowerCase().includes('several') ||
 					apiMessage.toLowerCase().includes('lots');
-				
+
 				// For fewer options, aim for 1-3 movies based on confidence ranking
 				const minCount = 1;
 				const maxCount = userWantsMoreOptions ? movieRecommendations.length : 3;
 				const recommendationCount = Math.min(maxCount, movieRecommendations.length);
 				const limitedRecommendations = movieRecommendations.slice(0, recommendationCount);
-				
+
 				// Process each recommendation to ensure concise descriptions
-				limitedRecommendations.forEach(movie => {
+				limitedRecommendations.forEach((movie) => {
 					// Ensure overview is concise (max 2 sentences)
 					if (movie.overview) {
 						const sentences = movie.overview.split(/[.!?]+/);
 						movie.overview = sentences.slice(0, 2).join('. ') + '.';
 					}
-					
+
 					// Keep the reason very concise, focused on user relevance
 					if (movie.reason && movie.reason.length > 100) {
 						movie.reason = movie.reason.substring(0, 100) + '...';
 					}
 				});
-				
+
 				// Store recommendations to be shown after text animation completes
 				// Find the message ID of the latest AI message
 				const messages = chatStore.getState().messages;
 				let latestAiMessageId = -1;
-				
+
 				for (let i = messages.length - 1; i >= 0; i--) {
 					if (messages[i].sender === 'ai') {
 						latestAiMessageId = messages[i].id;
 						break;
 					}
 				}
-				
-				console.log(`Setting pendingRecommendations with ${limitedRecommendations.length} movies for message ID ${latestAiMessageId}`);
-				
+
+				console.log(
+					`Setting pendingRecommendations with ${limitedRecommendations.length} movies for message ID ${latestAiMessageId}`
+				);
+
 				chatStore.update((state) => ({
 					...state,
 					pendingRecommendations: {
@@ -534,7 +582,7 @@ const chatApi = {
 						movies: limitedRecommendations
 					}
 				}));
-				
+
 				console.log(`pendingRecommendations set successfully for message ID ${latestAiMessageId}`);
 			}
 		} catch (error) {
@@ -554,15 +602,15 @@ const chatApi = {
 			chatStore.setLoading(false);
 		}
 	},
-	
+
 	// Show pending movie recommendations after text animation completes
 	showPendingRecommendations() {
 		const state = get(chatStore);
-		
+
 		if (state.pendingRecommendations) {
 			// Add the pending recommendations as a new message
 			this.addMessageFromAI(state.pendingRecommendations);
-			
+
 			// Clear the pending recommendations
 			chatStore.update((state) => ({
 				...state,

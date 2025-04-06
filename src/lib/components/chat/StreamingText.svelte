@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { marked } from 'marked';
 
 	interface StreamingTextProps {
@@ -24,6 +24,23 @@
 	let displayedCharacters = $state(0);
 	let animationInterval = $state<ReturnType<typeof setInterval> | null>(null);
 	let isAnimating = $state(false);
+	let chatContainer = $state<HTMLElement | null>(null);
+
+	// Function to scroll both container and page during message streaming
+	function scrollToMessage() {
+		// Find the chat container
+		const chatContainer = document.querySelector('.chat-container');
+		if (!chatContainer) return;
+		
+		// Scroll the container to the bottom
+		chatContainer.scrollTop = chatContainer.scrollHeight;
+		
+		// Also scroll the entire page to the bottom
+		window.scrollTo({
+			top: document.body.scrollHeight,
+			behavior: 'smooth'
+		});
+	}
 
 	function startAnimation() {
 		if (!text || isAnimating) return;
@@ -46,6 +63,9 @@
 		animationInterval = setInterval(() => {
 			displayedCharacters += increment;
 			displayedText = text.substring(0, displayedCharacters);
+			
+			// Scroll to bottom on every text update for more consistent behavior
+			scrollToMessage();
 
 			if (displayedCharacters >= charCount) {
 				// Animation complete
@@ -54,8 +74,10 @@
 				displayedText = text;
 				isAnimating = false;
 
-				// Set isComplete - this is important for parent components
-				// binding to this value for detecting animation completion
+				// Final scroll to keep message in view
+				scrollToMessage();
+
+				// Set isComplete
 				isComplete = true;
 				console.log('Text animation complete, isComplete set to true');
 			}
@@ -93,42 +115,37 @@
 
 		// If no markdown or parsing failed, just handle line breaks
 		const lines = content.split('\n');
-		
+
 		// Keep normal paragraphs for all lines except the last one
 		if (lines.length > 1) {
-			return lines
-				.slice(0, -1)
-				.map((line) => `<p>${line || ' '}</p>`)
-				.join('') +
-				`<p class="last-line">${lines[lines.length - 1] || ' '}</p>`;
+			return (
+				lines
+					.slice(0, -1)
+					.map((line) => `<p>${line || ' '}</p>`)
+					.join('') + `<p class="last-line">${lines[lines.length - 1] || ' '}</p>`
+			);
 		}
-		
+
 		// For single line text, just make it a "last-line" paragraph
 		return `<p class="last-line">${content || ' '}</p>`;
 	}
 
 	// Use Svelte 5's effect rune for reactivity
 	$effect(() => {
-		// console.log(
-		// 	'StreamingText effect: text=',
-		// 	text ? text.substring(0, 20) + '...' : 'empty',
-		// 	'displayedText=',
-		// 	displayedText ? displayedText.substring(0, 20) + '...' : 'empty',
-		// 	'isAnimating=',
-		// 	isAnimating
-		// );
-
 		if (text && text !== displayedText && !isAnimating) {
-			// console.log('Starting text animation');
 			startAnimation();
 		}
 
 		// If component is set to complete immediately, handle that
 		if (isComplete && !isAnimating && displayedText !== text) {
-			// console.log('Setting complete immediately');
 			displayedText = text;
 			displayedCharacters = text.length;
 		}
+	});
+
+	// When component mounts, find the chat container
+	onMount(() => {
+		chatContainer = document.querySelector('.chat-container');
 	});
 
 	// Cleanup on destroy
@@ -151,7 +168,7 @@
 		display: block;
 		margin-bottom: 0.5rem;
 	}
-	
+
 	.streaming-text :global(p.last-line) {
 		display: inline;
 		margin-bottom: 0;
@@ -177,4 +194,3 @@
 		}
 	}
 </style>
-

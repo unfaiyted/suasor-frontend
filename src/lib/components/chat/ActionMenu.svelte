@@ -1,26 +1,51 @@
 <!-- components/ActionMenu.svelte -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+	import type { Snippet, SvelteComponent } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { Heart, Film, Download, Share2, X } from '@lucide/svelte';
 
-	export let show = false;
+	interface ActionMenuItem {
+		id: string;
+		label: string;
+		icon?: typeof SvelteComponent;
+	}
 
-	// Define action items with icons if needed
-	export let actions = [
-		{ id: 'watchlist', label: 'Add to Watchlist' },
-		{ id: 'download', label: 'Request Downloads' },
-		{ id: 'share', label: 'Share Selection' }
+	interface ActionMenuProps {
+		show?: boolean;
+		// trigger: Snippet;
+		actions?: ActionMenuItem[];
+		onSelect?: (actionId: string) => void;
+		onClose?: () => void;
+	}
+
+	let {
+		show = $bindable(false),
+		onSelect,
+		onClose,
+		actions = []
+		// trigger
+	}: ActionMenuProps = $props();
+
+	// Default actions if none provided
+	actions = [
+		{ id: 'watchlist', label: 'Add to Watchlist', icon: Heart },
+		{ id: 'recommend', label: 'Recommend similar', icon: Film },
+		{ id: 'download', label: 'Request Downloads', icon: Download },
+		// { id: 'share', label: 'Share Selection', icon: Share2 },
+		{ id: 'clear', label: 'Clear Selection', icon: X }
 	];
 
-	const dispatch = createEventDispatcher();
-
 	function handleAction(actionId: string) {
-		dispatch('select', actionId);
+		onSelect?.(actionId);
 	}
 
 	function handleClickOutside(event: MouseEvent) {
-		if (show && !event.target.closest('.action-menu-container')) {
-			dispatch('close');
+		const target = event.target as HTMLElement;
+		const isClickInside = target.closest('.lucide-icon') || target.closest('.action-menu-btn');
+		if (show && target && !isClickInside) {
+			console.log('Click outside action menu-ActionMenu');
+			onClose?.();
 		}
 	}
 
@@ -31,25 +56,32 @@
 	onDestroy(() => {
 		document.removeEventListener('click', handleClickOutside);
 	});
+
+	$effect(() => {
+		console.log('Effect triggered for action menu');
+		console.log(show);
+	});
 </script>
 
-<div class="action-menu-container relative">
-	<slot name="trigger"></slot>
+<div class="action-menu-container bg-surface-200-800 relative">
+	<!-- <slot name="trigger"></slot> -->
+
+	<!-- {@render trigger()} -->
 
 	{#if show}
 		<div
-			class="bg-surface-100-800 absolute right-0 bottom-full z-20 mb-1 w-48 rounded shadow-lg"
+			class="bg-surface-200-800 absolute top-[-90px] right-[55px] z-20 mt-1 w-48 rounded shadow-lg"
 			transition:fade={{ duration: 150 }}
 		>
 			<ul class="py-1">
-				{#each actions as action}
+				{#each actions as action (action.id)}
 					<li>
 						<button
 							class="hover:bg-primary-500/20 flex w-full items-center gap-2 px-4 py-2 text-left"
-							on:click={() => handleAction(action.id)}
+							onclick={() => handleAction(action.id)}
 						>
 							{#if action.icon}
-								<svelte:component this={action.icon} size={16} />
+								<action.icon size={16} />
 							{/if}
 							{action.label}
 						</button>

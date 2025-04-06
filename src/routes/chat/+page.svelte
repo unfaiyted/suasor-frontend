@@ -8,7 +8,8 @@
 	import ChatInput from '$lib/components/chat/ChatInput.svelte';
 	import SelectedMoviesBar from '$lib/components/chat/SelectedMoviesBar.svelte';
 	import SidePanel from '$lib/components/chat/SidePanel.svelte';
-	import TypingMessage from '$lib/components/chat/TypingMessage.svelte';
+	import DownloadRequestModal from '$lib/components/chat/DownloadRequestModal.svelte';
+	import ListCreationModal from '$lib/components/chat/ListCreationModal.svelte';
 
 	// Import store
 	import chatStore, {
@@ -21,14 +22,26 @@
 	} from '$lib/stores/chat';
 
 	// Local state
-	let elemChat: HTMLElement;
-	let currentMessage = '';
-	let showActionsMenu = false;
-	let showSidePanel = false;
-	let showTypingIndicator = false;
+	let elemChat = $state<HTMLElement>();
+	let currentMessage = $state('');
+	let showActionsMenu = $state(false);
+	let showSidePanel = $state(false);
+	let showTypingIndicator = $state(false);
+	let showDownloadModal = $state(false);
+	let showListCreationModal = $state(false);
 
 	// State variables for chat functionality
-	let isInitializing = true;
+	let isInitializing = $state(true);
+	
+	// Add effect to scroll when chat container is available
+	$effect(() => {
+		if (elemChat && !isInitializing) {
+			setTimeout(() => {
+				scrollToLatestMessage();
+				console.log('Scrolled to bottom after chat container bind');
+			}, 300);
+		}
+	});
 
 	onMount(async () => {
 		// Set up click handler for action menu
@@ -46,6 +59,13 @@
 			console.error('Error initializing chat:', error);
 		} finally {
 			isInitializing = false;
+			
+			// Scroll to bottom after initialization is complete
+			// Use a small timeout to ensure DOM is fully updated
+			setTimeout(() => {
+				scrollToLatestMessage();
+				console.log('Initial scroll to bottom of chat');
+			}, 300);
 		}
 
 		return () => {
@@ -54,81 +74,79 @@
 	});
 
 	// Utility functions
-	function scrollChatBottom(behavior = 'smooth') {
+	function scrollToLatestMessage() {
+		// Scroll both the chat container and the page to the bottom
 		if (elemChat) {
-			elemChat.scrollTo({ top: elemChat.scrollHeight, behavior: behavior as ScrollBehavior });
+			// Scroll the chat container to the bottom
+			elemChat.scrollTop = elemChat.scrollHeight;
+			
+			// Also scroll the window/page to the bottom
+			window.scrollTo({
+				top: document.body.scrollHeight,
+				behavior: 'smooth'
+			});
+			
+			console.log('Scrolling both container and page to bottom');
 		}
 	}
 
 	function handleClickOutside(event: MouseEvent) {
 		const target = event.target as HTMLElement;
-		if (showActionsMenu && !target.closest('.actions-menu')) {
+		const isClickInside = target.closest('.lucide-icon') || target.closest('.action-menu-btn');
+		if (showActionsMenu && !isClickInside) {
+			console.log('Click outside actions menu');
 			showActionsMenu = false;
 		}
 	}
 
 	// Action handling functions
 	function createListFromSelection() {
-		const listName = prompt('Enter a name for your list:');
-		if (listName) {
-			chatStore.createListFromSelection(listName);
-			showActionsMenu = false;
-		}
+		showListCreationModal = true;
+		showActionsMenu = false;
 	}
 
 	function handleAction(action: string) {
 		// Handle different actions based on selection
 		switch (action) {
+			case 'recommend':
+				// Send empty message but with movie recommendation flag turned on
+				// This will use the selected movies for recommendations
+				chatStore.sendMessage('', true);
+				break;
 			case 'watchlist':
 				alert(`Adding ${$selectedMovies.length} movies to watchlist`);
 				break;
 			case 'download':
-				alert(`Requesting downloads for ${$selectedMovies.length} movies`);
+				showDownloadModal = true;
 				break;
 			case 'share':
 				alert(`Sharing ${$selectedMovies.length} movies`);
 				break;
 		}
+		console.log('Action:', action);
 		showActionsMenu = false;
 	}
 
-	// Send a message and show the typing indicator while waiting
-	async function handleSendMessage() {
-		if (!currentMessage.trim() && $selectedMovies.length === 0) return;
-
-		console.log('Sending message:', currentMessage);
-
-		// Create a blank AI response with typing indicator immediately
-		chatStore.addEmptyAIResponse();
-		showTypingIndicator = true;
-		scrollChatBottom(); // Scroll immediately to show typing indicator
-
-		try {
-			// Add a minimum delay for the typing indicator (at least 500ms)
-			console.log('Processing message...');
-			const messageProcessingPromise = chatStore.sendMessage(currentMessage);
-			const minTypingTimePromise = new Promise((resolve) => setTimeout(resolve, 500));
-
-			// Wait for both the API response and minimum typing time
-			await Promise.all([messageProcessingPromise, minTypingTimePromise]);
-			console.log('Message processed, response received');
-			currentMessage = '';
-		} finally {
-			// Hide typing indicator after response is received
-			console.log('Hiding typing indicator');
-			showTypingIndicator = false;
-			scrollChatBottom();
-		}
-	}
-
 	// Reactive statements to handle updates
-	$: if ($chatStore.messages) {
-		// Scroll to bottom when messages change
-		setTimeout(() => scrollChatBottom(), 0);
-	}
+	$effect(() => {
+		// When messages change, scroll to bottom
+		if ($chatStore.messages && $chatStore.messages.length > 0) {
+			// Wait a short tick to ensure DOM is updated
+			setTimeout(() => scrollToLatestMessage(), 100);
+		}
+	});
+	
+	// Watch the selectedMoviesBar appearance
+	$effect(() => {
+		// Only scroll when movies are first added (from 0)
+		if ($selectedMovies && $selectedMovies.length === 1) {
+			// Wait a short tick to ensure DOM is updated
+			setTimeout(() => scrollToLatestMessage(), 100);
+		}
+	});
 </script>
 
-<div class="mx-4 mt-4 flex h-full">
+<div class="mx-4 mt-4 flex h-[calc(100vh-40px)] relative">
 	<!-- Side Panel -->
 	{#if showSidePanel}
 		<SidePanel
@@ -139,8 +157,8 @@
 	{/if}
 
 	<!-- Main Chat Area -->
-	<section class="card bg-surface-100-900 rounded-container mb-5 flex-1 overflow-hidden p-4 pb-6">
-		<div class="mb-2 flex justify-between">
+	<section class="card bg-surface-100-900 rounded-container flex-1 overflow-hidden flex flex-col">
+		<div class="mb-2 flex justify-between p-4">
 			<div class="flex items-center gap-2">
 				<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
 					{showSidePanel ? 'Hide' : 'Show'} History
@@ -171,18 +189,16 @@
 
 		<!-- Show error notification if any -->
 		{#if $chatError}
-			<div class="alert alert-error mb-4 p-2" transition:fade>
+			<div class="alert alert-error mx-4 mb-4 p-2" transition:fade>
 				<span>{$chatError.message}</span>
 				<button class="btn btn-sm" on:click={() => chatStore.clearError()}>Dismiss</button>
 			</div>
 		{/if}
 
-		<div class="chat mb-6 grid h-full h-full min-h-[100%] w-full grid-rows-[1fr_auto_auto] pb-10">
-			<!-- Conversation -->
-			<section
-				bind:this={elemChat}
-				class="max-h-[100%] space-y-4 overflow-y-auto p-4 md:min-h-[100%]"
-			>
+		<!-- Main chat container with flex-grow to push input to bottom -->
+		<div class="flex-grow flex flex-col overflow-hidden">
+			<!-- Scrollable message area -->
+			<div bind:this={elemChat} class="chat-container flex-grow overflow-y-auto p-4 space-y-2">
 				{#if isInitializing}
 					<div class="flex flex-col items-center justify-center p-4 text-center">
 						<span class="loading loading-spinner loading-lg mb-2"></span>
@@ -203,43 +219,58 @@
 								message.sender === 'ai' &&
 								message.content.type === 'text' &&
 								!message.content.text}
-							toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
+							toggleSelection={(movie) => chatStore.toggleMovieSelection(movie)}
 						/>
 					{/each}
 				{/if}
 
-				<!-- We now show typing indicator directly in the chat message -->
-				<!-- Removed separate TypingMessage since we show the typing inside the empty AI message -->
-
+				<!-- Loading indicator -->
 				{#if $chatLoading && !isInitializing && $chatStore.messages.length === 0}
 					<div class="flex justify-center p-4">
 						<span class="loading loading-spinner loading-lg"></span>
 					</div>
 				{/if}
-			</section>
-
-			<!-- Selected movies bar -->
-			{#if $selectedMovies.length > 0}
-				<SelectedMoviesBar
-					selectedMovies={$selectedMovies}
-					{showActionsMenu}
-					toggleSelection={(e) => chatStore.toggleMovieSelection(e)}
-					createList={createListFromSelection}
-					handleAction={(e) => handleAction(e)}
-					toggleMenu={() => (showActionsMenu = !showActionsMenu)}
-				/>
-			{/if}
-
-			<!-- Input area -->
+			</div>
+            
+            <!-- Selected movies bar (if any) -->
+            {#if $selectedMovies.length > 0}
+                <SelectedMoviesBar
+                    selectedMovies={$selectedMovies}
+                    {showActionsMenu}
+                    toggleSelection={(movie) => chatStore.toggleMovieSelection(movie)}
+                    createList={createListFromSelection}
+                    handleAction={(e) => handleAction(e)}
+                    toggleMenu={() => {
+                        console.log(showActionsMenu);
+                        showActionsMenu = !showActionsMenu;
+                    }}
+                />
+            {/if}
+            
+			<!-- Input area always at the bottom of the flex container -->
 			<ChatInput
 				bind:currentMessage
 				hasSelectedMovies={$selectedMovies.length > 0}
-				on:sendMessage={handleSendMessage}
 				disabled={showTypingIndicator || $chatLoading}
 			/>
 		</div>
 	</section>
 </div>
+
+<!-- Modals -->
+<DownloadRequestModal 
+	show={showDownloadModal} 
+	selectedMovies={$selectedMovies} 
+	on:close={() => showDownloadModal = false} 
+	on:downloadRequested={() => chatStore.clearSelectedMovies()}
+/>
+
+<ListCreationModal 
+	show={showListCreationModal} 
+	selectedMovies={$selectedMovies} 
+	on:close={() => showListCreationModal = false} 
+	on:listCreated={() => chatStore.clearSelectedMovies()}
+/>
 
 <style>
 	:global(.full-page) {

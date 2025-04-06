@@ -249,9 +249,9 @@
 	}
 </script>
 
-<div class="container mx-auto">
+<div class="mx-auto">
 	{#if !isLoading && spotlightMovies.length > 0}
-		<div class="-mx-4">
+		<div class="z-10 -mx-4 -mt-16">
 			<MovieSpotlightCarousel
 				movies={spotlightMovies}
 				on:showDetails={handleShowDetails}

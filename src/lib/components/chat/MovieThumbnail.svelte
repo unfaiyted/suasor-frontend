@@ -15,7 +15,11 @@
 >
 	<div class="relative">
 		<img
-			src={$derived(movie.poster || movie.details?.artwork?.poster || `https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`)}
+			src={$derived(
+				movie.poster ||
+					movie.details?.artwork?.poster ||
+					`https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`
+			)}
 			alt={movie.title || movie.details?.title || 'Movie'}
 			class="h-[120px] w-full object-cover"
 		/>

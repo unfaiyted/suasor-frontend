@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Movie } from './types';
 	import { onDestroy } from 'svelte';
+	import { showMoviePopover, hideMoviePopover } from './MoviePopoverService';
 
 	type EnhancedMovieCardProps = {
 		movie: Movie;
@@ -12,7 +13,7 @@
 
 	let {
 		movie,
-		showPopoverOnHover = false,
+		showPopoverOnHover = true, // Enable by default
 		isSelected = false,
 		toggleSelection,
 		isInLibrary = false
@@ -25,6 +26,32 @@
 		if (toggleSelection) {
 			toggleSelection(movie);
 		}
+	}
+	
+	// Show popover on hover
+	function handleMouseEnter(event: MouseEvent) {
+		if (!showPopoverOnHover) return;
+		
+		clearTimeout(hoverTimeout);
+		hoverTimeout = setTimeout(() => {
+			// Get the element's position
+			const rect = cardElement.getBoundingClientRect();
+			// Position to the right of the card
+			const x = rect.right;
+			const y = rect.top + 20;
+			// Show the popover with the movie data
+			showMoviePopover(movie, x, y);
+		}, 300); // Small delay to prevent flickering
+	}
+	
+	// Hide popover when mouse leaves
+	function handleMouseLeave() {
+		if (!showPopoverOnHover) return;
+		
+		clearTimeout(hoverTimeout);
+		hoverTimeout = setTimeout(() => {
+			hideMoviePopover();
+		}, 200);
 	}
 
 	onDestroy(() => {
@@ -61,6 +88,8 @@
 	class:ring-primary-500={isSelected}
 	class:brightness-75={isSelected}
 	onclick={handleClick}
+	onmouseenter={handleMouseEnter}
+	onmouseleave={handleMouseLeave}
 	bind:this={cardElement}
 	role="button"
 >
@@ -106,4 +135,3 @@
 		</div>
 	{/if}
 </div>
-

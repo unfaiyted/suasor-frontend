@@ -3,38 +3,73 @@
 	import { Check, List, MoreVertical } from '@lucide/svelte';
 	import type { Movie } from './types';
 	import ActionMenu from './ActionMenu.svelte';
+	import ListCreationModal from './ListCreationModal.svelte';
 
 	interface SelectedMoviesBarProps {
 		selectedMovies: Movie[];
 		showActionsMenu: boolean;
 		toggleSelection: (movie: Movie) => void;
-		toggleMenu: () => void;
 		createList: () => void;
 		handleAction: (actionId: string) => void;
+		toggleMenu: () => void;
 	}
 
 	let {
 		selectedMovies,
-		showActionsMenu,
+		showActionsMenu = $bindable(false),
 		toggleSelection,
 		handleAction,
-		toggleMenu,
-		createList
+		createList,
+		toggleMenu
 	}: SelectedMoviesBarProps = $props();
+
+	// State for list creation modal using Svelte 5 syntax
+	let showListModal = $state(false);
+
+	// Define our own actions for the menu
+	const actionItems = [
+		{ id: 'recommend', label: 'Recommend based on these' },
+		{ id: 'clear', label: 'Clear selection' }
+	];
 
 	function toggleMovieSelection(movie: Movie) {
 		toggleSelection(movie);
 	}
 
 	function handleActionBar(actionId: string) {
-		handleAction(actionId);
+		// Handle actions specific to this component
+		if (actionId === 'recommend') {
+			// Pass to parent for chat message creation
+			handleAction('recommend');
+		} else if (actionId === 'clear') {
+			// Clear all selected movies
+			selectedMovies.forEach((movie) => {
+				toggleSelection(movie);
+			});
+		} else {
+			// Pass through any other actions to parent
+			handleAction(actionId);
+		}
+
 		showActionsMenu = false;
+	}
+
+	function handleCreateList() {
+		showListModal = true;
+	}
+
+	function handleListCreated(event: CustomEvent) {
+		// Log the created list - in a real app you'd save this to your store or API
+		console.log('List created:', event.detail);
+		showListModal = false;
 	}
 </script>
 
-<div class="border-surface-200-800 flex items-center justify-between border-t p-2">
+<div
+	class="border-surface-200-800 bg-surface-100-900 mt-2 flex items-center justify-between border-b p-2 shadow-sm"
+>
 	<div class="flex gap-2 overflow-x-auto">
-		{#each selectedMovies as movie}
+		{#each selectedMovies as movie (movie.id)}
 			<div class="relative w-16 flex-shrink-0">
 				<img
 					src={movie.poster ||
@@ -45,7 +80,7 @@
 				/>
 				<button
 					class="bg-primary-500 absolute flex h-5 w-5 items-center justify-center rounded-full text-white"
-					style={'top: 3px; left: 8px'}
+					style="top: 3px; left: 8px"
 					onclick={() => toggleMovieSelection(movie)}
 				>
 					<Check size={12} />
@@ -64,25 +99,34 @@
 			<button
 				type="button"
 				class="btn preset-filled flex items-center gap-1 p-2"
-				onclick={createList}
+				onclick={handleCreateList}
+				title="Create a list from selected movies"
 			>
 				<List size={16} />
 			</button>
-
-			<ActionMenu
-				show={showActionsMenu}
-				on:select={(e) => handleActionBar(e.detail)}
-				on:close={() => (showActionsMenu = false)}
+			<button
+				type="button"
+				class="action-menu-btn btn hover:preset-tonal p-2"
+				onclick={toggleMenu}
+				title="More actions"
 			>
-				<button
-					slot="trigger"
-					type="button"
-					class="btn hover:preset-tonal p-2"
-					onclick={() => (showActionsMenu = !showActionsMenu)}
-				>
-					<MoreVertical size={16} />
-				</button>
-			</ActionMenu>
+				<MoreVertical size={16} />
+			</button>
 		</nav>
+		<ActionMenu
+			show={showActionsMenu}
+			actions={actionItems}
+			onSelect={(e) => handleActionBar(e)}
+			onClose={() => (showActionsMenu = false)}
+		></ActionMenu>
 	</div>
 </div>
+
+<!-- List Creation Modal -->
+<ListCreationModal
+	show={showListModal}
+	{selectedMovies}
+	on:close={() => (showListModal = false)}
+	on:listCreated={handleListCreated}
+/>
+

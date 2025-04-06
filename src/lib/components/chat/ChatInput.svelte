@@ -5,16 +5,23 @@
 	import chatStore, { chatLoading } from '$lib/stores/chat';
 	import type { ClientResponse } from '$lib/api/types';
 
-	export let currentMessage = '';
-	export let hasSelectedMovies = false;
-	export let disabled = false;
-
-	const dispatch = createEventDispatcher();
+	interface ChatInputProps {
+		currentMessage: string;
+		hasSelectedMovies: boolean;
+		disabled: boolean;
+		onSendMessage?: () => void;
+	}
+	let {
+		currentMessage = $bindable(''),
+		hasSelectedMovies = false,
+		disabled = false,
+		onSendMessage
+	}: ChatInputProps = $props();
 
 	function sendMessage() {
-		chatStore.sendMessage(currentMessage);
+		// Send the message directly through the chat store
+		chatStore.sendMessage(currentMessage, false);
 		currentMessage = '';
-		dispatch('sendMessage');
 	}
 
 	function onPromptKeydown(event: KeyboardEvent) {
@@ -29,25 +36,23 @@
 	}
 </script>
 
-<section class="border-surface-200-800 border-t p-4">
-
-	<div
-		class="input-group divide-surface-200-800 rounded-container-token grid-cols-[1fr_auto] divide-x"
-	>
+<div class="chat-input-container border-surface-200-800 sticky bottom-0 left-0 right-0 z-10 border-t bg-white p-4 shadow-lg dark:bg-gray-900">
+	<div class="input-group divide-surface-200-800 mx-auto rounded-container-token grid-cols-[1fr_auto] divide-x">
 		<textarea
 			bind:value={currentMessage}
 			class="textarea border-0 !bg-transparent !bg-none ring-0"
 			name="prompt"
 			placeholder="Ask about movies or select examples to get recommendations..."
 			rows="1"
-			on:keydown={onPromptKeydown}
+			onkeydown={onPromptKeydown}
 			disabled={$chatLoading || disabled}
 		></textarea>
 		<button
-			class="input-group-cell p-3 {(currentMessage || hasSelectedMovies) && !($chatLoading || disabled)
+			class="input-group-cell p-3 {(currentMessage || hasSelectedMovies) &&
+			!($chatLoading || disabled)
 				? 'preset-filled-primary-500'
 				: 'preset-tonal'}"
-			on:click={sendMessage}
+			onclick={sendMessage}
 			disabled={$chatLoading || disabled}
 		>
 			{#if $chatLoading || disabled}
@@ -57,4 +62,4 @@
 			{/if}
 		</button>
 	</div>
-</section>
+</div>

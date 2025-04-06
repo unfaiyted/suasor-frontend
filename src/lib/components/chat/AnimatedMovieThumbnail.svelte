@@ -45,19 +45,6 @@
 		}, 300); // Small delay before hiding popover
 	}
 
-	// Handle showing popover separately from selection
-	function showMovieDetails(event: MouseEvent) {
-		// Don't interfere with other events
-		event.stopPropagation();
-
-		// Get position for the popover
-		if (thumbElement) {
-			const rect = thumbElement.getBoundingClientRect();
-			// Show the popover
-			showMoviePopover(movie, rect.right, rect.top);
-		}
-	}
-
 	// We need to ensure the movie can be selected by clicking it
 	function handleClick(event: MouseEvent | KeyboardEvent) {
 		// Prevent duplicated events
@@ -83,7 +70,6 @@
 	}}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
-	onclick={showMovieDetails}
 	bind:this={thumbElement}
 >
 	<div
@@ -98,9 +84,13 @@
 		aria-pressed={selected}
 	>
 		<img
-			src={$derived(movie.poster ||
-				movie.details?.artwork?.poster ||
-				`https://via.placeholder.com/300x450?text=${encodeURIComponent(movie.title || movie.details?.title || 'Movie')}`)}
+			src={$derived(
+				movie.poster ||
+					movie.details?.artwork?.poster ||
+					`https://via.placeholder.com/300x450?text=${encodeURIComponent(
+						movie.title || movie.details?.title || 'Movie'
+					)}`
+			)}
 			alt={movie.title || movie.details?.title || 'Movie'}
 			class="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
 			loading="lazy"
@@ -145,4 +135,3 @@
 		position: relative;
 	}
 </style>
-

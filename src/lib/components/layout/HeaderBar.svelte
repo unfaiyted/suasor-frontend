@@ -3,6 +3,8 @@
 	import type { UserResponse } from '$lib/api/types';
 	import {
 		Menu,
+		Home,
+		Search,
 		ArrowLeft,
 		Paperclip,
 		Calendar,
@@ -13,6 +15,7 @@
 	} from '@lucide/svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import SpotlightSearch from './SpotlightSearch.svelte';
 
 	let userInitials = '';
 	let user: UserResponse | null = null;
@@ -37,6 +40,7 @@
 
 	let userMenuVisible = false;
 	let mobileMenuVisible = false;
+	let showSearch = false;
 
 	function toggleUserMenu() {
 		userMenuVisible = !userMenuVisible;
@@ -50,6 +54,10 @@
 		if (mobileMenuVisible) {
 			userMenuVisible = false;
 		}
+	}
+	
+	function toggleSearch() {
+		showSearch = !showSearch;
 	}
 
 	// Close menus when clicking outside
@@ -76,7 +84,13 @@
 
 <div class="flex w-full items-center justify-between bg-transparent p-2 pb-2">
 	<div class="flex items-center">
-		<ArrowLeft size={24} />
+		<button 
+			class="text-primary-900-100 flex items-center justify-center z-20 ml-4 hover:bg-surface-200-800/50 rounded-full p-1"
+			onclick={toggleSearch}
+			aria-label="Search"
+		>
+			<Search size={24} />
+		</button>
 		<!-- <h2 class="h2 ml-3 sm:hidden">Movie Recommendations</h2> -->
 	</div>
 
@@ -86,15 +100,12 @@
 
 	<div class="flex items-center">
 		<div class="hidden space-x-4 sm:flex">
-			<Paperclip size={20} />
-			<Calendar size={20} />
+			<!-- <Paperclip size={20} /> -->
+			<Calendar size={20} class="text-primary-900-100 z-20 mt-3" />
 
 			<!-- User menu dropdown -->
-			<div class="user-menu-container relative bg-transparent">
-				<button
-					class="hover:bg-surface-200-700/50 rounded-full p-2"
-					on:click|stopPropagation={toggleUserMenu}
-				>
+			<div class="user-menu-container relative z-20 bg-transparent">
+				<button class="hover:bg-surface-200-700/50 rounded-full p-2" onclick={toggleUserMenu}>
 					{#if $isAuthenticated}
 						<div class="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full">
 							<span class="text-sm font-bold text-white">
@@ -108,7 +119,7 @@
 
 				{#if userMenuVisible}
 					<div
-						class="absolute right-0 z-50 mt-2 min-w-40 rounded-md bg-transparent p-2 pb-0 shadow-xl"
+						class="bg-surface-100-900 absolute right-0 z-20 z-50 mt-2 min-w-40 rounded-md p-2 pb-0 shadow-xl"
 					>
 						<div>
 							{#if $isAuthenticated}
@@ -116,16 +127,16 @@
 									{user?.username || 'User'}
 									<div class="text-xs opacity-70">{user?.email || ''}</div>
 								</div>
-								<div class="border-surface-300-600 my-1 border-t"></div>
-								<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/settings">
+								<div class="border-surface-400-600 my-1 border-t"></div>
+								<a class="hover:bg-surface-200-800/50 block rounded px-4 py-2" href="/settings">
 									<span class="flex items-center gap-2">
 										<Settings size={16} />
 										<span>Settings</span>
 									</span>
 								</a>
 								<button
-									class="hover:bg-surface-200-700/50 block w-full rounded px-4 py-2 text-left"
-									on:click={handleLogout}
+									class="hover:bg-surface-200-800/50 block w-full rounded px-4 py-2 text-left"
+									onclick={handleLogout}
 								>
 									<span class="flex items-center gap-2">
 										<LogOut size={16} />
@@ -133,7 +144,7 @@
 									</span>
 								</button>
 							{:else}
-								<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/login">
+								<a class="hover:bg-surface-200-800/50 block rounded px-4 py-2" href="/login">
 									<span class="flex items-center gap-2">
 										<LogIn size={16} />
 										<span>Log in</span>
@@ -146,10 +157,7 @@
 			</div>
 		</div>
 		<div class="mobile-menu-container block sm:hidden">
-			<button
-				class="hover:bg-surface-200-700/50 rounded-full p-2"
-				on:click|stopPropagation={toggleMobileMenu}
-			>
+			<button class="hover:bg-surface-200-700/50 rounded-full p-2" onclick={toggleMobileMenu}>
 				<Menu size={20} />
 			</button>
 
@@ -181,7 +189,7 @@
 							<div class="border-surface-300-600 my-1 border-t"></div>
 							<button
 								class="hover:bg-surface-200-700/50 block w-full rounded px-4 py-2 text-left"
-								on:click={handleLogout}
+								onclick={handleLogout}
 							>
 								<span class="flex items-center gap-2">
 									<LogOut size={16} />
@@ -202,3 +210,6 @@
 		</div>
 	</div>
 </div>
+
+<!-- Search component -->
+<SpotlightSearch bind:show={showSearch} />

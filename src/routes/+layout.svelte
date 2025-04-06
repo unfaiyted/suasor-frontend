@@ -119,7 +119,7 @@
 				</div>
 			</div>
 			<!-- Footer -->
-			<Footer />
+			<!-- <Footer /> -->
 		</div>
 	{/if}
 	<!-- Global Movie Popover that's managed at the top level (outside any containers) -->
