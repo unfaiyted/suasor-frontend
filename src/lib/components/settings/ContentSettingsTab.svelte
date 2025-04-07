@@ -1,35 +1,45 @@
 <script lang="ts">
 	import { Film, Tv, Music, Video, FileVideo, Filter, Blocks } from '@lucide/svelte';
 	import GenreSelector from './GenreSelector.svelte';
+	import type { UserConfig } from '$lib/api/types';
 
 	interface ContentSettingsTabProps {
-		showAdultContent: boolean;
-		includeUnratedContent: boolean;
-		contentTypes: string[];
-		preferredGenres: Record<string, string[]>;
-		maxRecommendations: Record<string, number>;
-		toggleMediaType: (type: string) => void;
-		handleGenreChange: (mediaType: string, genresList: string[]) => void;
-		isMediaTypePreferred: (type: string) => boolean;
+		formState: UserConfig;
+		updateFormState: (formState: Partial<UserConfig>) => void;
 	}
 
 	// Props - individual values instead of objects to mutate
 	let {
-		showAdultContent = $bindable(false),
-		includeUnratedContent = $bindable(false),
-		contentTypes = $bindable([]),
-		preferredGenres = $bindable({ movies: [], series: [], music: [] }),
-		maxRecommendations = $bindable({
-			movieRecommendations: 20,
-			seriesRecommendations: 20,
-			musicRecommendations: 20,
-			animeRecommendations: 20,
-			documentaryRecommendations: 20
+		formState = $bindable<UserConfig>({
+			language: 'en',
+			showAdultContent: false,
+			includeUnratedContent: false,
+			contentTypes: '',
+			preferredGenres: { movies: [], series: [], music: [] },
+			maxRecommendations: {
+				movies: 20,
+				series: 20,
+				music: 20,
+				anime: 20
+			}
 		}),
-		toggleMediaType,
-		handleGenreChange,
-		isMediaTypePreferred
+		updateFormState
 	}: ContentSettingsTabProps = $props();
+
+	const localMaxRecommendations = {
+		...formState.maxRecommendations
+	};
+
+	let showAdultContent = $state(formState.showAdultContent);
+	let includeUnratedContent = $state(formState.includeUnratedContent);
+	let contentTypes = $state((formState.contentTypes || '').split(','));
+	let preferredGenres = $state(formState.preferredGenres);
+	let maxRecommendations = $state(localMaxRecommendations || {});
+
+	function updateMaxRecommendations(mediaType: string, value: number | undefined) {
+		const updatedRecommendations = { ...formState.maxRecommendations, [mediaType]: value };
+		updateFormState({ maxRecommendations: updatedRecommendations });
+	}
 
 	// Media type options
 	const mediaTypes = [
@@ -40,7 +50,7 @@
 			color: 'red'
 		},
 		{
-			id: 'tvShows',
+			id: 'series',
 			label: 'TV Shows',
 			icon: Tv,
 			color: 'blue'
@@ -56,14 +66,34 @@
 			label: 'Anime',
 			icon: Video,
 			color: 'purple'
-		},
-		{
-			id: 'documentaries',
-			label: 'Documentaries',
-			icon: FileVideo,
-			color: 'orange'
 		}
+		// {
+		// 	id: 'documentaries',
+		// 	label: 'Documentaries',
+		// 	icon: FileVideo,
+		// 	color: 'orange'
+		// }
 	];
+
+	// Helper to check if a media type is preferred
+	function isMediaTypePreferred(type: string) {
+		if (!formState.contentTypes) return false;
+		return formState.contentTypes.includes(type) || false;
+	}
+
+	function toggleMediaType(type: string) {
+		if (!contentTypes) return;
+		const newMediaTypes = isMediaTypePreferred(type)
+			? contentTypes.filter((t: string) => t !== type)
+			: [...contentTypes, type];
+
+		updateFormState({ contentTypes: newMediaTypes.join(',') });
+		contentTypes = newMediaTypes;
+	}
+	function handleGenreChange(mediaType: string, genresList: string[]) {
+		if (!formState.preferredGenres) return;
+		updateFormState({ preferredGenres: { ...formState.preferredGenres, [mediaType]: genresList } });
+	}
 </script>
 
 <div class="space-y-6">
@@ -137,7 +167,12 @@
 					<p class="text-surface-900-50 text-sm">Show content with mature or adult ratings</p>
 				</div>
 				<label class="relative inline-flex cursor-pointer items-center">
-					<input type="checkbox" bind:checked={showAdultContent} class="peer sr-only" />
+					<input
+						type="checkbox"
+						bind:checked={showAdultContent}
+						onchange={() => updateFormState({ showAdultContent })}
+						class="peer sr-only"
+					/>
 					<div
 						class="peer peer-checked:bg-primary-500 h-6 w-11 rounded-full bg-gray-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-md after:transition-all peer-checked:after:translate-x-full dark:bg-gray-600"
 					></div>
@@ -155,7 +190,12 @@
 					<p class="text-surface-900-50 text-sm">Show content without official ratings</p>
 				</div>
 				<label class="relative inline-flex cursor-pointer items-center">
-					<input type="checkbox" bind:checked={includeUnratedContent} class="peer sr-only" />
+					<input
+						type="checkbox"
+						bind:checked={includeUnratedContent}
+						onchange={() => updateFormState({ includeUnratedContent })}
+						class="peer sr-only"
+					/>
 					<div
 						class="peer peer-checked:bg-primary-500 h-6 w-11 rounded-full bg-gray-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-md after:transition-all peer-checked:after:translate-x-full dark:bg-gray-600"
 					></div>
@@ -189,7 +229,7 @@
 								<div class="flex justify-between">
 									<span class="font-medium">{mediaType.label}</span>
 									<span class="text-sm font-medium">
-										{maxRecommendations.movieRecommendations}
+										{maxRecommendations.movies}
 									</span>
 								</div>
 								<input
@@ -197,7 +237,8 @@
 									min="5"
 									max="50"
 									step="5"
-									bind:value={maxRecommendations.movieRecommendations}
+									bind:value={maxRecommendations.movies}
+									onchange={() => updateMaxRecommendations('movies', maxRecommendations.movies)}
 									class="range range-primary mt-1 w-full"
 								/>
 								<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs">
@@ -214,7 +255,7 @@
 								</div>
 							</div>
 						</div>
-					{:else if mediaType.id === 'tvShows'}
+					{:else if mediaType.id === 'series'}
 						<div class="flex items-center gap-3">
 							<div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
 								<Tv size={18} class="text-white" />
@@ -223,7 +264,7 @@
 								<div class="flex justify-between">
 									<span class="font-medium">{mediaType.label}</span>
 									<span class="text-sm font-medium">
-										{maxRecommendations.seriesRecommendations}
+										{maxRecommendations.series}
 									</span>
 								</div>
 								<input
@@ -231,7 +272,8 @@
 									min="5"
 									max="50"
 									step="5"
-									bind:value={maxRecommendations.seriesRecommendations}
+									bind:value={maxRecommendations.series}
+									onchange={() => updateMaxRecommendations('series', maxRecommendations.series)}
 									class="range range-primary mt-1 w-full"
 								/>
 								<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs">
@@ -257,7 +299,7 @@
 								<div class="flex justify-between">
 									<span class="font-medium">{mediaType.label}</span>
 									<span class="text-sm font-medium">
-										{maxRecommendations.musicRecommendations}
+										{maxRecommendations.music}
 									</span>
 								</div>
 								<input
@@ -265,7 +307,8 @@
 									min="5"
 									max="50"
 									step="5"
-									bind:value={maxRecommendations.musicRecommendations}
+									bind:value={maxRecommendations.music}
+									onchange={() => updateMaxRecommendations('music', maxRecommendations.music)}
 									class="range range-primary mt-1 w-full"
 								/>
 								<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs">
@@ -291,7 +334,7 @@
 								<div class="flex justify-between">
 									<span class="font-medium">{mediaType.label}</span>
 									<span class="text-sm font-medium">
-										{maxRecommendations.animeRecommendations}
+										{maxRecommendations.anime}
 									</span>
 								</div>
 								<input
@@ -299,7 +342,8 @@
 									min="5"
 									max="50"
 									step="5"
-									bind:value={maxRecommendations.animeRecommendations}
+									bind:value={maxRecommendations.anime}
+									onchange={() => updateMaxRecommendations('anime', maxRecommendations.anime)}
 									class="range range-primary mt-1 w-full"
 								/>
 								<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs">
@@ -317,39 +361,39 @@
 							</div>
 						</div>
 					{:else if mediaType.id === 'documentaries'}
-						<div class="flex items-center gap-3">
-							<div class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500">
-								<FileVideo size={18} class="text-white" />
-							</div>
-							<div class="flex-1">
-								<div class="flex justify-between">
-									<span class="font-medium">{mediaType.label}</span>
-									<span class="text-sm font-medium">
-										{maxRecommendations.documentaryRecommendations}
-									</span>
-								</div>
-								<input
-									type="range"
-									min="5"
-									max="50"
-									step="5"
-									bind:value={maxRecommendations.documentaryRecommendations}
-									class="range range-primary mt-1 w-full"
-								/>
-								<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs">
-									<span>5</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>|</span>
-									<span>50</span>
-								</div>
-							</div>
-						</div>
+						<!-- <div class="flex items-center gap-3"> -->
+						<!-- 	<div class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500"> -->
+						<!-- 		<FileVideo size={18} class="text-white" /> -->
+						<!-- 	</div> -->
+						<!-- 	<div class="flex-1"> -->
+						<!-- 		<div class="flex justify-between"> -->
+						<!-- 			<span class="font-medium">{mediaType.label}</span> -->
+						<!-- 			<span class="text-sm font-medium"> -->
+						<!-- 				{maxRecommendations.documentary} -->
+						<!-- 			</span> -->
+						<!-- 		</div> -->
+						<!-- 		<input -->
+						<!-- 			type="range" -->
+						<!-- 			min="5" -->
+						<!-- 			max="50" -->
+						<!-- 			step="5" -->
+						<!-- 			bind:value={maxRecommendations.documentary} -->
+						<!-- 			class="range range-primary mt-1 w-full" -->
+						<!-- 		/> -->
+						<!-- 		<div class="text-surface-900-50 flex w-full justify-between px-1 text-xs"> -->
+						<!-- 			<span>5</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>|</span> -->
+						<!-- 			<span>50</span> -->
+						<!-- 		</div> -->
+						<!-- 	</div> -->
+						<!-- </div> -->
 					{/if}
 				{/each}
 			{/if}
@@ -367,8 +411,8 @@
 
 		{#if contentTypes.length > 0}
 			<GenreSelector
-				preferredMediaTypes={contentTypes}
-				genres={preferredGenres}
+				bind:preferredMediaTypes={contentTypes}
+				genres={preferredGenres || {}}
 				onChange={handleGenreChange}
 			/>
 		{:else}

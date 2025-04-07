@@ -8,12 +8,12 @@
 		onChange: (mediaType: string, genresList: string[]) => void;
 	}
 
-	let { preferredMediaTypes, genres, onChange }: GenreSelectorProps = $props();
+	let { preferredMediaTypes = $bindable([]), genres, onChange }: GenreSelectorProps = $props();
 
 	// Local state with Svelte 5 syntax
 	let selectedGenres = $state({
 		movies: genres.movies || [],
-		tvShows: genres.tvShows || [],
+		series: genres.series || [],
 		music: genres.music || []
 	});
 
@@ -21,12 +21,16 @@
 	let activeTab = $state(
 		preferredMediaTypes.includes('movies')
 			? 'movies'
-			: preferredMediaTypes.includes('tvShows')
-				? 'tvShows'
+			: preferredMediaTypes.includes('series')
+				? 'series'
 				: preferredMediaTypes.includes('music')
 					? 'music'
 					: 'movies'
 	);
+
+	$effect(() => {
+		console.log('preferredMediaTypes:', preferredMediaTypes);
+	});
 
 	// Available genres for each media type
 	const availableGenres = {
@@ -50,7 +54,7 @@
 			'War',
 			'Western'
 		],
-		tvShows: [
+		series: [
 			'Action & Adventure',
 			'Animation',
 			'Comedy',
@@ -89,7 +93,7 @@
 	};
 
 	// Toggle genre selection
-	function toggleGenre(mediaType: 'movies' | 'tvShows' | 'music', genre: string) {
+	function toggleGenre(mediaType: 'movies' | 'series' | 'music', genre: string) {
 		const index = selectedGenres[mediaType].indexOf(genre);
 		if (index === -1) {
 			selectedGenres[mediaType] = [...selectedGenres[mediaType], genre];
@@ -102,7 +106,7 @@
 	}
 
 	// Activate a tab
-	function setActiveTab(tab: 'movies' | 'tvShows' | 'music') {
+	function setActiveTab(tab: 'movies' | 'series' | 'music') {
 		if (preferredMediaTypes.includes(tab)) {
 			activeTab = tab;
 		}
@@ -112,7 +116,7 @@
 	$effect(() => {
 		selectedGenres = {
 			movies: genres.movies || [],
-			tvShows: genres.tvShows || [],
+			series: genres.series || [],
 			music: genres.music || []
 		};
 	});
@@ -145,23 +149,23 @@
 				</button>
 			{/if}
 
-			{#if preferredMediaTypes.includes('tvShows')}
+			{#if preferredMediaTypes.includes('series')}
 				<button
 					class={'px-1 pb-2 transition-colors ' +
-						(activeTab === 'tvShows'
+						(activeTab === 'series'
 							? 'border-primary-500 text-primary-500 border-b-2 font-medium'
 							: 'text-surface-900-50 hover:text-surface-900-50-hover')}
 					onclick={(e) => {
 						e.preventDefault();
-						setActiveTab('tvShows');
+						setActiveTab('series');
 					}}
 				>
 					<div class="flex items-center gap-2">
 						<Tv size={16} />
 						<span>TV Shows</span>
-						{#if selectedGenres.tvShows?.length > 0}
+						{#if selectedGenres.series?.length > 0}
 							<span class="bg-primary-500/20 text-primary-500 rounded-full px-2 py-0.5 text-xs">
-								{selectedGenres.tvShows.length}
+								{selectedGenres.series.length}
 							</span>
 						{/if}
 					</div>
@@ -225,28 +229,28 @@
 					{/each}
 				</div>
 			</div>
-		{:else if activeTab === 'tvShows' && preferredMediaTypes.includes('tvShows')}
+		{:else if activeTab === 'series' && preferredMediaTypes.includes('series')}
 			<div>
 				<div class="mb-2 flex items-center justify-between">
 					<h3 class="font-medium">TV Show Genres</h3>
 					<span class="text-surface-900-50 text-sm">
-						Selected: {selectedGenres.tvShows?.length || 0}
+						Selected: {selectedGenres.series?.length || 0}
 					</span>
 				</div>
 				<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-					{#each availableGenres.tvShows as genre}
+					{#each availableGenres.series as genre}
 						<div
 							class={'flex cursor-pointer items-center rounded-lg border p-3 ' +
-								(selectedGenres.tvShows?.includes(genre)
+								(selectedGenres.series?.includes(genre)
 									? 'bg-primary-500/20 border-primary-500/50'
 									: 'bg-surface-200-800/30 hover:bg-surface-200-800/60 border-transparent')}
 							onclick={(e) => {
 								e.preventDefault();
-								toggleGenre('tvShows', genre);
+								toggleGenre('series', genre);
 							}}
 						>
 							<span class="flex-1">{genre}</span>
-							{#if selectedGenres.tvShows?.includes(genre)}
+							{#if selectedGenres.series?.includes(genre)}
 								<div class="bg-primary-500 rounded-full p-0.5 text-white">
 									<Check size={14} />
 								</div>

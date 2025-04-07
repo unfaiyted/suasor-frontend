@@ -53,7 +53,7 @@ function organizeClientsByType(
 			}
 			result[type].push(client);
 		} else {
-			console.warn('Client type is undefined:', client.clientType);
+			// console.warn('Client type is undefined:', client.clientType);
 		}
 	});
 

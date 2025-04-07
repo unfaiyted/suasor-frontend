@@ -7088,7 +7088,7 @@ export interface components {
             /** @example 20 */
             itemsPerPage?: number;
             /** @example en-US */
-            language: string;
+            language?: string;
             /** @example R */
             maxContentRating?: string;
             /** @description how many movie recommendations to generate */

@@ -13,35 +13,40 @@
 		ModelsUserConfigRecommendationSyncFrequency,
 		ModelsUserConfigRecommendationStrategy
 	} from '$lib/api/suasor.v1.d';
+	import type { UserConfig } from '$lib/api/types';
 
 	interface RecommendationSettingsTabProps {
-		recommendationSyncFrequency: ModelsUserConfigRecommendationSyncFrequency;
-		recommendationStrategy: ModelsUserConfigRecommendationStrategy;
-
-		automateRecommendations: boolean;
-		automationMinimumRating: number;
-		discoveryModeEnabled: boolean;
-		discoveryModeRatio: number;
-		setRecommendationStrategy: (strategy: ModelsUserConfigRecommendationStrategy) => void;
-		setRecommendationFrequency: (frequency: ModelsUserConfigRecommendationSyncFrequency) => void;
+		formState: UserConfig;
+		updateFormState: (formState: Partial<UserConfig>) => void;
 	}
 
 	// Props with explicit typing
 	let {
-		// Recommendation settings with defaults
-		recommendationSyncFrequency = $bindable(ModelsUserConfigRecommendationSyncFrequency.weekly),
-		recommendationStrategy = $bindable(ModelsUserConfigRecommendationStrategy.balanced),
-		automateRecommendations = $bindable(false),
-		automationMinimumRating = $bindable(7),
+		formState = $bindable<UserConfig>({
+			language: 'en',
+			recommendationSyncFrequency: ModelsUserConfigRecommendationSyncFrequency.weekly,
+			recommendationStrategy: ModelsUserConfigRecommendationStrategy.balanced,
+			recommendationSyncEnabled: false,
+			recommendationMinRating: 5,
+			discoveryModeEnabled: true,
+			discoveryModeRatio: 30
+		}),
 
-		discoveryModeEnabled = $bindable(true),
-		discoveryModeRatio = $bindable(30),
-		setRecommendationStrategy,
-		setRecommendationFrequency
-
-		// Callback for updates
-		// onUpdateSetting
+		updateFormState
 	}: RecommendationSettingsTabProps = $props();
+
+	let recommendationSyncFrequency = $state(formState.recommendationSyncFrequency);
+	let recommendationStrategy = $state(formState.recommendationStrategy);
+	let automateRecommendations = $state(formState.recommendationSyncEnabled);
+	let automationMinimumRating = $state(formState.recommendationMinRating);
+
+	let discoveryModeEnabled = $state(formState.discoveryModeEnabled);
+	let discoveryModeRatio = $state(formState.discoveryModeRatio);
+
+	if (formState.discoveryModeRatio && formState.discoveryModeRatio > 1) {
+		discoveryModeRatio = formState.discoveryModeRatio / 100;
+		console.log('Discovery mode ratio:', formState.discoveryModeRatio);
+	}
 
 	// Map API enum values to user-friendly labels with improved descriptions
 	const frequencyOptions = [
@@ -128,7 +133,8 @@
 					class:border-primary-500={recommendationStrategy === option.value}
 					class:border-surface-300-600={recommendationStrategy !== option.value}
 					onclick={() => {
-						setRecommendationStrategy(option.value);
+						recommendationStrategy = option.value;
+						updateFormState({ recommendationStrategy: option.value });
 					}}
 				>
 					{#if recommendationStrategy === option.value}
@@ -191,7 +197,8 @@
 					class:border-primary-500={recommendationSyncFrequency === option.value}
 					class:border-surface-300-600={recommendationSyncFrequency !== option.value}
 					onclick={() => {
-						setRecommendationFrequency(option.value);
+						recommendationSyncFrequency = option.value;
+						updateFormState({ recommendationSyncFrequency: option.value });
 					}}
 				>
 					{#if recommendationSyncFrequency === option.value}
@@ -307,6 +314,10 @@
 						max="100"
 						step="10"
 						bind:value={discoveryModeRatio}
+						onchange={() =>
+							discoveryModeRatio
+								? updateFormState({ discoveryModeRatio: discoveryModeRatio / 100 })
+								: null}
 						class="range range-primary flex-1"
 					/>
 					<span class="w-12 text-center font-medium">{discoveryModeRatio}%</span>
