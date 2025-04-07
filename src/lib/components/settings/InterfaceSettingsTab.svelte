@@ -1,28 +1,26 @@
 <script lang="ts">
 	import { Settings, Moon, Sun, Languages, Bell, Bot } from '@lucide/svelte';
 	import { ModelsUserConfigAiChatPersonality, ModelsUserConfigTheme } from '$lib/api/suasor.v1.d';
+	import type { UserConfig } from '$lib/api/types';
 
 	interface InterfaceSettingsTabProps {
-		theme: ModelsUserConfigTheme;
-		language: string;
-		notifications: boolean;
-		aiPersonality: ModelsUserConfigAiChatPersonality;
-		setTheme: (theme: ModelsUserConfigTheme) => void;
-		setLanguage: (language: string) => void;
-		setNotifications: (notifications: boolean) => void;
-		setAiPersonality: (aiPersonality: ModelsUserConfigAiChatPersonality) => void;
+		formState: UserConfig;
+		updateFormState: (formState: Partial<UserConfig>) => void;
 	}
 
 	// Props - use individual props and update functions
 	let {
-		theme = $bindable(ModelsUserConfigTheme.system),
-		language = $bindable('en'),
-		notifications = $bindable(true),
-		aiPersonality = $bindable(ModelsUserConfigAiChatPersonality.friendly),
-		setTheme,
-		setNotifications,
-		setAiPersonality
+		formState = $bindable<UserConfig>({
+			theme: ModelsUserConfigTheme.system,
+			language: 'en',
+			notificationsEnabled: true,
+			aiChatPersonality: ModelsUserConfigAiChatPersonality.friendly
+		}),
+		updateFormState
 	}: InterfaceSettingsTabProps = $props();
+
+	let language = $state(formState.language);
+	let notificationsEnabled = $state(formState.notificationsEnabled);
 
 	// AI personality options
 	const personalityOptions = [
@@ -68,20 +66,20 @@
 		<h3 class="text-lg font-medium">Interface Settings</h3>
 	</header>
 
-	<!-- Theme Preference -->
+	<!-- formState.theme Preference -->
 	<div class="form-control">
-		<label class="label" for="theme-preference">
-			<span class="label-text font-medium">Theme Preference</span>
+		<label class="label" for="formState.theme-preference">
+			<span class="label-text font-medium">formState.theme Preference</span>
 		</label>
 		<div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 			<button
 				type="button"
 				class="flex items-center gap-3 rounded-lg border p-4 transition-colors"
-				class:bg-primary-500={theme === 'light'}
-				class:bg-opacity-10={theme === 'light'}
-				class:border-primary-500={theme === 'light'}
-				class:border-surface-300-600={theme !== 'light'}
-				onclick={() => setTheme(ModelsUserConfigTheme.light)}
+				class:bg-primary-500={formState.theme === 'light'}
+				class:bg-opacity-10={formState.theme === 'light'}
+				class:border-primary-500={formState.theme === 'light'}
+				class:border-surface-300-600={formState.theme !== 'light'}
+				onclick={() => updateFormState({ theme: ModelsUserConfigTheme.light })}
 			>
 				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500">
 					<Sun size={18} class="text-white" />
@@ -92,11 +90,11 @@
 			<button
 				type="button"
 				class="flex items-center gap-3 rounded-lg border p-4 transition-colors"
-				class:bg-primary-500={theme === 'dark'}
-				class:bg-opacity-10={theme === 'dark'}
-				class:border-primary-500={theme === 'dark'}
-				class:border-surface-300-600={theme !== 'dark'}
-				onclick={() => setTheme(ModelsUserConfigTheme.dark)}
+				class:bg-primary-500={formState.theme === 'dark'}
+				class:bg-opacity-10={formState.theme === 'dark'}
+				class:border-primary-500={formState.theme === 'dark'}
+				class:border-surface-300-600={formState.theme !== 'dark'}
+				onclick={() => updateFormState({ theme: ModelsUserConfigTheme.dark })}
 			>
 				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500">
 					<Moon size={18} class="text-white" />
@@ -107,11 +105,11 @@
 			<button
 				type="button"
 				class="flex items-center gap-3 rounded-lg border p-4 transition-colors"
-				class:bg-primary-500={theme === 'system'}
-				class:bg-opacity-10={theme === 'system'}
-				class:border-primary-500={theme === 'system'}
-				class:border-surface-300-600={theme !== 'system'}
-				onclick={() => setTheme(ModelsUserConfigTheme.system)}
+				class:bg-primary-500={formState.theme === 'system'}
+				class:bg-opacity-10={formState.theme === 'system'}
+				class:border-primary-500={formState.theme === 'system'}
+				class:border-surface-300-600={formState.theme !== 'system'}
+				onclick={() => updateFormState({ theme: ModelsUserConfigTheme.system })}
 			>
 				<div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-500">
 					<Settings size={18} class="text-white" />
@@ -132,7 +130,11 @@
 				<Languages size={18} class="text-white" />
 			</div>
 			<div class="flex-1">
-				<select class="select bg-surface-200-800/50 w-full" bind:value={language}>
+				<select
+					class="select bg-surface-200-800/50 w-full"
+					value={language}
+					onchange={() => updateFormState({ language: language })}
+				>
 					<option value="en">English</option>
 					<option value="es">Spanish</option>
 					<option value="fr">French</option>
@@ -163,9 +165,8 @@
 				</div>
 				<input
 					type="checkbox"
-					checked={notifications}
-					onchange={() => setNotifications(notifications)}
-					class="toggle"
+					bind:checked={notificationsEnabled}
+					onclick={() => updateFormState({ notificationsEnabled: !notificationsEnabled })}
 				/>
 			</div>
 		</div>
@@ -181,10 +182,10 @@
 				<button
 					type="button"
 					class="flex flex-col items-center rounded-lg border border-transparent p-4 transition-colors"
-					class:bg-primary-500={aiPersonality === option.id}
-					class:bg-opacity-10={aiPersonality === option.id}
-					class:border-primary-500={aiPersonality === option.id}
-					onclick={() => setAiPersonality(option.id)}
+					class:bg-primary-500={formState.aiChatPersonality === option.id}
+					class:bg-opacity-10={formState.aiChatPersonality === option.id}
+					class:border-primary-500={formState.aiChatPersonality === option.id}
+					onclick={() => updateFormState({ aiChatPersonality: option.id })}
 				>
 					{#if option.color === 'blue'}
 						<div class="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">

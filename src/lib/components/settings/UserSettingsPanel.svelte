@@ -159,35 +159,36 @@
 		try {
 			// Prepare complete user config for saving
 			const completeConfig: UserConfig = {
-				...formState,
-				// Interface preferences
-				theme: formState.theme,
-				notificationsEnabled: formState.notificationsEnabled || false,
-				// Content preferences
-				includeUnratedContent: formState.includeUnratedContent,
-				showAdultContent: formState.showAdultContent,
-				contentTypes: formState.contentTypes,
-				preferredGenres: formState.preferredGenres,
-
-				// Recommendation settings
-				aiChatPersonality: formState.aiChatPersonality,
-				recommendationSyncFrequency: formState.recommendationSyncFrequency,
-				recommendationStrategy: formState.recommendationStrategy,
-				recommendationListPrefix: formState.recommendationListPrefix,
-				recommendationContentTypes: formState.recommendationContentTypes,
-				recommendationSyncListType: formState.recommendationSyncListType,
-				recommendationSyncEnabled: formState.recommendationSyncEnabled,
-				recommendationMinRating: formState.recommendationMinRating,
-				recommendationMaxAge: formState.recommendationMaxAge,
-				// recommendationMinimumRating: formState.recommendationMinRating,
-				discoveryModeEnabled: formState.discoveryModeEnabled,
-				maxRecommendations: formState.maxRecommendations,
-
-				discoveryModeRatio:
-					formState.discoveryModeRatio && formState.discoveryModeRatio > 1
-						? formState.discoveryModeRatio / 100
-						: formState.discoveryModeRatio
+				...formState
+				// 	// Interface preferences
+				// 	theme: formState.theme,
+				// 	notificationsEnabled: formState.notificationsEnabled || false,
+				// 	// Content preferences
+				// 	includeUnratedContent: formState.includeUnratedContent,
+				// 	showAdultContent: formState.showAdultContent,
+				// 	contentTypes: formState.contentTypes,
+				// 	preferredGenres: formState.preferredGenres,
+				//
+				// 	// Recommendation settings
+				// 	aiChatPersonality: formState.aiChatPersonality,
+				// 	recommendationSyncFrequency: formState.recommendationSyncFrequency,
+				// 	recommendationStrategy: formState.recommendationStrategy,
+				// 	recommendationListPrefix: formState.recommendationListPrefix,
+				// 	recommendationContentTypes: formState.recommendationContentTypes,
+				// 	recommendationSyncListType: formState.recommendationSyncListType,
+				// 	recommendationSyncEnabled: formState.recommendationSyncEnabled,
+				// 	recommendationMinRating: formState.recommendationMinRating,
+				// 	recommendationMaxAge: formState.recommendationMaxAge,
+				// 	// recommendationMinimumRating: formState.recommendationMinRating,
+				// 	discoveryModeEnabled: formState.discoveryModeEnabled,
+				// 	maxRecommendations: formState.maxRecommendations
 			};
+
+			if (completeConfig.discoveryModeRatio && completeConfig.discoveryModeRatio > 1) {
+				completeConfig.discoveryModeEnabled = true;
+				completeConfig.discoveryModeRatio = completeConfig.discoveryModeRatio / 100;
+				console.log('Discovery mode ratio:', completeConfig.discoveryModeRatio);
+			}
 
 			console.log('Submitting complete form data:', completeConfig);
 
@@ -265,6 +266,12 @@
 	function setRecommendationFrequency(frequency: ModelsUserConfigRecommendationSyncFrequency) {
 		formState.recommendationSyncFrequency = frequency;
 	}
+
+	function updateFormState(newState: Partial<UserConfig>) {
+		console.log('Updating form state:', newState);
+		formState = { ...formState, ...newState };
+		console.log('Updated form state:', formState);
+	}
 </script>
 
 <CardHeader title="User Settings" subtitle="Manage your personal preferences" />
@@ -288,16 +295,7 @@
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<!-- Interface Settings Tab -->
 		{#if activeTab === 'interface'}
-			<InterfaceSettingsTab
-				theme={formState.theme as ModelsUserConfigTheme}
-				language={formState.language}
-				notifications={formState.notificationsEnabled || false}
-				aiPersonality={formState.aiChatPersonality as ModelsUserConfigAiChatPersonality}
-				{setTheme}
-				{setLanguage}
-				{setNotifications}
-				{setAiPersonality}
-			/>
+			<InterfaceSettingsTab {formState} {updateFormState} />
 			<!-- Content Settings Tab -->
 		{:else if activeTab === 'content'}
 			<ContentSettingsTab
@@ -317,8 +315,8 @@
 				recommendationStrategy={formState.recommendationStrategy as ModelsUserConfigRecommendationStrategy}
 				automateRecommendations={formState.recommendationSyncEnabled as boolean}
 				automationMinimumRating={formState.recommendationMinRating as number}
-				enableDiscovery={formState.discoveryModeEnabled as boolean}
-				discoveryRatio={formState.discoveryModeRatio as number}
+				discoveryModeEnabled={formState.discoveryModeEnabled as boolean}
+				discoveryModeRatio={formState.discoveryModeRatio as number}
 				{setRecommendationStrategy}
 				{setRecommendationFrequency}
 			/>

@@ -20,8 +20,8 @@
 
 		automateRecommendations: boolean;
 		automationMinimumRating: number;
-		enableDiscovery: boolean;
-		discoveryRatio: number;
+		discoveryModeEnabled: boolean;
+		discoveryModeRatio: number;
 		setRecommendationStrategy: (strategy: ModelsUserConfigRecommendationStrategy) => void;
 		setRecommendationFrequency: (frequency: ModelsUserConfigRecommendationSyncFrequency) => void;
 	}
@@ -34,8 +34,8 @@
 		automateRecommendations = $bindable(false),
 		automationMinimumRating = $bindable(7),
 
-		enableDiscovery = $bindable(true),
-		discoveryRatio = $bindable(0.5),
+		discoveryModeEnabled = $bindable(true),
+		discoveryModeRatio = $bindable(30),
 		setRecommendationStrategy,
 		setRecommendationFrequency
 
@@ -289,7 +289,7 @@
 					</p>
 				</div>
 				<label class="relative inline-flex cursor-pointer items-center">
-					<input type="checkbox" bind:checked={enableDiscovery} class="peer sr-only" />
+					<input type="checkbox" bind:checked={discoveryModeEnabled} class="peer sr-only" />
 					<div
 						class="peer peer-checked:bg-primary-500 h-6 w-11 rounded-full bg-gray-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-md after:transition-all peer-checked:after:translate-x-full dark:bg-gray-600"
 					></div>
@@ -297,7 +297,7 @@
 			</div>
 		</div>
 
-		{#if enableDiscovery}
+		{#if discoveryModeEnabled}
 			<div class="mt-3 ml-12">
 				<label class="text-sm font-medium" for="discovery-ratio">Discovery Ratio</label>
 				<div class="mt-1 flex items-center gap-3">
@@ -306,10 +306,10 @@
 						min="0"
 						max="100"
 						step="10"
-						bind:value={discoveryRatio}
+						bind:value={discoveryModeRatio}
 						class="range range-primary flex-1"
 					/>
-					<span class="w-12 text-center font-medium">{discoveryRatio}%</span>
+					<span class="w-12 text-center font-medium">{discoveryModeRatio}%</span>
 				</div>
 				<p class="text-surface-900-50 mt-1 text-xs">
 					Percentage of recommendations that will explore new content types
