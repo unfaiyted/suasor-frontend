@@ -278,19 +278,19 @@ const chatApi = {
 	toggleMovieSelection(movie: Movie) {
 		// Track whether this movie is in the latest message before updating state
 		let isInLatestMessage = false;
-		
+
 		// Get all messages
 		const messages = chatStore.getState().messages;
 		if (messages.length > 0) {
 			// Get the last message
 			const lastMessage = messages[messages.length - 1];
-			
+
 			// Check if this movie appears in the latest message's movie lists
 			if (lastMessage.content.type === 'movieList' && lastMessage.content.movies) {
-				isInLatestMessage = lastMessage.content.movies.some(m => m.id === movie.id);
+				isInLatestMessage = lastMessage.content.movies.some((m) => m.id === movie.id);
 			}
 		}
-		
+
 		// Update the state
 		chatStore.update((state) => {
 			const selectedIndex = state.selectedMovies.findIndex((m) => m.id === movie.id);
@@ -309,7 +309,7 @@ const chatApi = {
 				};
 			}
 		});
-		
+
 		// Only scroll if the movie was in the latest message
 		setTimeout(() => {
 			if (isInLatestMessage) {
@@ -354,20 +354,20 @@ const chatApi = {
 				}
 			]
 		}));
-		
+
 		// Scroll both container and page to bottom when user sends a message
 		setTimeout(() => {
 			const chatContainer = document.querySelector('.chat-container');
 			if (chatContainer) {
 				// Scroll the chat container
 				chatContainer.scrollTop = chatContainer.scrollHeight;
-				
+
 				// Also scroll the entire page
 				window.scrollTo({
 					top: document.body.scrollHeight,
 					behavior: 'smooth'
 				});
-				
+
 				console.log('Scrolling container and page to bottom after user message');
 			}
 		}, 50);

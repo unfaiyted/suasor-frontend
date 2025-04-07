@@ -4,12 +4,12 @@
 	import type { ClientResponse } from '$lib/api/types';
 
 	type MediaServersPanelProps = {
-		saveSettings?: (config: Record<string, ClientResponse[]>) => void;
+		onSave?: (config: Record<string, ClientResponse[]>) => void;
 		clientsByType?: Record<string, ClientResponse[]>;
 		isLoading?: boolean;
 	};
 
-	const { saveSettings, isLoading = false, clientsByType = {} }: MediaServersPanelProps = $props();
+	const { onSave, isLoading = false, clientsByType = {} }: MediaServersPanelProps = $props();
 
 	// Define the media server integrations
 	const mediaIntegrations = [
@@ -45,8 +45,8 @@
 
 	// Handle settings changes
 	function handleSettingsChange(updatedClientsByType: Record<string, ClientResponse[]>) {
-		if (saveSettings) {
-			saveSettings(updatedClientsByType);
+		if (onSave) {
+			onSave(updatedClientsByType);
 		}
 	}
 </script>

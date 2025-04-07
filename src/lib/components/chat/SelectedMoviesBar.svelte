@@ -129,4 +129,3 @@
 	on:close={() => (showListModal = false)}
 	on:listCreated={handleListCreated}
 />
-

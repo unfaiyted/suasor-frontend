@@ -55,7 +55,7 @@
 			userMenuVisible = false;
 		}
 	}
-	
+
 	function toggleSearch() {
 		showSearch = !showSearch;
 	}
@@ -84,8 +84,8 @@
 
 <div class="flex w-full items-center justify-between bg-transparent p-2 pb-2">
 	<div class="flex items-center">
-		<button 
-			class="text-primary-900-100 flex items-center justify-center z-20 ml-4 hover:bg-surface-200-800/50 rounded-full p-1"
+		<button
+			class="text-primary-900-100 hover:bg-surface-200-800/50 z-20 ml-4 flex items-center justify-center rounded-full p-1"
 			onclick={toggleSearch}
 			aria-label="Search"
 		>

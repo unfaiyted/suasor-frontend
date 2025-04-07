@@ -134,10 +134,10 @@
 	// Save recent searches to localStorage
 	function saveRecentSearch(query: string) {
 		if (!query.trim()) return;
-		
+
 		// Add to start of array, remove duplicates
-		recentSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
-		
+		recentSearches = [query, ...recentSearches.filter((s) => s !== query)].slice(0, 5);
+
 		try {
 			localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
 		} catch (error) {
@@ -148,15 +148,15 @@
 	// Function to perform search
 	function performSearch() {
 		isLoading = true;
-		
+
 		// Clear previous results
 		searchResults = [];
-		
+
 		// Simulate API call delay
 		setTimeout(() => {
 			if (!searchQuery.trim()) {
 				// Show recent searches when query is empty
-				searchResults = recentSearches.map(query => ({
+				searchResults = recentSearches.map((query) => ({
 					id: `recent-${query}`,
 					title: query,
 					type: 'recent',
@@ -165,32 +165,35 @@
 				isLoading = false;
 				return;
 			}
-			
+
 			// Filter mock data based on query and category
 			const query = searchQuery.toLowerCase();
 			let results: SearchResult[] = [];
-			
+
 			if (selectedCategory === 'All' || selectedCategory === 'Movies') {
-				results = [...results, ...mockMovies.filter(movie => 
-					movie.title.toLowerCase().includes(query)
-				)];
+				results = [
+					...results,
+					...mockMovies.filter((movie) => movie.title.toLowerCase().includes(query))
+				];
 			}
-			
+
 			if (selectedCategory === 'All' || selectedCategory === 'TV Shows') {
-				results = [...results, ...mockTvShows.filter(show => 
-					show.title.toLowerCase().includes(query)
-				)];
+				results = [
+					...results,
+					...mockTvShows.filter((show) => show.title.toLowerCase().includes(query))
+				];
 			}
-			
+
 			if (selectedCategory === 'All' || selectedCategory === 'Music') {
-				results = [...results, ...mockMusic.filter(album => 
-					album.title.toLowerCase().includes(query)
-				)];
+				results = [
+					...results,
+					...mockMusic.filter((album) => album.title.toLowerCase().includes(query))
+				];
 			}
-			
+
 			searchResults = results;
 			isLoading = false;
-			
+
 			// Reset selection index
 			selectedIndex = results.length > 0 ? 0 : -1;
 		}, 300);
@@ -215,7 +218,7 @@
 			default:
 				goto('/');
 		}
-		
+
 		saveRecentSearch(searchQuery);
 		closeSearch();
 	}
@@ -231,7 +234,7 @@
 	// Handle keyboard navigation
 	function handleKeydown(event: KeyboardEvent) {
 		if (!show) return;
-		
+
 		switch (event.key) {
 			case 'ArrowDown':
 				event.preventDefault();
@@ -255,10 +258,13 @@
 				break;
 			case 'Tab':
 				// If category tabs are focused, move between them
-				if (event.target instanceof HTMLElement && event.target.classList.contains('category-tab')) {
+				if (
+					event.target instanceof HTMLElement &&
+					event.target.classList.contains('category-tab')
+				) {
 					event.preventDefault();
 					const currentIndex = categories.indexOf(selectedCategory);
-					const nextIndex = event.shiftKey 
+					const nextIndex = event.shiftKey
 						? (currentIndex - 1 + categories.length) % categories.length
 						: (currentIndex + 1) % categories.length;
 					selectedCategory = categories[nextIndex];
@@ -280,9 +286,9 @@
 				}, 10);
 			}
 		}
-		
+
 		document.addEventListener('keydown', globalKeyHandler);
-		
+
 		return () => {
 			document.removeEventListener('keydown', globalKeyHandler);
 		};
@@ -312,7 +318,7 @@
 	onMount(() => {
 		loadRecentSearches();
 		const cleanup = setupGlobalShortcut();
-		
+
 		// Auto-focus search input when modal opens
 		$effect(() => {
 			if (show) {
@@ -322,7 +328,7 @@
 				}, 10);
 			}
 		});
-		
+
 		return cleanup;
 	});
 
@@ -361,23 +367,23 @@
 			>
 				<!-- Search header -->
 				<div class="border-surface-200-800 flex items-center gap-3 border-b p-3">
-					<div class="flex-grow flex items-center gap-3">
+					<div class="flex flex-grow items-center gap-3">
 						<Search size={18} class="text-surface-900-50 flex-shrink-0" />
 						<input
 							id="spotlight-search-input"
 							type="text"
-							class="flex-grow bg-transparent outline-none w-full"
+							class="w-full flex-grow bg-transparent outline-none"
 							placeholder="Search for movies, TV shows, music..."
 							bind:value={searchQuery}
 							autocomplete="off"
 						/>
 					</div>
-					
-					<div class="flex-shrink-0 flex items-center gap-1">
-						<kbd class="bg-surface-300-700 px-2 py-1 rounded text-xs">ESC</kbd>
-						<span class="text-xs text-surface-900-50">to close</span>
+
+					<div class="flex flex-shrink-0 items-center gap-1">
+						<kbd class="bg-surface-300-700 rounded px-2 py-1 text-xs">ESC</kbd>
+						<span class="text-surface-900-50 text-xs">to close</span>
 					</div>
-					
+
 					<button
 						class="text-surface-900-50 hover:text-surface-900-50-hover rounded p-1"
 						onclick={closeSearch}
@@ -386,15 +392,15 @@
 						<X size={18} />
 					</button>
 				</div>
-				
+
 				<!-- Category tabs -->
 				<div class="border-surface-200-800 flex gap-1 border-b p-2">
 					{#each categories as category}
 						<button
-							class={"category-tab rounded px-3 py-1 text-sm transition-colors " + 
-								(selectedCategory === category 
-									? "bg-primary-500/20 text-primary-500" 
-									: "text-surface-900-50 hover:bg-surface-200-700/50")}
+							class={'category-tab rounded px-3 py-1 text-sm transition-colors ' +
+								(selectedCategory === category
+									? 'bg-primary-500/20 text-primary-500'
+									: 'text-surface-900-50 hover:bg-surface-200-700/50')}
 							onclick={() => {
 								selectedCategory = category;
 								performSearch();
@@ -409,10 +415,12 @@
 				<div class="max-h-[60vh] overflow-y-auto">
 					{#if isLoading}
 						<div class="flex justify-center p-6">
-							<div class="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent"></div>
+							<div
+								class="border-primary-500 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+							></div>
 						</div>
 					{:else if searchResults.length === 0}
-						<div class="p-6 text-center text-surface-900-50">
+						<div class="text-surface-900-50 p-6 text-center">
 							{searchQuery.trim() ? 'No results found' : 'Start typing to search'}
 						</div>
 					{:else}
@@ -422,17 +430,19 @@
 									Recent Searches
 								</div>
 							{/if}
-							
+
 							{#each searchResults as result, index}
 								<div
-									class={"hover:bg-surface-200-700/50 flex items-center gap-3 rounded p-2 transition-colors " + 
-										(index === selectedIndex ? "bg-surface-200-700/50" : "")}
+									class={'hover:bg-surface-200-700/50 flex items-center gap-3 rounded p-2 transition-colors ' +
+										(index === selectedIndex ? 'bg-surface-200-700/50' : '')}
 									onclick={() => navigateToResult(result)}
 									role="button"
 									tabindex="0"
 								>
 									{#if result.type === 'recent'}
-										<div class="text-surface-900-50 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded">
+										<div
+											class="text-surface-900-50 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded"
+										>
 											<Clock size={18} />
 										</div>
 									{:else if result.poster}
@@ -442,47 +452,54 @@
 											class="h-10 w-10 rounded object-cover"
 										/>
 									{:else}
-										<div class="bg-surface-200-700 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded">
+										<div
+											class="bg-surface-200-700 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded"
+										>
 											<svelte:component this={getTypeIcon(result.type)} size={18} />
 										</div>
 									{/if}
-									
-									<div class="flex-grow min-w-0">
+
+									<div class="min-w-0 flex-grow">
 										<div class="flex items-center gap-2">
-											<span class="font-medium truncate">{result.title}</span>
+											<span class="truncate font-medium">{result.title}</span>
 											{#if result.year && result.type !== 'recent'}
 												<span class="text-surface-900-50 text-sm">({result.year})</span>
 											{/if}
 											{#if result.inLibrary}
-												<span class="text-green-500 text-xs">In Library</span>
+												<span class="text-xs text-green-500">In Library</span>
 											{/if}
 										</div>
 										{#if result.subtitle}
-											<div class="text-surface-900-50 text-sm truncate">{result.subtitle}</div>
+											<div class="text-surface-900-50 truncate text-sm">{result.subtitle}</div>
 										{/if}
 									</div>
-									
-									<div class="flex-shrink-0 flex items-center gap-2">
+
+									<div class="flex flex-shrink-0 items-center gap-2">
 										{#if result.rating && result.type !== 'recent'}
 											<div class="flex items-center gap-1 text-amber-500">
 												<Star size={14} />
 												<span class="text-xs">{result.rating}</span>
 											</div>
 										{/if}
-										
+
 										{#if result.type !== 'recent'}
-											<div class="text-surface-900-50 rounded-full bg-surface-200-700 px-2 py-0.5 text-xs">
-												{result.type === 'movie' ? 'Movie' : 
-												 result.type === 'series' ? 'TV' : 
-												 result.type === 'album' ? 'Album' : 
-												 result.type}
+											<div
+												class="text-surface-900-50 bg-surface-200-700 rounded-full px-2 py-0.5 text-xs"
+											>
+												{result.type === 'movie'
+													? 'Movie'
+													: result.type === 'series'
+														? 'TV'
+														: result.type === 'album'
+															? 'Album'
+															: result.type}
 											</div>
 										{/if}
 									</div>
-									
-									<div class="flex-shrink-0 flex gap-1">
+
+									<div class="flex flex-shrink-0 gap-1">
 										{#if result.type !== 'recent'}
-											<button 
+											<button
 												class="hover:bg-surface-300-700/50 text-primary-500 rounded p-1"
 												onclick={(e) => {
 													e.stopPropagation();
@@ -493,8 +510,8 @@
 											>
 												<Heart size={16} />
 											</button>
-											
-											<button 
+
+											<button
 												class="hover:bg-surface-300-700/50 text-primary-500 rounded p-1"
 												onclick={(e) => {
 													e.stopPropagation();
@@ -512,23 +529,23 @@
 						</div>
 					{/if}
 				</div>
-				
+
 				<!-- Keyboard shortcuts help -->
-				<div class="border-surface-200-800 border-t p-3 text-xs text-surface-900-50">
+				<div class="border-surface-200-800 text-surface-900-50 border-t p-3 text-xs">
 					<div class="flex items-center justify-between">
 						<div>
 							<span>Press </span>
-							<kbd class="bg-surface-300-700 px-1 rounded">↑</kbd>
-							<kbd class="bg-surface-300-700 px-1 rounded">↓</kbd>
+							<kbd class="bg-surface-300-700 rounded px-1">↑</kbd>
+							<kbd class="bg-surface-300-700 rounded px-1">↓</kbd>
 							<span> to navigate, </span>
-							<kbd class="bg-surface-300-700 px-1 rounded">Enter</kbd>
+							<kbd class="bg-surface-300-700 rounded px-1">Enter</kbd>
 							<span> to select</span>
 						</div>
 						<div>
 							<span>Shortcut: </span>
-							<kbd class="bg-surface-300-700 px-1 rounded">Ctrl</kbd>
+							<kbd class="bg-surface-300-700 rounded px-1">Ctrl</kbd>
 							<span>+</span>
-							<kbd class="bg-surface-300-700 px-1 rounded">K</kbd>
+							<kbd class="bg-surface-300-700 rounded px-1">K</kbd>
 						</div>
 					</div>
 				</div>

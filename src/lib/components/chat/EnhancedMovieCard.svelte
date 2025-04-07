@@ -27,11 +27,11 @@
 			toggleSelection(movie);
 		}
 	}
-	
+
 	// Show popover on hover
 	function handleMouseEnter(event: MouseEvent) {
 		if (!showPopoverOnHover) return;
-		
+
 		clearTimeout(hoverTimeout);
 		hoverTimeout = setTimeout(() => {
 			// Get the element's position
@@ -43,11 +43,11 @@
 			showMoviePopover(movie, x, y);
 		}, 300); // Small delay to prevent flickering
 	}
-	
+
 	// Hide popover when mouse leaves
 	function handleMouseLeave() {
 		if (!showPopoverOnHover) return;
-		
+
 		clearTimeout(hoverTimeout);
 		hoverTimeout = setTimeout(() => {
 			hideMoviePopover();

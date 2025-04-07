@@ -32,7 +32,7 @@
 
 	// State variables for chat functionality
 	let isInitializing = $state(true);
-	
+
 	// Add effect to scroll when chat container is available
 	$effect(() => {
 		if (elemChat && !isInitializing) {
@@ -59,7 +59,7 @@
 			console.error('Error initializing chat:', error);
 		} finally {
 			isInitializing = false;
-			
+
 			// Scroll to bottom after initialization is complete
 			// Use a small timeout to ensure DOM is fully updated
 			setTimeout(() => {
@@ -79,13 +79,13 @@
 		if (elemChat) {
 			// Scroll the chat container to the bottom
 			elemChat.scrollTop = elemChat.scrollHeight;
-			
+
 			// Also scroll the window/page to the bottom
 			window.scrollTo({
 				top: document.body.scrollHeight,
 				behavior: 'smooth'
 			});
-			
+
 			console.log('Scrolling both container and page to bottom');
 		}
 	}
@@ -135,7 +135,7 @@
 			setTimeout(() => scrollToLatestMessage(), 100);
 		}
 	});
-	
+
 	// Watch the selectedMoviesBar appearance
 	$effect(() => {
 		// Only scroll when movies are first added (from 0)
@@ -146,7 +146,7 @@
 	});
 </script>
 
-<div class="mx-4 mt-4 flex h-[calc(100vh-40px)] relative">
+<div class="relative mx-4 mt-4 flex h-[calc(100vh-40px)]">
 	<!-- Side Panel -->
 	{#if showSidePanel}
 		<SidePanel
@@ -157,7 +157,7 @@
 	{/if}
 
 	<!-- Main Chat Area -->
-	<section class="card bg-surface-100-900 rounded-container flex-1 overflow-hidden flex flex-col">
+	<section class="card bg-surface-100-900 rounded-container flex flex-1 flex-col overflow-hidden">
 		<div class="mb-2 flex justify-between p-4">
 			<div class="flex items-center gap-2">
 				<button class="btn btn-sm" on:click={() => (showSidePanel = !showSidePanel)}>
@@ -196,9 +196,9 @@
 		{/if}
 
 		<!-- Main chat container with flex-grow to push input to bottom -->
-		<div class="flex-grow flex flex-col overflow-hidden">
+		<div class="flex flex-grow flex-col overflow-hidden">
 			<!-- Scrollable message area -->
-			<div bind:this={elemChat} class="chat-container flex-grow overflow-y-auto p-4 space-y-2">
+			<div bind:this={elemChat} class="chat-container flex-grow space-y-2 overflow-y-auto p-4">
 				{#if isInitializing}
 					<div class="flex flex-col items-center justify-center p-4 text-center">
 						<span class="loading loading-spinner loading-lg mb-2"></span>
@@ -231,22 +231,22 @@
 					</div>
 				{/if}
 			</div>
-            
-            <!-- Selected movies bar (if any) -->
-            {#if $selectedMovies.length > 0}
-                <SelectedMoviesBar
-                    selectedMovies={$selectedMovies}
-                    {showActionsMenu}
-                    toggleSelection={(movie) => chatStore.toggleMovieSelection(movie)}
-                    createList={createListFromSelection}
-                    handleAction={(e) => handleAction(e)}
-                    toggleMenu={() => {
-                        console.log(showActionsMenu);
-                        showActionsMenu = !showActionsMenu;
-                    }}
-                />
-            {/if}
-            
+
+			<!-- Selected movies bar (if any) -->
+			{#if $selectedMovies.length > 0}
+				<SelectedMoviesBar
+					selectedMovies={$selectedMovies}
+					{showActionsMenu}
+					toggleSelection={(movie) => chatStore.toggleMovieSelection(movie)}
+					createList={createListFromSelection}
+					handleAction={(e) => handleAction(e)}
+					toggleMenu={() => {
+						console.log(showActionsMenu);
+						showActionsMenu = !showActionsMenu;
+					}}
+				/>
+			{/if}
+
 			<!-- Input area always at the bottom of the flex container -->
 			<ChatInput
 				bind:currentMessage
@@ -258,17 +258,17 @@
 </div>
 
 <!-- Modals -->
-<DownloadRequestModal 
-	show={showDownloadModal} 
-	selectedMovies={$selectedMovies} 
-	on:close={() => showDownloadModal = false} 
+<DownloadRequestModal
+	show={showDownloadModal}
+	selectedMovies={$selectedMovies}
+	on:close={() => (showDownloadModal = false)}
 	on:downloadRequested={() => chatStore.clearSelectedMovies()}
 />
 
-<ListCreationModal 
-	show={showListCreationModal} 
-	selectedMovies={$selectedMovies} 
-	on:close={() => showListCreationModal = false} 
+<ListCreationModal
+	show={showListCreationModal}
+	selectedMovies={$selectedMovies}
+	on:close={() => (showListCreationModal = false)}
 	on:listCreated={() => chatStore.clearSelectedMovies()}
 />
 

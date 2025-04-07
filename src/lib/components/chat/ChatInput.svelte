@@ -36,8 +36,12 @@
 	}
 </script>
 
-<div class="chat-input-container border-surface-200-800 sticky bottom-0 left-0 right-0 z-10 border-t bg-white p-4 shadow-lg dark:bg-gray-900">
-	<div class="input-group divide-surface-200-800 mx-auto rounded-container-token grid-cols-[1fr_auto] divide-x">
+<div
+	class="chat-input-container border-surface-200-800 sticky right-0 bottom-0 left-0 z-10 border-t bg-white p-4 shadow-lg dark:bg-gray-900"
+>
+	<div
+		class="input-group divide-surface-200-800 rounded-container-token mx-auto grid-cols-[1fr_auto] divide-x"
+	>
 		<textarea
 			bind:value={currentMessage}
 			class="textarea border-0 !bg-transparent !bg-none ring-0"

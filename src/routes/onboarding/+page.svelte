@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { ChevronRight, ChevronLeft, Train } from '@lucide/svelte';
+	import { ChevronLeft, Train } from '@lucide/svelte';
 	import OnboardingWelcome from '$lib/components/onboarding/OnboardingWelcome.svelte';
 	import OnboardingPreferences from '$lib/components/onboarding/OnboardingPreferences.svelte';
 	import OnboardingAccountLinks from '$lib/components/onboarding/OnboardingAccountLinks.svelte';
@@ -9,6 +8,13 @@
 	import OnboardingGenres from '$lib/components/onboarding/OnboardingGenres.svelte';
 	import OnboardingRecommendations from '$lib/components/onboarding/OnboardingRecommendations.svelte';
 	import OnboardingComplete from '$lib/components/onboarding/OnboardingComplete.svelte';
+	import configApi from '$lib/stores/config';
+	import {
+		ModelsUserConfigRecommendationStrategy,
+		ModelsUserConfigRecommendationSyncFrequency
+	} from '$lib/api/suasor.v1.d';
+	import type { UserConfig } from '$lib/api/types';
+	import type { OnboardingData, CompleteOnboardingData } from '$lib/components/onboarding/types';
 
 	// Define the onboarding steps
 	const steps = [
@@ -24,7 +30,7 @@
 	// State management with Svelte 5
 	let currentStep = $state(0);
 	let totalSteps = $state(steps.length);
-	let onboardingData = $state({
+	let onboardingData: CompleteOnboardingData = $state({
 		// Media type preferences
 		mediaTypes: {
 			movies: false,
@@ -53,6 +59,11 @@
 		// Recommendation preferences
 		recommendationFrequency: 'weekly',
 		automateRecommendations: false
+	});
+
+	// Load user config if it exists
+	onMount(async () => {
+		await configApi.loadUserConfig();
 	});
 
 	// Check if a step is accessible
@@ -102,7 +113,8 @@
 				for (const [mediaType, isSelected] of Object.entries(onboardingData.mediaTypes)) {
 					if (
 						isSelected &&
-						(!onboardingData.genres[mediaType] || onboardingData.genres[mediaType].length === 0)
+						(!onboardingData.genres[mediaType as keyof typeof onboardingData.genres] ||
+							onboardingData.genres[mediaType as keyof typeof onboardingData.genres].length === 0)
 					) {
 						return false;
 					}
@@ -119,11 +131,11 @@
 	}
 
 	// Navigate to a specific step if accessible
-	function goToStep(stepIndex: number) {
-		if (isStepAccessible(stepIndex)) {
-			currentStep = stepIndex;
-		}
-	}
+	// function goToStep(stepIndex: number) {
+	// 	if (isStepAccessible(stepIndex)) {
+	// 		currentStep = stepIndex;
+	// 	}
+	// }
 
 	// Navigate to next step
 	function goToNextStep() {
@@ -141,14 +153,90 @@
 		}
 	}
 
+	// Map the onboarding data to UserConfig format
+	function mapOnboardingDataToUserConfig() {
+		// Map recommendation frequency to API enum
+		let recommendationSyncFrequency: ModelsUserConfigRecommendationSyncFrequency =
+			ModelsUserConfigRecommendationSyncFrequency.daily;
+		switch (onboardingData.recommendationFrequency) {
+			case 'daily':
+				recommendationSyncFrequency = ModelsUserConfigRecommendationSyncFrequency.daily;
+				break;
+			case 'weekly':
+				recommendationSyncFrequency = ModelsUserConfigRecommendationSyncFrequency.weekly;
+				break;
+			case 'monthly':
+				recommendationSyncFrequency = ModelsUserConfigRecommendationSyncFrequency.monthly;
+				break;
+			case 'manual':
+				recommendationSyncFrequency = ModelsUserConfigRecommendationSyncFrequency.manual;
+				break;
+			default:
+				recommendationSyncFrequency = ModelsUserConfigRecommendationSyncFrequency.weekly;
+		}
+
+		// Map recommendation strategy
+		let recommendationStrategy: ModelsUserConfigRecommendationStrategy =
+			ModelsUserConfigRecommendationStrategy.balanced;
+		// Default to AI strategy, could be enhanced based on user preferences
+
+		// Prepare default client IDs if they exist from account setup
+		const defaultClientSettings = onboardingData.defaultClients || {};
+
+		return {
+			// User preferences
+			theme: 'system', // Default theme, can be overridden in settings
+			language: 'en', // Default language, can be overridden in settings
+
+			// Media preferences from onboarding
+			includeUnratedContent: false, // Default to false for safety
+			includeAdultContent: false, // Default to false for safety
+			preferredGenres: {
+				movieGenres: onboardingData.genres.movies || [],
+				seriesGenres: onboardingData.genres.tvShows || [],
+				musicGenres: onboardingData.genres.music || [],
+				bookGenres: []
+			},
+			maxRecommendations: {
+				movieRecommendations: 20,
+				seriesRecommendations: 20,
+				musicRecommendations: 20
+			},
+
+			// AI preferences
+			aiPersonality: onboardingData.aiPersonality,
+
+			// Recommendation settings
+			recommendationSyncFrequency,
+			recommendationStrategy,
+			automateRecommendations: onboardingData.automateRecommendations,
+
+			// Default client IDs (if configured during setup)
+			...defaultClientSettings,
+
+			// Media preferences
+			preferredMediaTypes: Object.entries(onboardingData.mediaTypes)
+				.filter(([_, enabled]) => enabled)
+				.map(([type]) => type),
+
+			// Notification settings
+			notificationsEnabled: true // Default to enabled
+		} as UserConfig;
+	}
+
 	// Save onboarding data and redirect to the main app
 	async function completeOnboarding() {
 		try {
-			// Here you would save the onboarding data to your API
-			// await saveOnboardingData(onboardingData);
+			// Map onboarding data to UserConfig format
+			const userConfig = mapOnboardingDataToUserConfig();
 
-			// Redirect to the main app
-			goto('/');
+			// Save user configuration to the API
+			await configApi.saveUserConfig(userConfig);
+
+			// Redirect to the main app with a force reload to ensure layout updates correctly
+			// We use window.location.href instead of goto to force a full page reload
+			// This ensures the layout will properly reset
+			window.location.href = '/';
 		} catch (error) {
 			console.error('Error saving onboarding data:', error);
 		}
@@ -161,34 +249,65 @@
 				'Are you sure you want to skip the onboarding process? You can configure these settings later.'
 			)
 		) {
-			goto('/');
+			// Use window.location.href to force a full page reload
+			window.location.href = '/';
 		}
 	}
 
 	// Handle current step completed event
-	function handleStepCompleted(event) {
-		const { stepData } = event.detail;
+	function handleStepCompleted(data: { stepData: OnboardingData }) {
+		const { stepData } = data;
 
 		// Update onboarding data based on the completed step
 		const currentStepName = steps[currentStep];
 		switch (currentStepName) {
 			case 'preferences':
-				onboardingData.mediaTypes = stepData.mediaTypes;
-				onboardingData.aiPersonality = stepData.aiPersonality;
+				if (stepData.mediaTypes) {
+					onboardingData.mediaTypes = stepData.mediaTypes;
+				}
+				if (stepData.aiPersonality) {
+					onboardingData.aiPersonality = stepData.aiPersonality;
+				}
 				break;
 			case 'accountLinks':
-				onboardingData.accountsToLink = stepData.accountsToLink;
-				onboardingData.skipAccountLinking = stepData.skipAccountLinking;
+				if (stepData.accountsToLink) {
+					onboardingData.accountsToLink = stepData.accountsToLink;
+				}
+				if (stepData.skipAccountLinking) {
+					onboardingData.skipAccountLinking = stepData.skipAccountLinking;
+				}
 				break;
 			case 'accountSetup':
-				onboardingData.accountData = stepData.accountData;
+				if (stepData.accountData) {
+					onboardingData.accountData = stepData.accountData;
+				}
+				// Store client IDs and default client settings
+				if (stepData.clientIds) {
+					onboardingData.clientIds = stepData.clientIds;
+				}
+				if (stepData.defaultClients) {
+					onboardingData.defaultClients = stepData.defaultClients;
+				}
 				break;
 			case 'genres':
-				onboardingData.genres = stepData.genres;
+				if (stepData.genres) {
+					onboardingData.genres = stepData.genres;
+				}
 				break;
 			case 'recommendations':
-				onboardingData.recommendationFrequency = stepData.recommendationFrequency;
-				onboardingData.automateRecommendations = stepData.automateRecommendations;
+				if (stepData.recommendationFrequency) {
+					onboardingData.recommendationFrequency = stepData.recommendationFrequency;
+				}
+				// Store the API values if provided
+				if (stepData.recommendationSyncFrequency) {
+					onboardingData.recommendationSyncFrequency = stepData.recommendationSyncFrequency;
+				}
+				if (stepData.recommendationStrategy) {
+					onboardingData.recommendationStrategy = stepData.recommendationStrategy;
+				}
+				if (stepData.automateRecommendations) {
+					onboardingData.automateRecommendations = stepData.automateRecommendations;
+				}
 				break;
 		}
 
@@ -209,7 +328,7 @@
 		</div>
 		<button
 			class="text-surface-900-50 hover:text-surface-900-50-hover text-sm"
-			on:click={skipOnboarding}
+			onclick={skipOnboarding}
 		>
 			Skip Setup
 		</button>
@@ -240,7 +359,7 @@
 
 				<!-- Simplified step dots (center-aligned, fixed width) -->
 				<div class="mx-auto flex max-w-sm items-center justify-center gap-8 py-4">
-					{#each steps.slice(1, -1) as step, idx}
+					{#each steps.slice(1, -1) as _step, idx}
 						<div
 							class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all"
 							class:text-white={currentStep > idx + 1}
@@ -264,36 +383,36 @@
 	<main class="flex flex-grow items-center justify-center p-4">
 		<div class="w-full max-w-3xl">
 			{#if steps[currentStep] === 'welcome'}
-				<OnboardingWelcome on:complete={handleStepCompleted} />
+				<OnboardingWelcome onComplete={handleStepCompleted} />
 			{:else if steps[currentStep] === 'preferences'}
-				<OnboardingPreferences preferences={onboardingData} on:complete={handleStepCompleted} />
+				<OnboardingPreferences preferences={onboardingData} onComplete={handleStepCompleted} />
 			{:else if steps[currentStep] === 'accountLinks'}
 				<OnboardingAccountLinks
 					accountsToLink={onboardingData.accountsToLink}
-					on:complete={handleStepCompleted}
+					onComplete={handleStepCompleted}
 				/>
 			{:else if steps[currentStep] === 'accountSetup'}
 				<OnboardingAccountSetup
 					accountsToLink={onboardingData.accountsToLink}
 					accountData={onboardingData.accountData}
-					on:complete={handleStepCompleted}
+					onComplete={handleStepCompleted}
 				/>
 			{:else if steps[currentStep] === 'genres'}
 				<OnboardingGenres
 					mediaTypes={onboardingData.mediaTypes}
 					genres={onboardingData.genres}
 					accountData={onboardingData.accountData}
-					on:complete={handleStepCompleted}
+					onComplete={handleStepCompleted}
 				/>
 			{:else if steps[currentStep] === 'recommendations'}
 				<OnboardingRecommendations
 					recommendationFrequency={onboardingData.recommendationFrequency}
 					automateRecommendations={onboardingData.automateRecommendations}
 					mediaTypes={onboardingData.mediaTypes}
-					on:complete={handleStepCompleted}
+					onComplete={handleStepCompleted}
 				/>
 			{:else if steps[currentStep] === 'complete'}
-				<OnboardingComplete {onboardingData} on:complete={completeOnboarding} />
+				<OnboardingComplete {onboardingData} onComplete={completeOnboarding} />
 			{/if}
 		</div>
 	</main>
@@ -304,7 +423,7 @@
 			<div class="mx-auto w-full max-w-3xl">
 				<button
 					class="btn preset-outlined rounded-full"
-					on:click={goToPreviousStep}
+					onclick={goToPreviousStep}
 					disabled={currentStep === 0}
 				>
 					<ChevronLeft size={16} />
@@ -314,4 +433,3 @@
 		</footer>
 	{/if}
 </div>
-

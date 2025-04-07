@@ -345,7 +345,7 @@ export const clientsApi = {
 		}
 	},
 
-	// Test client connection
+	// Test client connection (with existing client ID)
 	testClient: async (client: ClientRequest) => {
 		clientsStore.setLoading(true);
 
@@ -362,6 +362,46 @@ export const clientsApi = {
 					...state,
 					loading: false,
 					success: `Connection to ${client.name} successful`
+				}));
+				return response.data.data;
+			} else {
+				throw new Error(response.error?.message || 'Connection test failed');
+			}
+		} catch (err) {
+			clientsStore.setError(err);
+			return null;
+		}
+	},
+
+	// Test a new client connection (without requiring a client ID)
+	testNewClientConnection: async (
+		clientType: TypesClientType | TypesMediaClientType,
+		clientConfig: Partial<ClientConfigTypes>,
+		name: string = 'Client'
+	) => {
+		clientsStore.setLoading(true);
+
+		try {
+			const clientTypeStr = clientType.toString().toLowerCase();
+
+			// Construct client test request
+			const testRequest = {
+				clientType: clientType,
+				name: name,
+				client: clientConfig
+			};
+
+			// Cast the path to avoid TypeScript route checking issues
+			const response = await POST(`/admin/client/${clientTypeStr}/test` as any, {
+				body: testRequest
+			});
+
+			if (response.data?.data) {
+				// Update store with success message
+				clientsStore.update((state) => ({
+					...state,
+					loading: false,
+					success: `Connection to ${name} successful`
 				}));
 				return response.data.data;
 			} else {

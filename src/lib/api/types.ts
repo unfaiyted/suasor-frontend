@@ -4,9 +4,8 @@ import {
 	TypesMediaType,
 	TypesClientType,
 	TypesMediaClientType,
-	ModelsUserConfigRecommendationFrequency,
 	ModelsUserConfigRecommendationStrategy,
-	ModelsUserConfigSyncFrequency
+	ModelsUserConfigRecommendationSyncFrequency
 } from './suasor.v1.d';
 
 // Auth related types
@@ -77,16 +76,17 @@ export type Album = components['schemas']['types.Album'];
 export type Artist = components['schemas']['types.Artist'];
 export type Playlist = components['schemas']['types.Playlist'];
 export type Track = components['schemas']['types.Track'];
-export type Movie = components['schemas']['types.Movie'];
+export type Movie = components['schemas']['suasor_client_media_types.Movie'];
 export type Series = components['schemas']['types.Series'];
-export type Person = components['schemas']['types.Person'];
+export type Person = components['schemas']['suasor_client_media_types.Person'];
 
 // MediaItem types
 export type MediaItemAlbum = components['schemas']['models.MediaItem-types_Album'];
 export type MediaItemArtist = components['schemas']['models.MediaItem-types_Artist'];
 export type MediaItemPlaylist = components['schemas']['models.MediaItem-types_Playlist'];
 export type MediaItemTrack = components['schemas']['models.MediaItem-types_Track'];
-export type MediaItemMovie = components['schemas']['models.MediaItem-types_Movie'];
+export type MediaItemMovie =
+	components['schemas']['models.MediaItem-suasor_client_media_types_Movie'];
 export type MediaItemSeries = components['schemas']['models.MediaItem-types_Series'];
 export type MediaClient = components['schemas']['models.Client-types_ClientConfig'];
 
@@ -115,9 +115,9 @@ export type AddMediaRequest = components['schemas']['requests.AddMediaRequest'];
 export type UpdateMediaRequest = components['schemas']['requests.UpdateMediaRequest'];
 
 // Recommendation types
-export type RecommendationFrequency = ModelsUserConfigRecommendationFrequency;
+export type RecommendationFrequency = ModelsUserConfigRecommendationSyncFrequency;
 export type RecommendationStrategy = ModelsUserConfigRecommendationStrategy;
-export type SyncFrequency = ModelsUserConfigSyncFrequency;
+export type SyncFrequency = ModelsUserConfigRecommendationSyncFrequency;
 
 // Error handling types
 export type ErrorType = components['schemas']['errors.ErrorType'];

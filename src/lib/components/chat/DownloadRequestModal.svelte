@@ -27,7 +27,7 @@
 	let qualityProfiles = $state<{ id: number; name: string }[]>([]);
 	let metadataProfiles = $state<{ id: number; name: string }[]>([]);
 	let loadingProfiles = $state(false);
-	
+
 	// Create event dispatcher
 	const dispatch = createEventDispatcher();
 
@@ -69,7 +69,7 @@
 	async function handleClientChange(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		selectedClientId = parseInt(select.value);
-		
+
 		if (selectedClientId) {
 			await loadProfiles(selectedClientId);
 		} else {
@@ -82,7 +82,7 @@
 	async function loadProfiles(clientId: number) {
 		loadingProfiles = true;
 		errorMessage = '';
-		
+
 		try {
 			// Load quality profiles
 			const qualityResponse = await GET(`/api/client/${clientId}/radarr/profiles/quality`);
@@ -92,7 +92,7 @@
 					qualityProfileId = qualityProfiles[0].id;
 				}
 			}
-			
+
 			// Load metadata profiles
 			const metadataResponse = await GET(`/api/client/${clientId}/radarr/profiles/metadata`);
 			if (metadataResponse.data?.data) {
@@ -109,9 +109,7 @@
 	}
 
 	// Count how many movies are already in library
-	let inLibraryCount = $derived(
-		selectedMovies.filter(movie => movie.inLibrary).length
-	);
+	let inLibraryCount = $derived(selectedMovies.filter((movie) => movie.inLibrary).length);
 
 	// Request the download
 	async function requestDownload() {
@@ -225,7 +223,9 @@
 
 					<!-- Media client selection -->
 					<div class="mb-4">
-						<label for="download-client" class="mb-1 block text-sm font-medium">Download Client</label>
+						<label for="download-client" class="mb-1 block text-sm font-medium"
+							>Download Client</label
+						>
 						<select
 							id="download-client"
 							class="select w-full"
@@ -240,7 +240,7 @@
 						</select>
 						{#if availableClients.length === 0}
 							<p class="mt-2 text-sm text-amber-500">
-								<AlertTriangle size={14} class="inline mr-1" />
+								<AlertTriangle size={14} class="mr-1 inline" />
 								No Radarr clients configured. Please add a Radarr client in Settings.
 							</p>
 						{/if}
@@ -249,7 +249,9 @@
 					<!-- Quality Profile selection -->
 					{#if selectedClientId}
 						<div class="mb-4">
-							<label for="quality-profile" class="mb-1 block text-sm font-medium">Quality Profile</label>
+							<label for="quality-profile" class="mb-1 block text-sm font-medium"
+								>Quality Profile</label
+							>
 							<select
 								id="quality-profile"
 								class="select w-full"
@@ -272,7 +274,9 @@
 						<!-- Metadata Profile selection if available -->
 						{#if metadataProfiles.length > 0}
 							<div class="mb-4">
-								<label for="metadata-profile" class="mb-1 block text-sm font-medium">Metadata Profile</label>
+								<label for="metadata-profile" class="mb-1 block text-sm font-medium"
+									>Metadata Profile</label
+								>
 								<select
 									id="metadata-profile"
 									class="select w-full"
@@ -309,18 +313,19 @@
 						<div class="mb-4">
 							<div class="mb-2">
 								<div class="flex items-center justify-between">
-									<label class="text-sm font-medium">Selected Movies ({selectedMovies.length})</label>
+									<label class="text-sm font-medium"
+										>Selected Movies ({selectedMovies.length})</label
+									>
 									{#if inLibraryCount > 0}
 										<span class="text-xs text-amber-500">
-											<AlertTriangle size={14} class="inline mr-1" />
-											{inLibraryCount} {inLibraryCount === 1 ? 'movie is' : 'movies are'} already in your library
+											<AlertTriangle size={14} class="mr-1 inline" />
+											{inLibraryCount}
+											{inLibraryCount === 1 ? 'movie is' : 'movies are'} already in your library
 										</span>
 									{/if}
 								</div>
 							</div>
-							<div
-								class="border-surface-200-800 max-h-72 overflow-y-auto rounded border"
-							>
+							<div class="border-surface-200-800 max-h-72 overflow-y-auto rounded border">
 								{#each selectedMovies as movie (movie.id)}
 									<div
 										class="hover:bg-surface-300-800 flex items-center gap-2 p-2 transition-colors"

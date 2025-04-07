@@ -312,7 +312,7 @@
 </script>
 
 <div
-	class="grid gap-2 chat-message mb-6"
+	class="chat-message mb-6 grid gap-2"
 	class:grid-cols-[auto_1fr]={message.sender === 'ai'}
 	class:grid-cols-[1fr_auto]={message.sender === 'user'}
 	data-message-id={message.id}
@@ -322,11 +322,7 @@
 		<div
 			class="avatar bg-surface-300-600-token flex h-16 w-16 items-center justify-center overflow-hidden rounded-full"
 		>
-			<img
-				src="/lumen.png"
-				alt={message.name}
-				class="h-full w-full object-cover"
-			/>
+			<img src="/lumen.png" alt={message.name} class="h-full w-full object-cover" />
 		</div>
 	{/if}
 
@@ -363,9 +359,17 @@
 
 					<!-- Show the inline movie recommendations after text animation is complete -->
 					{#if textAnimationComplete && messageRecommendationId !== null && inlinePendingMovies.length > 0}
-						<div class="movie-recommendations mt-4" data-rec-message-id={message.id} in:fade={{ duration: 300 }}>
+						<div
+							class="movie-recommendations mt-4"
+							data-rec-message-id={message.id}
+							in:fade={{ duration: 300 }}
+						>
 							<h4 class="mb-2 text-sm font-medium">Movie Recommendations:</h4>
-							<div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6" data-rec-grid-id={message.id} style="max-width: 80%; margin: 0 auto;">
+							<div
+								class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6"
+								data-rec-grid-id={message.id}
+								style="max-width: 80%; margin: 0 auto;"
+							>
 								{#each inlinePendingMovies as movie, i}
 									<div in:fade={{ duration: 300, delay: i * 150 }}>
 										<EnhancedMovieCard
@@ -395,7 +399,11 @@
 					<StreamingText text={message.content.text} speed={5} isComplete={true} />
 				</div>
 			{/if}
-			<div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6" data-rec-grid-id={message.id} style="max-width: 80%; margin: 0 auto;">
+			<div
+				class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6"
+				data-rec-grid-id={message.id}
+				style="max-width: 80%; margin: 0 auto;"
+			>
 				{#each message.content.movies as movie, i (movie.id)}
 					<div in:fade={{ duration: 300, delay: i * 50 }}>
 						<EnhancedMovieCard
@@ -414,11 +422,7 @@
 		<div
 			class="avatar bg-primary-300 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full"
 		>
-			<img
-				src="/suasorer.png"
-				alt={message.name}
-				class="h-full w-full object-cover"
-			/>
+			<img src="/suasorer.png" alt={message.name} class="h-full w-full object-cover" />
 		</div>
 	{/if}
 </div>

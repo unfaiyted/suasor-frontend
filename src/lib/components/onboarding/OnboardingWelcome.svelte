@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { Film, Tv, Music, Bot } from '@lucide/svelte';
+	import type { OnboardingData } from './types';
 
-	// Event dispatcher to notify parent component when step is completed
-	const dispatch = createEventDispatcher();
+	interface OnboardingWelcomeProps {
+		onComplete: (data: { stepData: OnboardingData }) => void;
+	}
+	let { onComplete }: OnboardingWelcomeProps = $props();
 
 	// Function to handle continuation to next step
 	function handleContinue() {
-		// Just dispatch the event with stepData directly
-		dispatch('complete', { stepData: {} });
+		onComplete({ stepData: {} });
 	}
 </script>
 
@@ -88,4 +89,3 @@
 		</button>
 	</div>
 </div>
-

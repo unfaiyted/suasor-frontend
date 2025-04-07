@@ -31,10 +31,10 @@
 		// Find the chat container
 		const chatContainer = document.querySelector('.chat-container');
 		if (!chatContainer) return;
-		
+
 		// Scroll the container to the bottom
 		chatContainer.scrollTop = chatContainer.scrollHeight;
-		
+
 		// Also scroll the entire page to the bottom
 		window.scrollTo({
 			top: document.body.scrollHeight,
@@ -63,7 +63,7 @@
 		animationInterval = setInterval(() => {
 			displayedCharacters += increment;
 			displayedText = text.substring(0, displayedCharacters);
-			
+
 			// Scroll to bottom on every text update for more consistent behavior
 			scrollToMessage();
 

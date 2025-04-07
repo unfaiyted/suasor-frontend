@@ -52,7 +52,6 @@ function loadAppPreferences(): AppPreferences {
 		return defaultAppPreferences;
 	}
 }
-
 // Save preferences to localStorage
 function saveAppPreferences(preferences: AppPreferences): void {
 	if (!browser) return;
@@ -130,8 +129,15 @@ export const configApi = {
 		try {
 			// Merge with existing config to ensure we send a complete object
 			const state = configStore.getState();
-			const currentConfig = state.userConfig || {};
-			const updatedConfig = { ...currentConfig, ...config };
+			if (!state.userConfig) {
+				throw new Error('Existing User config not found');
+			}
+			const currentConfig = state.userConfig;
+
+			// Handle nested properties like preferredGenres separately
+			const updatedConfig: UserConfig = { ...currentConfig, ...config };
+
+			console.log('Updated config:', updatedConfig);
 
 			const response = await PUT('/config/user', {
 				body: updatedConfig

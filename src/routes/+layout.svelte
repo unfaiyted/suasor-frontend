@@ -28,6 +28,12 @@
 	// Variables for reactive state
 	let isPublicPath = $state(false);
 	let shouldRedirect = $state(false);
+	let isOnboarding = $state(false);
+
+	// Update isOnboarding reactively based on the current path
+	$effect(() => {
+		isOnboarding = page?.url?.pathname === '/onboarding';
+	});
 
 	// Update derived values using $effect
 	$effect(() => {
@@ -96,7 +102,7 @@
 </script>
 
 <div class="mx-auto w-full">
-	{#if !isAuth}
+	{#if !isAuth || isPublicPath || isOnboarding}
 		<!-- Simple layout for login/register/public pages or when not logged in -->
 		<div class="flex min-h-screen w-full flex-col items-center justify-center">
 			{@render children()}

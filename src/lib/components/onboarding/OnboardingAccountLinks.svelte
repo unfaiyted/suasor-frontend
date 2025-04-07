@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { Monitor, Activity, ToggleRight, Bot, Plus, Check } from '@lucide/svelte';
+	import type { AccountsToLink, OnboardingData } from './types';
 
 	// Props for the component
 	interface OnboardingAccountLinksProps {
-		accountsToLink: {
-			mediaApplications: string[];
-			mediaTrackers: string[];
-			automationTools: string[];
-			aiEngines: string[];
-		};
+		accountsToLink: AccountsToLink;
+		onComplete: (data: { stepData: OnboardingData }) => void;
 	}
 
-	let { accountsToLink } = $props<OnboardingAccountLinksProps>();
+	let { accountsToLink, onComplete }: OnboardingAccountLinksProps = $props();
 
 	// Local state with Svelte 5 syntax
 	let selectedAccounts = $state({
@@ -59,7 +55,6 @@
 	};
 
 	// Event dispatcher to notify parent component when step is completed
-	const dispatch = createEventDispatcher();
 
 	// Toggle account selection
 	function toggleAccount(category: string, accountId: string) {
@@ -79,7 +74,8 @@
 	// Handle skip account linking
 	function handleSkipLinking() {
 		skipAccountLinking = true;
-		dispatch('complete', {
+
+		onComplete({
 			stepData: {
 				accountsToLink: selectedAccounts,
 				skipAccountLinking: true
@@ -96,7 +92,7 @@
 
 	// Continue to next step
 	function handleContinue() {
-		dispatch('complete', {
+		onComplete({
 			stepData: {
 				accountsToLink: selectedAccounts,
 				skipAccountLinking: false
@@ -443,4 +439,3 @@
 		</div>
 	</div>
 </div>
-
