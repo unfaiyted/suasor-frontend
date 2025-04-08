@@ -16,11 +16,9 @@
 	// Import components
 	import SettingsTabs from '$lib/components/settings/SettingsTabs.svelte';
 	import type { ClientRequest } from '$lib/api/types';
-	import AIIntegrationsPanel from '$lib/components/settings/AIIntegrationsPanel.svelte';
 	import NotificationArea from '$lib/components/util/NotificationArea.svelte';
 	import UserSettingsPanel from '$lib/components/settings/UserSettingsPanel.svelte';
-	import MediaServersPanel from '$lib/components/settings/MediaServersPanel.svelte';
-	import AutomationPanel from '$lib/components/settings/AutomationPanel.svelte';
+	import IntegrationsTabPanel from '$lib/components/settings/IntegrationsTabPanel.svelte';
 	import SiteConfigPanel from '$lib/components/settings/SiteConfigPanel.svelte';
 	import ServerSettingsPanel from '$lib/components/settings/ServerSettingsPanel.svelte';
 	import DatabasePanel from '$lib/components/settings/DatabasePanel.svelte';
@@ -93,9 +91,7 @@
 	// Define tabs
 	const tabs = [
 		{ id: 'user', label: 'User Settings', icon: User, adminOnly: false },
-		{ id: 'media-servers', label: 'Media Servers', icon: Film, adminOnly: true },
-		{ id: 'automation', label: 'Automation Tools', icon: Radio, adminOnly: true },
-		{ id: 'ai-integrations', label: 'AI', icon: Brain, adminOnly: true },
+		{ id: 'integrations', label: 'Integrations', icon: Film, adminOnly: true },
 		{ id: 'site', label: 'Site Configuration', icon: Settings, adminOnly: true },
 		{ id: 'server', label: 'Server Settings', icon: Server, adminOnly: true },
 		{ id: 'database', label: 'Database', icon: Database, adminOnly: true },
@@ -228,7 +224,9 @@
 					await configApi.saveSystemConfig(updatedConfig);
 					success = 'Server settings saved successfully';
 				}
-			} else {
+			} else if (!section.includes('media-servers') && !section.includes('automation') && !section.includes('ai-integrations')) {
+				// Don't show global success messages for integration panels
+				// since they have their own success indicators
 				success = `${section} settings saved successfully`;
 			}
 		} catch (err) {
@@ -320,7 +318,7 @@
 	<SettingsTabs {tabs} {activeTab} {switchTab} {user} />
 
 	<!-- Notification Area -->
-	<NotificationArea {error} {success} />
+	<NotificationArea {error} success={activeTab === 'integrations' ? '' : success} />
 
 	<!-- Content Area -->
 	<div
@@ -341,16 +339,13 @@
 				onUpdateSetting={updateUserSetting}
 				{isLoading}
 			/>
-		{:else if activeTab === 'media-servers' && user.isAdmin && clientsByType}
-			<MediaServersPanel
+		{:else if activeTab === 'integrations' && user.isAdmin && clientsByType}
+			<IntegrationsTabPanel
 				{clientsByType}
-				onSave={(data) => saveSystemSettings('media-servers', data)}
-				{isLoading}
-			/>
-		{:else if activeTab === 'automation' && user.isAdmin && clientsByType}
-			<AutomationPanel
-				{clientsByType}
-				onSave={(data) => saveSystemSettings('automation', data)}
+				onSave={(section, data) => {
+					success = ''; // Clear any success message when saving integration settings
+					saveSystemSettings(section, data);
+				}}
 				{isLoading}
 			/>
 		{:else if activeTab === 'site' && user.isAdmin}
@@ -369,12 +364,6 @@
 			<DatabasePanel onSave={(data) => saveSystemSettings('database', data)} {isLoading} />
 		{:else if activeTab === 'security' && user.isAdmin}
 			<SecurityPanel onSave={(data) => saveSystemSettings('security', data)} {isLoading} />
-		{:else if activeTab === 'ai-integrations' && user.isAdmin && clientsByType}
-			<AIIntegrationsPanel
-				{clientsByType}
-				onSave={(data) => saveSystemSettings('ai-integrations', data)}
-				{isLoading}
-			/>
 		{:else}
 			<div class="flex h-64 items-center justify-center">
 				<p class="text-lg">Please select a settings category from the tabs above.</p>

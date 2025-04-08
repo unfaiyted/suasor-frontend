@@ -4,13 +4,13 @@
 	import type { ClientResponse } from '$lib/api/types';
 
 	type AutomationPanelProps = {
-		saveSettings?: (config: Record<string, ClientResponse[]>) => void;
+		onSave?: (config: Record<string, ClientResponse[]>) => void;
 		clientsByType?: Record<string, ClientResponse[]>;
 		isLoading?: boolean;
 	};
 
 	const {
-		saveSettings,
+		onSave,
 		isLoading = false,
 		// clientsByType used in the template
 		clientsByType = {}
@@ -43,8 +43,8 @@
 
 	// Handle settings changes
 	function handleSettingsChange(updatedClientsByType: Record<string, ClientResponse[]>) {
-		if (saveSettings) {
-			saveSettings(updatedClientsByType);
+		if (onSave) {
+			onSave(updatedClientsByType);
 		}
 	}
 </script>

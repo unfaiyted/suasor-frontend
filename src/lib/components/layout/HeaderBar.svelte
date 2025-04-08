@@ -84,6 +84,11 @@
 
 <div class="flex w-full items-center justify-between bg-transparent p-2 pb-2">
 	<div class="flex items-center">
+		<!-- Logo -->
+		<a href="/" class="mr-2 hidden sm:block">
+			<img src="/logo.svg" alt="Suasor Logo" class="h-8 pl-4" />
+		</a>
+
 		<button
 			class="text-primary-900-100 hover:bg-surface-200-800/50 z-20 ml-4 flex items-center justify-center rounded-full p-1"
 			onclick={toggleSearch}
@@ -213,3 +218,4 @@
 
 <!-- Search component -->
 <SpotlightSearch bind:show={showSearch} />
+
