@@ -29,7 +29,8 @@
 		isLoggedIn: false,
 		isAdmin: false,
 		name: '',
-		email: ''
+		email: '',
+		username: ''
 	});
 
 	// Current active tab
@@ -71,7 +72,8 @@
 				isLoggedIn: true,
 				isAdmin: change.role === 'admin',
 				name: change.username || '',
-				email: change.email || ''
+				email: change.email || '',
+				username: change.username || ''
 			};
 		}
 	});

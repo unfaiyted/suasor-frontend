@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Home, Film, Sparkles } from '@lucide/svelte';
+	import { Home, Film, Sparkles, User } from '@lucide/svelte';
 	import CardHeader from '../util/CardHeader.svelte';
 	import SaveButton from '../util/SaveButton.svelte';
 	import {
@@ -16,6 +16,7 @@
 	import InterfaceSettingsTab from './InterfaceSettingsTab.svelte';
 	import ContentSettingsTab from './ContentSettingsTab.svelte';
 	import RecommendationsTab from './RecommendationsTab.svelte';
+	import ProfileSettingsTab from './ProfileSettingsTab.svelte';
 
 	interface UserSettingsPanelProps {
 		config: UserConfig;
@@ -42,6 +43,22 @@
 		notifyOnSync: config.notifyOnSync || false,
 
 		aiChatPersonality: config.aiChatPersonality || ModelsUserConfigAiChatPersonality.friendly,
+
+		// Profile settings
+		displayName: config.displayName || '',
+		bio: config.bio || '',
+		avatarUrl: config.avatarUrl || null,
+		socialLinks: config.socialLinks || {
+			twitter: '',
+			letterboxd: '',
+			lastfm: '',
+			trakt: ''
+		},
+		privacySettings: config.privacySettings || {
+			showWatchHistory: true,
+			shareRecommendations: true,
+			publicProfile: true
+		},
 
 		// Content settings
 		showAdultContent: config.showAdultContent || false,
@@ -80,7 +97,7 @@
 	});
 
 	// For UI organization
-	let activeTab = $state('interface');
+	let activeTab = $state('profile');
 	let isSaving = $state(false);
 
 	// Handle form submission
@@ -125,6 +142,7 @@
 
 	// Tab configuration
 	const tabs = [
+		{ id: 'profile', label: 'Profile', icon: User },
 		{ id: 'interface', label: 'Interface', icon: Home },
 		{ id: 'content', label: 'Content', icon: Film },
 		{ id: 'recommendations', label: 'Recommendations', icon: Sparkles }
@@ -162,13 +180,16 @@
 	</div>
 
 	<form onsubmit={handleSubmit} class="space-y-6">
+		<!-- Profile Settings Tab -->
+		{#if activeTab === 'profile'}
+			<ProfileSettingsTab {formState} {updateFormState} user={{ name: config.name || '', email: config.email || '' }} />
 		<!-- Interface Settings Tab -->
-		{#if activeTab === 'interface'}
+		{:else if activeTab === 'interface'}
 			<InterfaceSettingsTab {formState} {updateFormState} />
-			<!-- Content Settings Tab -->
+		<!-- Content Settings Tab -->
 		{:else if activeTab === 'content'}
 			<ContentSettingsTab {formState} {updateFormState} />
-			<!-- Recommendations Settings Tab -->
+		<!-- Recommendations Settings Tab -->
 		{:else if activeTab === 'recommendations'}
 			<RecommendationsTab {formState} {updateFormState} />
 		{/if}
