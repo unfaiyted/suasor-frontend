@@ -16,6 +16,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import SpotlightSearch from './SpotlightSearch.svelte';
+	import CalendarPopup from './CalendarPopup.svelte';
 
 	let userInitials = '';
 	let user: UserResponse | null = null;
@@ -38,14 +39,16 @@
 		});
 	}
 
-	let userMenuVisible = false;
-	let mobileMenuVisible = false;
-	let showSearch = false;
+	let userMenuVisible = $state(false);
+	let mobileMenuVisible = $state(false);
+	let showSearch = $state(false);
+	let calendarVisible = $state(false);
 
 	function toggleUserMenu() {
 		userMenuVisible = !userMenuVisible;
 		if (userMenuVisible) {
 			mobileMenuVisible = false;
+			calendarVisible = false;
 		}
 	}
 
@@ -53,11 +56,32 @@
 		mobileMenuVisible = !mobileMenuVisible;
 		if (mobileMenuVisible) {
 			userMenuVisible = false;
+			calendarVisible = false;
 		}
 	}
 
 	function toggleSearch() {
 		showSearch = !showSearch;
+		// Close other menus when opening search
+		if (showSearch) {
+			userMenuVisible = false;
+			mobileMenuVisible = false;
+			calendarVisible = false;
+		}
+	}
+
+	function toggleCalendar() {
+		console.log('Toggle calendar called, current state:', calendarVisible);
+		calendarVisible = !calendarVisible;
+		if (calendarVisible) {
+			userMenuVisible = false;
+			mobileMenuVisible = false;
+		}
+		console.log('Calendar visibility set to:', calendarVisible);
+	}
+
+	function closeCalendar() {
+		calendarVisible = false;
 	}
 
 	// Close menus when clicking outside
@@ -71,13 +95,26 @@
 		if (!target.closest('.mobile-menu-container') && mobileMenuVisible) {
 			mobileMenuVisible = false;
 		}
+
+		// Calendar is handled by its own component
+	}
+
+	// Handle keyboard shortcuts for the HeaderBar
+	function handleKeyDown(event: KeyboardEvent) {
+		// Ctrl+K or Command+K for search
+		if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+			event.preventDefault();
+			toggleSearch();
+		}
 	}
 
 	onMount(() => {
 		document.addEventListener('click', handleClickOutside);
+		document.addEventListener('keydown', handleKeyDown);
 
 		return () => {
 			document.removeEventListener('click', handleClickOutside);
+			document.removeEventListener('keydown', handleKeyDown);
 		};
 	});
 </script>
@@ -105,12 +142,26 @@
 
 	<div class="flex items-center">
 		<div class="hidden space-x-4 sm:flex">
-			<!-- <Paperclip size={20} /> -->
-			<Calendar size={20} class="text-primary-900-100 z-20 mt-3" />
+			<!-- Calendar icon and popup -->
+			<div class="calendar-container relative z-20">
+				<button 
+					class="text-primary-900-100 hover:bg-surface-200-800/50 flex items-center justify-center rounded-full p-2"
+					onclick={toggleCalendar}
+					aria-label="Calendar"
+				>
+					<Calendar size={20} />
+				</button>
+				<CalendarPopup show={calendarVisible} onClose={closeCalendar} />
+			</div>
 
 			<!-- User menu dropdown -->
 			<div class="user-menu-container relative z-20 bg-transparent">
-				<button class="hover:bg-surface-200-700/50 rounded-full p-2" onclick={toggleUserMenu}>
+				<button 
+					class="hover:bg-surface-200-700/50 rounded-full p-2" 
+					onclick={toggleUserMenu}
+					aria-label="User menu"
+					aria-expanded={userMenuVisible}
+				>
 					{#if $isAuthenticated}
 						<div class="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full">
 							<span class="text-sm font-bold text-white">
@@ -188,6 +239,17 @@
 							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/chat">
 								<span>Recommendations</span>
 							</a>
+							<button 
+								class="hover:bg-surface-200-700/50 flex w-full items-center gap-2 rounded px-4 py-2 text-left"
+								onclick={(e) => {
+									e.preventDefault();
+									mobileMenuVisible = false;
+									toggleCalendar();
+								}}
+							>
+								<Calendar size={16} />
+								<span>Calendar</span>
+							</button>
 							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/settings">
 								<span>Settings</span>
 							</a>
@@ -217,5 +279,8 @@
 </div>
 
 <!-- Search component -->
-<SpotlightSearch bind:show={showSearch} />
+<SpotlightSearch 
+  show={showSearch} 
+  on:close={() => showSearch = false} 
+/>
 

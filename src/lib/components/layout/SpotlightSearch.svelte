@@ -12,7 +12,7 @@
 		show: boolean;
 	}
 
-	let { show = $bindable(false) } = $props();
+	let { show = false } = $props();
 
 	// State management with Svelte 5 syntax
 	let searchQuery = $state('');
@@ -225,10 +225,15 @@
 
 	// Close the search
 	function closeSearch() {
-		show = false;
+		// This is now a one-way binding, so we need to dispatch an event
+		// for the parent component to close the search
+		dispatch('close');
+		
+		// We'll also update our local state
 		searchQuery = '';
 		searchResults = [];
-		dispatch('close');
+		
+		// The parent component should set show=false
 	}
 
 	// Handle keyboard navigation
@@ -281,9 +286,17 @@
 			if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
 				event.preventDefault();
 				show = true;
+				
+				// Focus the search input after a short delay
 				setTimeout(() => {
-					document.getElementById('spotlight-search-input')?.focus();
-				}, 10);
+					const searchInput = document.getElementById('spotlight-search-input');
+					if (searchInput) {
+						searchInput.focus();
+						console.log('Search input focused');
+					} else {
+						console.warn('Search input element not found');
+					}
+				}, 50);
 			}
 		}
 
@@ -319,17 +332,24 @@
 		loadRecentSearches();
 		const cleanup = setupGlobalShortcut();
 
-		// Auto-focus search input when modal opens
-		$effect(() => {
-			if (show) {
-				setTimeout(() => {
-					document.getElementById('spotlight-search-input')?.focus();
-					performSearch(); // Show recent searches initially
-				}, 10);
-			}
-		});
-
 		return cleanup;
+	});
+	
+	// Auto-focus search input when modal opens
+	$effect(() => {
+		if (show) {
+			console.log('Show changed to true, will focus search input');
+			setTimeout(() => {
+				const searchInput = document.getElementById('spotlight-search-input');
+				if (searchInput) {
+					searchInput.focus();
+					console.log('Search input focused from effect');
+					performSearch(); // Show recent searches initially
+				} else {
+					console.warn('Search input element not found in effect');
+				}
+			}, 50);
+		}
 	});
 
 	// Handle clickoutside
