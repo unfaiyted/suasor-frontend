@@ -8,8 +8,16 @@
 
 	const dispatch = createEventDispatcher();
 
+	import { goto } from '$app/navigation';
+
 	function handleClick() {
-		dispatch('showDetails', movie);
+		// If this is a modal view, use the event
+		if (typeof dispatch === 'function') {
+			dispatch('showDetails', movie);
+		} else {
+			// Navigate to the movie details page
+			goto(`/movies/${movie.id}`);
+		}
 	}
 
 	function handleWatchlistClick(e) {

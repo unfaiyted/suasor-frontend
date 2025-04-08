@@ -295,11 +295,18 @@
 					onSetDefault={(client) => handleSetDefault(client)}
 					onSaved={(client) => handleSaved(client)}
 					onError={(client) => handleError(client)}
+						onDeleted={(event) => {
+							if (i === 0) {
+								removeMainIntegration();
+							} else {
+								removeIntegration(i - 1);
+							}
+						}}
 				/>
 
 				<!-- Remove button (for all integrations) -->
 				<button
-					class="btn btn-sm btn-error btn-icon absolute top-2 right-2"
+					class="btn btn-sm btn-error btn-icon absolute top-2 right-2 hidden"
 					title="Remove integration"
 					aria-label="Remove integration"
 					onclick={() => i === 0 ? removeMainIntegration() : removeIntegration(i - 1)}

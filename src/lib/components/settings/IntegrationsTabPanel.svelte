@@ -14,19 +14,71 @@
 
 	const { clientsByType = {}, isLoading = false, onSave }: IntegrationsTabPanelProps = $props();
 
-	// For UI organization
-	let activeTab = $state('media-servers');
-
+	// Import URL and browser utilities
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
+	
 	// Tab configuration
 	const tabs = [
-		{ id: 'media-servers', label: 'Media Servers', icon: Film },
-		{ id: 'automation', label: 'Automation', icon: Radio },
-		{ id: 'ai', label: 'AI', icon: Brain }
+		{ id: 'media-servers', label: 'Media Servers', icon: Film, path: 'media' },
+		{ id: 'automation', label: 'Automation', icon: Radio, path: 'automation' },
+		{ id: 'ai', label: 'AI', icon: Brain, path: 'ai' }
 	];
+	
+	// For UI organization - default to media-servers
+	let activeTab = $state('media-servers');
+	
+	// Get subtab from URL if present (integrations/media, integrations/automation, integrations/ai)
+	$effect(() => {
+		const path = $page.url.pathname;
+		const subtabParam = $page.url.searchParams.get('subtab');
+		
+		// Try to get subtab from search params first
+		if (subtabParam) {
+			const matchingTab = tabs.find(tab => tab.path === subtabParam);
+			if (matchingTab) {
+				activeTab = matchingTab.id;
+				return;
+			}
+		}
+		
+		// Then try to get from URL path
+		if (path.startsWith('/settings/integrations/')) {
+			const pathParts = path.split('/');
+			if (pathParts.length > 3) {
+				const subtabPath = pathParts[3];
+				const matchingTab = tabs.find(tab => tab.path === subtabPath);
+				if (matchingTab) {
+					activeTab = matchingTab.id;
+					return;
+				}
+			}
+		}
+		
+		// Finally, check session storage (set by the main settings page)
+		if (browser) {
+			const storedSubtab = sessionStorage.getItem('integrationsSubtab');
+			if (storedSubtab) {
+				const matchingTab = tabs.find(tab => tab.path === storedSubtab);
+				if (matchingTab) {
+					activeTab = matchingTab.id;
+					// Clear it after using
+					sessionStorage.removeItem('integrationsSubtab');
+				}
+			}
+		}
+	});
 
-	// Set active tab
+	// Set active tab and update URL
 	function setActiveTab(tabId: string) {
 		activeTab = tabId;
+		
+		// Update URL to include the subtab without page reload
+		const selectedTab = tabs.find(tab => tab.id === tabId);
+		if (selectedTab && browser) {
+			// Update browser history to reflect the current subtab
+			history.pushState({}, '', `/settings/integrations/${selectedTab.path}`);
+		}
 	}
 
 	// Handle settings saves for each panel

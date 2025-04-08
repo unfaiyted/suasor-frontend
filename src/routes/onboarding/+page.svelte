@@ -218,6 +218,12 @@
 			preferredMediaTypes: Object.entries(onboardingData.mediaTypes)
 				.filter(([_, enabled]) => enabled)
 				.map(([type]) => type),
+				
+			// Set contentTypes for sidebar display
+			contentTypes: Object.entries(onboardingData.mediaTypes)
+				.filter(([_, enabled]) => enabled)
+				.map(([type]) => type)
+				.join(','),
 
 			// Notification settings
 			notificationsEnabled: true // Default to enabled

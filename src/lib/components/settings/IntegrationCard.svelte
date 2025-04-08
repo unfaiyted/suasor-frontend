@@ -9,8 +9,8 @@
 		SubsonicConfig,
 		UserConfig
 	} from '$lib/api/types';
-	import { fade } from 'svelte/transition';
-	import { Star } from '@lucide/svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { Star, Trash2 } from '@lucide/svelte';
 
 	type IntegrationCardProps = {
 		title: string;
@@ -21,6 +21,7 @@
 		onError?: (event: { message: string }) => void;
 		isDefault?: boolean;
 		onSetDefault?: (client: ClientResponse) => void;
+		onDeleted?: (event: { client: ClientResponse }) => void;
 	};
 
 	const { 
@@ -31,7 +32,8 @@
 		onSaved, 
 		onError,
 		isDefault = false,
-		onSetDefault
+		onSetDefault,
+		onDeleted
 	}: IntegrationCardProps = $props();
 
 	// Make a local version that we can update when saving
@@ -184,6 +186,57 @@
 		if (integration.clientType) newForm.clientType = integration.clientType;
 
 		formIntegration = newForm;
+	}
+	
+	// Delete confirmation popover state
+	let showDeleteConfirm = $state(false);
+	let deleteButtonRef = $state(null); // Reference to the delete button element
+	let deleteInProgress = $state(false);
+	let deleteError = $state('');
+	
+	// Function to delete the client
+	async function deleteClient() {
+		if (!integration || !integration.id) return;
+		
+		// Reset status indicators
+		deleteError = '';
+		deleteInProgress = true;
+		
+		try {
+			// The API requires both client ID and client type
+			const clientTypeStr = integration.clientType.toString().toLowerCase();
+			const clientId = integration.id.toString();
+			
+			const result = await clientsApi.deleteClient(clientId, clientTypeStr);
+			
+			if (result) {
+				// Close the confirmation popover
+				showDeleteConfirm = false;
+				
+				// Notify parent component
+				setTimeout(() => {
+					onDeleted?.({ client: integration });
+				}, 300);
+			} else {
+				deleteError = 'Failed to delete integration';
+				onError?.({ message: deleteError });
+			}
+		} catch (err) {
+			deleteError = (err as Error).message || 'An error occurred while deleting';
+			onError?.({ message: deleteError });
+		} finally {
+			deleteInProgress = false;
+		}
+	}
+	
+	// Toggle delete confirmation popover
+	function toggleDeleteConfirm(e) {
+		if (e) e.stopPropagation();
+		showDeleteConfirm = !showDeleteConfirm;
+		// Reset error when closing
+		if (!showDeleteConfirm) {
+			deleteError = '';
+		}
 	}
 
 	function validateIntegration() {
@@ -517,52 +570,106 @@
 
 <div class="card preset-outlined-surface-500 bg-surface-200-800 relative p-4">
 	<!-- Header with default indicator -->
-	<div class="mb-2 flex items-center">
-		<!-- Default indicator star - fixed width container moved to left side -->
-		<div class="w-7 h-7 flex items-center justify-center mr-2">
-			{#if isDefault}
-				<!-- Default client (filled star) -->
-				<div title="Default client" class="text-amber-500">
-					<Star size={18} fill="currentColor" />
-				</div>
-			{:else if integration && integration.id && onSetDefault}
-				<!-- Existing integration that can be set as default -->
-				<button
-					title="Set as default client"
-					class="text-amber-500/50 hover:text-amber-500 transition-colors"
-					onclick={setAsDefault}
-					disabled={savingInProgress}
-				>
-					<Star size={18} />
-				</button>
-			{:else}
-				<!-- New integration (inactive star) -->
-				<div title="Save integration to enable default setting" class="text-amber-500/20">
-					<Star size={18} />
-				</div>
-			{/if}
+	<div class="mb-2 flex items-center justify-between">
+		<div class="flex items-center">
+			<!-- Default indicator star - fixed width container moved to left side -->
+			<div class="w-7 h-7 flex items-center justify-center mr-2">
+				{#if isDefault}
+					<!-- Default client (filled star) -->
+					<div title="Default client" class="text-amber-500">
+						<Star size={18} fill="currentColor" />
+					</div>
+				{:else if integration && integration.id && onSetDefault}
+					<!-- Existing integration that can be set as default -->
+					<button
+						title="Set as default client"
+						class="text-amber-500/50 hover:text-amber-500 transition-colors"
+						onclick={setAsDefault}
+						disabled={savingInProgress}
+					>
+						<Star size={18} />
+					</button>
+				{:else}
+					<!-- New integration (inactive star) -->
+					<div title="Save integration to enable default setting" class="text-amber-500/20">
+						<Star size={18} />
+					</div>
+				{/if}
+			</div>
+			
+			<h4 class="flex items-center text-lg font-bold">
+				{title}
+				{#if saveSuccess}
+					<span class="text-success-500 ml-2" transition:fade>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M20 6L9 17l-5-5"></path>
+						</svg>
+					</span>
+				{/if}
+			</h4>
 		</div>
 		
-		<h4 class="flex items-center text-lg font-bold">
-			{title}
-			{#if saveSuccess}
-				<span class="text-success-500 ml-2" transition:fade>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
+		<!-- Delete button only for existing integrations -->
+		{#if integration && integration.id}
+			<div class="relative">
+				<button
+					bind:this={deleteButtonRef}
+					class="text-error-500/70 hover:text-error-500 transition-colors rounded-full p-1.5 hover:bg-surface-300-700/20"
+					onclick={toggleDeleteConfirm}
+					title="Delete integration"
+				>
+					<Trash2 size={16} />
+				</button>
+				
+				<!-- Delete confirmation popover -->
+				{#if showDeleteConfirm}
+					<div 
+						class="delete-confirmation-popover" 
+						in:fly={{ y: 5, duration: 150 }}
+						out:fade={{ duration: 100 }}
 					>
-						<path d="M20 6L9 17l-5-5"></path>
-					</svg>
-				</span>
-			{/if}
-		</h4>
+						<div class="p-3 max-w-[200px]">
+							<h5 class="text-sm font-semibold mb-2">Delete {title}?</h5>
+							{#if deleteError}
+								<div class="text-error-500 text-xs mb-2">{deleteError}</div>
+							{/if}
+							<div class="flex gap-2 mt-3">
+								<button 
+									class="flex-1 bg-error-500 hover:bg-error-600 text-white text-xs py-1.5 px-2 rounded disabled:opacity-50"
+									onclick={deleteClient}
+									disabled={deleteInProgress}
+								>
+									{#if deleteInProgress}
+										<svg class="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+									{:else}
+										Delete
+									{/if}
+								</button>
+								<button 
+									class="flex-1 bg-surface-300-700 hover:bg-surface-400-600 text-xs py-1.5 px-2 rounded"
+									onclick={toggleDeleteConfirm}
+								>
+									Cancel
+								</button>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 
 	{#if saveError}
@@ -717,3 +824,24 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	/* Delete confirmation popover styling */
+	.delete-confirmation-popover {
+		position: absolute;
+		top: calc(100% + 5px);
+		right: 0;
+		background-color: #202020;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		z-index: 100;
+		width: max-content;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		overflow: hidden;
+	}
+	
+	/* Ensure popover appears on top */
+	.relative {
+		position: relative;
+	}
+</style>

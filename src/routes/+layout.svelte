@@ -11,12 +11,18 @@
 	import { goto } from '$app/navigation';
 
 	import { authStore } from '$lib/stores/auth';
+	import configApi from '$lib/stores/config';
 
 	let isAuth = $state(false);
 
 	authStore.subscribe((change) => {
 		console.log('Auth store changed:', change);
 		isAuth = change.isAuthenticated;
+		
+		// Load user configuration when authenticated
+		if (change.isAuthenticated) {
+			configApi.loadUserConfig();
+		}
 	});
 
 	let { children } = $props();

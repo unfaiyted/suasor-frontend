@@ -87,7 +87,11 @@
 			? contentTypes.filter((t: string) => t !== type)
 			: [...contentTypes, type];
 
-		updateFormState({ contentTypes: newMediaTypes.join(',') });
+		// Update both contentTypes and preferredMediaTypes for consistency
+		updateFormState({ 
+			contentTypes: newMediaTypes.join(','),
+			preferredMediaTypes: newMediaTypes
+		});
 		contentTypes = newMediaTypes;
 	}
 	function handleGenreChange(mediaType: string, genresList: string[]) {

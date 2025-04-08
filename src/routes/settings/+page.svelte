@@ -224,7 +224,11 @@
 					await configApi.saveSystemConfig(updatedConfig);
 					success = 'Server settings saved successfully';
 				}
-			} else if (!section.includes('media-servers') && !section.includes('automation') && !section.includes('ai-integrations')) {
+			} else if (
+				!section.includes('media-servers') &&
+				!section.includes('automation') &&
+				!section.includes('ai-integrations')
+			) {
 				// Don't show global success messages for integration panels
 				// since they have their own success indicators
 				success = `${section} settings saved successfully`;
@@ -296,18 +300,54 @@
 	// 	isLoading = $configLoading;
 	// });
 
-	// Initialize component
+	// Get the URL parameters to determine which tab to show
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
+	
+	// Initialize component 
+	const { data } = $props();
+	
 	onMount(async () => {
 		// Check if user is authenticated
 		if (isAuthenticated) {
 			await Promise.all([fetchUserConfig(), fetchSystemConfig(), loadClientData()]);
+			
+			// Check for tab in URL query parameters first
+			const tabParam = $page.url.searchParams.get('tab');
+			let targetTab: string | null = tabParam;
+			
+			// Check for subtab parameter (for integration subtabs)
+			const subtabParam = $page.url.searchParams.get('subtab');
+			// We'll store this in sessionStorage for the integrations component to use
+			if (subtabParam && browser && targetTab === 'integrations') {
+				sessionStorage.setItem('integrationsSubtab', subtabParam);
+			}
+			
+			// If not in query params, try to get tab from URL path
+			if (!targetTab) {
+				const path = $page.url.pathname;
+				if (path !== '/settings') {
+					const pathParts = path.split('/');
+					if (pathParts.length > 2) {
+						targetTab = pathParts[2];
+					}
+				}
+			}
+			
+			// Set the active tab if we found one and the user has permission
+			if (targetTab) {
+				const tab = tabs.find(t => t.id === targetTab);
+				if (tab && (!tab.adminOnly || user.isAdmin)) {
+					activeTab = targetTab;
+				}
+			}
 		} else {
 			error = 'You must be logged in to view settings';
 		}
 	});
 </script>
 
-<div class="container mx-auto px-4 py-10">
+<div class="container mx-auto max-w-6xl px-4 py-8">
 	<!-- Header Section -->
 	<header class="mb-8">
 		<h1 class="h1 text-primary-500 mb-2 font-bold">Settings</h1>
