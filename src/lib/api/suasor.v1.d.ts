@@ -3684,6 +3684,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/jobs/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all active job runs
+         * @description Returns a list of all currently running jobs
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_JobRun"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/jobs/media-sync": {
         parameters: {
             query?: never;
@@ -4072,6 +4120,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/jobs/runs/{id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get job run progress
+         * @description Returns progress information for a specific job run
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Job Run ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_JobRun"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/jobs/schedules": {
         parameters: {
             query?: never;
@@ -4168,7 +4276,53 @@ export interface paths {
                 };
             };
         };
-        post?: never;
+        /**
+         * Create a new job schedule
+         * @description Creates a new job schedule
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Job schedule to create */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["models.JobSchedule"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_JobSchedule"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-error"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -6074,6 +6228,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload user avatar
+         * @description Uploads a new avatar image for the currently authenticated user
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: binary
+                         * @description Avatar image file (jpeg, png, gif only)
+                         */
+                        avatar: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successfully uploaded avatar */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-requests_AvatarUploadResponse"];
+                    };
+                };
+                /** @description Invalid file format or size */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized - Not logged in */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/password": {
         parameters: {
             query?: never;
@@ -6835,10 +7065,18 @@ export interface components {
             jobType?: components["schemas"]["models.JobType"];
             /** @description Metadata related to the job (stored as JSON) */
             metadata?: string;
+            /** @description Items processed so far */
+            processedItems?: number;
+            /** @description Progress percentage (0-100) */
+            progress?: number;
             /** @description When the job started running */
             startTime?: string;
             /** @description Status of the job run */
             status?: components["schemas"]["models.JobStatus"];
+            /** @description Current status message */
+            statusMessage?: string;
+            /** @description Total items to process */
+            totalItems?: number;
             updatedAt?: string;
             /** @description User ID associated with the job, if applicable */
             userId?: number;
@@ -7050,11 +7288,21 @@ export interface components {
         /** @description User-specific configuration stored in the database */
         "models.UserConfig": {
             /**
+             * @description Activity Analysis Settings
+             * @example true
+             */
+            activityAnalysisEnabled?: boolean;
+            /**
              * @description AI Algorithm Settings
              * @example serious
              * @enum {string}
              */
             aiChatPersonality?: ModelsUserConfigAiChatPersonality;
+            /**
+             * @description Content Availability Settings
+             * @example true
+             */
+            contentAvailabilityEnabled?: boolean;
             /**
              * @description What sidebar options to show based on the enabled content types.
              * @example movie,series,tv
@@ -7075,6 +7323,8 @@ export interface components {
             discoveryModeEnabled?: boolean;
             /** @example 0.5 */
             discoveryModeRatio?: number;
+            /** @example John Doe */
+            displayName?: string;
             /** @example true */
             emailNotifications?: boolean;
             /** @example true */
@@ -7097,6 +7347,13 @@ export interface components {
             minContentRating?: string;
             /** @example 0.7 */
             newContentWeight?: number;
+            /** @example movie,series,music */
+            newReleaseMediaTypes?: string;
+            /**
+             * @description New Release Notifications Settings
+             * @example true
+             */
+            newReleaseNotificationsEnabled?: boolean;
             /**
              * @description Notification Settings
              * @example true
@@ -7113,6 +7370,13 @@ export interface components {
             onboardingCompleted?: boolean;
             /** @example 0.8 */
             personalHistoryWeight?: number;
+            /** @example bidirectional */
+            playlistSyncDirection?: string;
+            /**
+             * @description Playlist Sync Settings
+             * @example true
+             */
+            playlistSyncEnabled?: boolean;
             /** @example 0.3 */
             popularityWeight?: number;
             /** @example en,ja */
@@ -7165,6 +7429,11 @@ export interface components {
             recommendationSyncListType?: ModelsUserConfigRecommendationSyncListType;
             /** @example false */
             showAdultContent?: boolean;
+            /**
+             * @description Smart Collections Settings
+             * @example true
+             */
+            smartCollectionsEnabled?: boolean;
             /**
              * @description UI Preferences
              * @example dark
@@ -7233,6 +7502,16 @@ export interface components {
             filters?: {
                 [key: string]: unknown;
             };
+        };
+        /** @description Response data after avatar upload */
+        "requests.AvatarUploadResponse": {
+            /**
+             * @description FilePath is the path to the uploaded avatar file
+             *     @Description Path to the uploaded avatar file
+             *     @Example "/uploads/avatars/user_1.jpg"
+             * @example /uploads/avatars/user_1.jpg
+             */
+            filePath?: string;
         };
         /** @description Request payload for changing user password */
         "requests.ChangePasswordRequest": {
@@ -7323,6 +7602,13 @@ export interface components {
         };
         /** @description Request payload for updating user profile */
         "requests.ProfileRequest": {
+            /**
+             * @description Avatar is the path to the user's avatar image
+             *     @Description Path to the user's avatar image
+             *     @Example "/uploads/avatars/user_1.jpg"
+             * @example /uploads/avatars/user_1.jpg
+             */
+            avatar?: string;
             /**
              * @description Email is the new email address
              *     @Description Updated email address for the user
@@ -7505,6 +7791,13 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-models_JobRun": {
+            data?: components["schemas"]["models.JobRun"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-models_JobSchedule": {
             data?: components["schemas"]["models.JobSchedule"];
             /** @example Operation successful */
@@ -7556,6 +7849,13 @@ export interface components {
         };
         "responses.APIResponse-models_UserConfig": {
             data?: components["schemas"]["models.UserConfig"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-requests_AvatarUploadResponse": {
+            data?: components["schemas"]["requests.AvatarUploadResponse"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -7803,6 +8103,13 @@ export interface components {
         };
         /** @description User information returned in API responses */
         "responses.UserResponse": {
+            /**
+             * @description Avatar is the path to the user's avatar image
+             *     @Description Path to the user's avatar image
+             *     @Example "/uploads/avatars/user_1.jpg"
+             * @example /uploads/avatars/user_1.jpg
+             */
+            avatar?: string;
             /** @description Email is the unique email address of the user
              *     @Description User's email address
              *     @Example "user@example.com" */
@@ -7914,6 +8221,8 @@ export interface components {
                 apiBaseURL: string;
                 /** @example http://localhost:3000 */
                 appURL: string;
+                /** @example ./uploads/avatars */
+                avatarPath: string;
                 /**
                  * @example development
                  * @enum {string}
@@ -7924,6 +8233,8 @@ export interface components {
                  * @enum {string}
                  */
                 logLevel: TypesConfigurationAppLogLevel;
+                /** @example 5242880 */
+                maxAvatarSize: number;
                 /** @example 100 */
                 maxPageSize: number;
                 /** @example suasor */
@@ -8291,7 +8602,10 @@ export enum ModelsJobStatus {
 }
 export enum ModelsJobType {
     JobTypeRecommendation = "recommendation",
-    JobTypeSync = "sync"
+    JobTypeSync = "sync",
+    JobTypeSystem = "system",
+    JobTypeNotification = "notification",
+    JobTypeAnalysis = "analysis"
 }
 export enum ModelsRecommendationSource {
     RecommendationSourceAI = "ai",

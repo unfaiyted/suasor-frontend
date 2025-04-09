@@ -305,26 +305,26 @@
 	// Get the URL parameters to determine which tab to show
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
-	
-	// Initialize component 
+
+	// Initialize component
 	const { data } = $props();
-	
+
 	onMount(async () => {
 		// Check if user is authenticated
 		if (isAuthenticated) {
 			await Promise.all([fetchUserConfig(), fetchSystemConfig(), loadClientData()]);
-			
+
 			// Check for tab in URL query parameters first
 			const tabParam = $page.url.searchParams.get('tab');
 			let targetTab: string | null = tabParam;
-			
+
 			// Check for subtab parameter (for integration subtabs)
 			const subtabParam = $page.url.searchParams.get('subtab');
 			// We'll store this in sessionStorage for the integrations component to use
 			if (subtabParam && browser && targetTab === 'integrations') {
 				sessionStorage.setItem('integrationsSubtab', subtabParam);
 			}
-			
+
 			// If not in query params, try to get tab from URL path
 			if (!targetTab) {
 				const path = $page.url.pathname;
@@ -335,10 +335,10 @@
 					}
 				}
 			}
-			
+
 			// Set the active tab if we found one and the user has permission
 			if (targetTab) {
-				const tab = tabs.find(t => t.id === targetTab);
+				const tab = tabs.find((t) => t.id === targetTab);
 				if (tab && (!tab.adminOnly || user.isAdmin)) {
 					activeTab = targetTab;
 				}
@@ -377,6 +377,7 @@
 		{:else if activeTab === 'user' && userConfig}
 			<UserSettingsPanel
 				config={userConfig}
+				{user}
 				onSave={saveUserSettings}
 				onUpdateSetting={updateUserSetting}
 				{isLoading}

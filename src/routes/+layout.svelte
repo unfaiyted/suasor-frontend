@@ -4,6 +4,7 @@
 	import SideBar from '$lib/components/layout/SideBar.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import GlobalMoviePopover from '$lib/components/chat/GlobalMoviePopover.svelte';
+	import ViewportIndicator from '$lib/components/util/ViewportIndicator.svelte';
 	// import { PanelRight } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { navigating } from '$app/state';
@@ -136,4 +137,7 @@
 	{/if}
 	<!-- Global Movie Popover that's managed at the top level (outside any containers) -->
 	<GlobalMoviePopover />
+	
+	<!-- Viewport indicator for development -->
+	<ViewportIndicator />
 </div>

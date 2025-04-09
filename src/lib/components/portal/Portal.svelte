@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 
 	interface PortalProps {
@@ -6,7 +6,7 @@
 	}
 
 	// Portal target ID
-	let { target = 'portal' }: PortalProps = $props;
+	let { target = 'portal' }: PortalProps = $props();
 
 	// DOM reference to the portal content
 	let ref;

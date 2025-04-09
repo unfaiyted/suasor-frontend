@@ -33,3 +33,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Error Handling**: Custom ApiError class, try/catch blocks with error dispatching
 - **Structure**: Organized component logic, reactive statements for derived state
 - **Format**: 2-space indentation, trailing semicolons, single quotes
+- **Props**: Use svlete 5 syntax, let {props}:TypeInterfaceProps = $props,
+- **Components**: Use svelte 5 syntax
+- **State**: Use svelte 5 syntax, let itemState = $state<Type>()
+- **Stores**: Use svelte 5 syntax. Subscribe to stores for update in components. Do not use $: syntax. Do not use dispatch methods.
+- **Syntax**: Use Svelte 5 syntax, do not use on:click instead use onclick, same for for all handlers. Do not use depreceated dispatch methods. Subscribe to stores. Do not use $: syntax. Do not use export let instead use let {props}:TypeInterfaceProps = $props, use $state() in components like let itemState = $state<Type>()

@@ -92,14 +92,14 @@
 	}
 
 	import { goto } from '$app/navigation';
-	
+
 	// Function to handle configure button click - redirect to settings with appropriate tab
 	function handleConfigureClick(e: Event) {
 		e.stopPropagation();
-		
+
 		// Determine which settings subtab to navigate to based on integration type
 		let subtabPath = 'media';
-		
+
 		if (type === 'mediaServer') {
 			subtabPath = 'media';
 		} else if (type === 'automationTool') {
@@ -107,14 +107,40 @@
 		} else if (type === 'aiModel') {
 			subtabPath = 'ai';
 		}
-		
+
 		// Navigate to the correct settings page with specific subtab
 		goto(`/settings/integrations/${subtabPath}`);
+	}
+
+	// Function to trigger sync for media servers
+	async function triggerSync(e: Event) {
+		e.stopPropagation();
+
+		try {
+			// This would be an actual API call in production
+			// Example: await fetch('/api/integration/sync', { method: 'POST', body: JSON.stringify({ name }) });
+			console.log(`Triggering sync for ${name}`);
+
+			// Show a temporary success message (in production, you'd want to update the lastSync time)
+			testResult = 'success';
+			testMessage = `Sync started for ${name}`;
+
+			// Hide message after 3 seconds
+			setTimeout(() => {
+				if (testResult === 'success') {
+					testResult = null;
+					testMessage = '';
+				}
+			}, 3000);
+		} catch (error) {
+			testResult = 'error';
+			testMessage = `Failed to start sync: ${error instanceof Error ? error.message : 'Unknown error'}`;
+		}
 	}
 </script>
 
 <div
-	class="border-surface-300-700 mb-2 overflow-hidden rounded-lg border transition-all hover:shadow-md {showDetails
+	class="border-surface-200-800 mb-2 overflow-hidden rounded-lg border transition-all hover:shadow-md {showDetails
 		? 'pb-2'
 		: ''}"
 >
@@ -168,9 +194,34 @@
 		<div class="bg-surface-300-800 mx-3 mt-2 space-y-2 rounded-md p-3 text-sm">
 			<!-- Details specific to each integration type -->
 			{#if type === 'mediaServer'}
-				<div class="flex justify-between">
+				<div class="flex items-center justify-between">
 					<span class="text-surface-700-300">Last Synced:</span>
-					<span>{formatLastSync(extraInfo)}</span>
+					<div class="flex items-center gap-2">
+						<span>{formatLastSync(extraInfo)}</span>
+						<button
+							class="text-tertiary-600 hover:text-tertiary-800 hover:bg-tertiary-100 dark:hover:bg-tertiary-900/30 rounded-full p-1 text-xs focus:outline-none"
+							onclick={triggerSync}
+							title="Sync now"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="lucide lucide-refresh-cw"
+								><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path
+									d="M21 3v5h-5"
+								/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path
+									d="M3 21v-5h5"
+								/></svg
+							>
+						</button>
+					</div>
 				</div>
 				<div class="flex justify-between">
 					<span class="text-surface-700-300">Connection URL:</span>
@@ -202,27 +253,26 @@
 
 			<div class="flex gap-2 pt-2">
 				<button
-					class="bg-tertiary-500 hover:bg-tertiary-600 focus:ring-tertiary-300 flex-1 rounded-md py-1 text-xs text-white focus:ring-2 focus:outline-none"
-					onclick={handleTestClick}
-					disabled={isTesting}
-				>
-					{#if isTesting}
-						<span
-							class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"
-						></span>
-					{:else}
-						Test
-					{/if}
-				</button>
-
-				<button
 					class="bg-tertiary-600 hover:bg-tertiary-700 focus:ring-tertiary-300 flex-1 rounded-md py-1 text-xs text-white focus:ring-2 focus:outline-none"
 					onclick={handleConfigureClick}
 				>
 					Configure
 				</button>
+
+				<button
+					class="text-tertiary-600 hover:bg-tertiary-100 dark:hover:bg-tertiary-900/30 focus:ring-tertiary-300 flex-1 rounded-md border border-transparent py-1 text-xs transition-colors focus:ring-2 focus:outline-none dark:border-transparent"
+					onclick={handleTestClick}
+					disabled={isTesting}
+				>
+					{#if isTesting}
+						<span
+							class="border-tertiary-600 inline-block h-3 w-3 animate-spin rounded-full border-2 border-t-transparent"
+						></span>
+					{:else}
+						Test
+					{/if}
+				</button>
 			</div>
 		</div>
 	{/if}
 </div>
-

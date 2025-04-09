@@ -10,7 +10,7 @@
 		ModelsUserConfigRecommendationSyncListType,
 		ModelsUserConfigPreferredContentLength
 	} from '$lib/api/suasor.v1.d';
-	import type { UserConfig } from '$lib/api/types';
+	import type { UserConfig, UserResponse } from '$lib/api/types';
 
 	// Import the tab components
 	import InterfaceSettingsTab from './InterfaceSettingsTab.svelte';
@@ -19,6 +19,7 @@
 	import ProfileSettingsTab from './ProfileSettingsTab.svelte';
 
 	interface UserSettingsPanelProps {
+		user: UserResponse;
 		config: UserConfig;
 		onSave: (config: UserConfig) => Promise<void>;
 		onUpdateSetting: () => Promise<void>;
@@ -26,7 +27,13 @@
 	}
 
 	// Props - receive the config object and callbacks instead of individual values
-	const { config, onSave, onUpdateSetting, isLoading = false }: UserSettingsPanelProps = $props();
+	const {
+		config,
+		onSave,
+		onUpdateSetting,
+		isLoading = false,
+		user
+	}: UserSettingsPanelProps = $props();
 
 	// Create a local form state
 	let formState = $state<UserConfig>({
@@ -45,7 +52,6 @@
 		aiChatPersonality: config.aiChatPersonality || ModelsUserConfigAiChatPersonality.friendly,
 
 		// Profile settings
-		displayName: config.displayName || '',
 		bio: config.bio || '',
 		avatarUrl: config.avatarUrl || null,
 		socialLinks: config.socialLinks || {
@@ -182,14 +188,18 @@
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<!-- Profile Settings Tab -->
 		{#if activeTab === 'profile'}
-			<ProfileSettingsTab {formState} {updateFormState} user={{ name: config.name || '', email: config.email || '' }} />
-		<!-- Interface Settings Tab -->
+			<ProfileSettingsTab
+				{formState}
+				{updateFormState}
+				user={{ name: user.name || '', email: user.email || '' }}
+			/>
+			<!-- Interface Settings Tab -->
 		{:else if activeTab === 'interface'}
 			<InterfaceSettingsTab {formState} {updateFormState} />
-		<!-- Content Settings Tab -->
+			<!-- Content Settings Tab -->
 		{:else if activeTab === 'content'}
 			<ContentSettingsTab {formState} {updateFormState} />
-		<!-- Recommendations Settings Tab -->
+			<!-- Recommendations Settings Tab -->
 		{:else if activeTab === 'recommendations'}
 			<RecommendationsTab {formState} {updateFormState} />
 		{/if}

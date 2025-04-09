@@ -48,7 +48,7 @@
 			<Navigation.Tile labelExpanded="Menu" onclick={toggleExpanded} title="Toggle Menu Width">
 				<IconMenu />
 			</Navigation.Tile>
-			<Navigation.Tile labelExpanded="Search" href="/" title="Search Content">
+			<Navigation.Tile labelExpanded="Dashboard" href="/" title="Dashboard">
 				<IconHome />
 			</Navigation.Tile>
 		{/snippet}

@@ -119,11 +119,11 @@
 	});
 </script>
 
-<div class="flex w-full items-center justify-between bg-transparent p-2 pb-2">
-	<div class="flex items-center">
+<div class="z-20 flex w-full items-center justify-between bg-transparent p-2 pb-2">
+	<div class="z-20 flex items-center">
 		<!-- Logo -->
 		<a href="/" class="mr-2 hidden sm:block">
-			<img src="/logo.svg" alt="Suasor Logo" class="h-8 pl-4" />
+			<img src="/logo.svg" alt="Suasor Logo" class=" z-20 h-8 pl-4" />
 		</a>
 
 		<button
@@ -144,7 +144,7 @@
 		<div class="hidden space-x-4 sm:flex">
 			<!-- Calendar icon and popup -->
 			<div class="calendar-container relative z-20">
-				<button 
+				<button
 					class="text-primary-900-100 hover:bg-surface-200-800/50 flex items-center justify-center rounded-full p-2"
 					onclick={toggleCalendar}
 					aria-label="Calendar"
@@ -156,8 +156,8 @@
 
 			<!-- User menu dropdown -->
 			<div class="user-menu-container relative z-20 bg-transparent">
-				<button 
-					class="hover:bg-surface-200-700/50 rounded-full p-2" 
+				<button
+					class="hover:bg-surface-200-700/50 rounded-full p-2"
 					onclick={toggleUserMenu}
 					aria-label="User menu"
 					aria-expanded={userMenuVisible}
@@ -239,7 +239,7 @@
 							<a class="hover:bg-surface-200-700/50 block rounded px-4 py-2" href="/chat">
 								<span>Recommendations</span>
 							</a>
-							<button 
+							<button
 								class="hover:bg-surface-200-700/50 flex w-full items-center gap-2 rounded px-4 py-2 text-left"
 								onclick={(e) => {
 									e.preventDefault();
@@ -279,8 +279,4 @@
 </div>
 
 <!-- Search component -->
-<SpotlightSearch 
-  show={showSearch} 
-  on:close={() => showSearch = false} 
-/>
-
+<SpotlightSearch show={showSearch} on:close={() => (showSearch = false)} />

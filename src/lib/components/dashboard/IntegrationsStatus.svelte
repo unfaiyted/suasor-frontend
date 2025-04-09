@@ -29,7 +29,7 @@
 		};
 	}
 
-	const { integrationStatus } = $props<IntegrationsStatusProps>();
+	const { integrationStatus }: IntegrationsStatusProps = $props();
 
 	// State for active/expanded sections
 	let expandedSections = $state({

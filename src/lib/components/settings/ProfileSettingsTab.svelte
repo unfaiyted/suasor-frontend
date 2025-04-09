@@ -22,37 +22,41 @@
 	let bio = $state(formState.bio || '');
 	let avatar = $state<string | null>(formState.avatarUrl || null);
 	let tempAvatar = $state<string | null>(null);
-	let social = $state<Record<string, string>>(formState.socialLinks || {
-		twitter: '',
-		letterboxd: '',
-		lastfm: '',
-		trakt: ''
-	});
-	let privacySettings = $state(formState.privacySettings || {
-		showWatchHistory: true,
-		shareRecommendations: true,
-		publicProfile: true
-	});
-	
+	let social = $state<Record<string, string>>(
+		formState.socialLinks || {
+			twitter: '',
+			letterboxd: '',
+			lastfm: '',
+			trakt: ''
+		}
+	);
+	let privacySettings = $state(
+		formState.privacySettings || {
+			showWatchHistory: true,
+			shareRecommendations: true,
+			publicProfile: true
+		}
+	);
+
 	// File upload handling
 	let fileInput: HTMLInputElement;
-	
+
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files && input.files[0]) {
 			const file = input.files[0];
-			
+
 			// Validate file is an image and under size limit (5MB)
 			if (!file.type.startsWith('image/')) {
 				alert('Please select an image file');
 				return;
 			}
-			
+
 			if (file.size > 5 * 1024 * 1024) {
 				alert('Image size should be less than 5MB');
 				return;
 			}
-			
+
 			// Create a preview URL
 			const reader = new FileReader();
 			reader.onload = (e) => {
@@ -61,7 +65,7 @@
 			reader.readAsDataURL(file);
 		}
 	}
-	
+
 	function confirmAvatar() {
 		if (tempAvatar) {
 			avatar = tempAvatar;
@@ -69,20 +73,20 @@
 			tempAvatar = null;
 		}
 	}
-	
+
 	function cancelAvatar() {
 		tempAvatar = null;
 	}
-	
+
 	function removeAvatar() {
 		avatar = null;
 		updateFormState({ avatarUrl: null });
 	}
-	
+
 	// Update form when values change
 	$effect(() => {
-		updateFormState({ 
-			displayName, 
+		updateFormState({
+			displayName,
 			bio,
 			socialLinks: social,
 			privacySettings
@@ -97,7 +101,7 @@
 		</div>
 		<h3 class="text-lg font-medium">Profile Settings</h3>
 	</header>
-	
+
 	<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 		<!-- Left column: Avatar and Bio -->
 		<div class="md:col-span-1">
@@ -137,12 +141,14 @@
 							<X size={16} />
 						</button>
 					{:else}
-						<div class="bg-surface-200-800 flex aspect-square w-32 items-center justify-center rounded-full">
+						<div
+							class="bg-surface-200-800 flex aspect-square w-32 items-center justify-center rounded-full"
+						>
 							<UserCircle size={64} class="text-surface-500-400" />
 						</div>
 					{/if}
 				</div>
-				
+
 				<div>
 					<button
 						type="button"
@@ -163,12 +169,12 @@
 						Images should be square, JPG or PNG, max 5MB
 					</p>
 				</div>
-				
+
 				<!-- Bio -->
 				<div class="w-full">
 					<label class="mb-1 block text-sm font-medium">Bio</label>
 					<textarea
-						class="bg-surface-200-800/50 h-32 w-full rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+						class="bg-surface-200-800/50 focus:ring-primary-500 h-32 w-full rounded-lg p-2 text-sm focus:ring-2 focus:outline-none"
 						placeholder="Tell us about yourself and your media interests..."
 						maxlength="300"
 						bind:value={bio}
@@ -179,7 +185,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- Right column: Profile Details -->
 		<div class="space-y-6 md:col-span-2">
 			<!-- Username and Display Name -->
@@ -193,17 +199,15 @@
 						<input
 							type="text"
 							id="username"
-							class="bg-surface-200-800/50 flex-1 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+							class="bg-surface-200-800/50 focus:ring-primary-500 flex-1 rounded-lg p-2 focus:ring-2 focus:outline-none"
 							value={username}
 							readonly
 							disabled
 						/>
 					</div>
-					<p class="text-surface-900-50 mt-1 text-xs">
-						Username cannot be changed
-					</p>
+					<p class="text-surface-900-50 mt-1 text-xs">Username cannot be changed</p>
 				</div>
-				
+
 				<div class="form-control">
 					<label class="label" for="displayName">
 						<span class="label-text font-medium">Display Name</span>
@@ -213,7 +217,7 @@
 						<input
 							type="text"
 							id="displayName"
-							class="bg-surface-200-800/50 flex-1 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+							class="bg-surface-200-800/50 focus:ring-primary-500 flex-1 rounded-lg p-2 focus:ring-2 focus:outline-none"
 							placeholder="How you want to be known"
 							bind:value={displayName}
 						/>
@@ -223,7 +227,7 @@
 					</p>
 				</div>
 			</div>
-			
+
 			<!-- Email -->
 			<div class="form-control">
 				<label class="label" for="email">
@@ -234,17 +238,15 @@
 					<input
 						type="email"
 						id="email"
-						class="bg-surface-200-800/50 flex-1 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+						class="bg-surface-200-800/50 focus:ring-primary-500 flex-1 rounded-lg p-2 focus:ring-2 focus:outline-none"
 						value={email}
 						readonly
 						disabled
 					/>
 				</div>
-				<p class="text-surface-900-50 mt-1 text-xs">
-					Contact admin to change your email address
-				</p>
+				<p class="text-surface-900-50 mt-1 text-xs">Contact admin to change your email address</p>
 			</div>
-			
+
 			<!-- Social Media Links -->
 			<div class="form-control">
 				<label class="label">
@@ -253,40 +255,31 @@
 				<div class="bg-surface-200-800/20 rounded-lg p-4">
 					<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 						<div>
-							<label class="mb-1 block text-sm">Twitter</label>
+							<label class="mb-1 block text-sm" for="letterboxd">Letterboxd</label>
 							<input
 								type="text"
-								class="bg-surface-200-800/50 w-full rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-								placeholder="@username"
-								bind:value={social.twitter}
-							/>
-						</div>
-						
-						<div>
-							<label class="mb-1 block text-sm">Letterboxd</label>
-							<input
-								type="text"
-								class="bg-surface-200-800/50 w-full rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+								name="letterboxd"
+								class="bg-surface-200-800/50 focus:ring-primary-500 w-full rounded p-2 text-sm focus:ring-2 focus:outline-none"
 								placeholder="username"
 								bind:value={social.letterboxd}
 							/>
 						</div>
-						
+
 						<div>
 							<label class="mb-1 block text-sm">Last.fm</label>
 							<input
 								type="text"
-								class="bg-surface-200-800/50 w-full rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+								class="bg-surface-200-800/50 focus:ring-primary-500 w-full rounded p-2 text-sm focus:ring-2 focus:outline-none"
 								placeholder="username"
 								bind:value={social.lastfm}
 							/>
 						</div>
-						
+
 						<div>
 							<label class="mb-1 block text-sm">Trakt.tv</label>
 							<input
 								type="text"
-								class="bg-surface-200-800/50 w-full rounded p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+								class="bg-surface-200-800/50 focus:ring-primary-500 w-full rounded p-2 text-sm focus:ring-2 focus:outline-none"
 								placeholder="username"
 								bind:value={social.trakt}
 							/>
@@ -297,7 +290,7 @@
 					</p>
 				</div>
 			</div>
-			
+
 			<!-- Privacy Settings -->
 			<div class="form-control">
 				<label class="label">
@@ -308,33 +301,23 @@
 						<div class="flex items-center justify-between">
 							<div>
 								<span class="text-sm font-medium">Public Profile</span>
-								<p class="text-surface-900-50 text-xs">
-									Allow others to view your profile
-								</p>
+								<p class="text-surface-900-50 text-xs">Allow others to view your profile</p>
 							</div>
-							<input
-								type="checkbox"
-								bind:checked={privacySettings.publicProfile}
-							/>
+							<input type="checkbox" bind:checked={privacySettings.publicProfile} />
 						</div>
-						
+
 						<div class="border-surface-300-700 border-t pt-3"></div>
-						
+
 						<div class="flex items-center justify-between">
 							<div>
 								<span class="text-sm font-medium">Show Watch History</span>
-								<p class="text-surface-900-50 text-xs">
-									Let others see what you've watched
-								</p>
+								<p class="text-surface-900-50 text-xs">Let others see what you've watched</p>
 							</div>
-							<input
-								type="checkbox"
-								bind:checked={privacySettings.showWatchHistory}
-							/>
+							<input type="checkbox" bind:checked={privacySettings.showWatchHistory} />
 						</div>
-						
+
 						<div class="border-surface-300-700 border-t pt-3"></div>
-						
+
 						<div class="flex items-center justify-between">
 							<div>
 								<span class="text-sm font-medium">Share Recommendations</span>
@@ -342,10 +325,7 @@
 									Allow your recommendations to be shared with other users
 								</p>
 							</div>
-							<input
-								type="checkbox"
-								bind:checked={privacySettings.shareRecommendations}
-							/>
+							<input type="checkbox" bind:checked={privacySettings.shareRecommendations} />
 						</div>
 					</div>
 				</div>
@@ -353,3 +333,4 @@
 		</div>
 	</div>
 </div>
+
