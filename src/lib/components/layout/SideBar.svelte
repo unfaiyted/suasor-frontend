@@ -10,18 +10,31 @@
 	import IconAnime from '@lucide/svelte/icons/venetian-mask';
 	import IconMusic from '@lucide/svelte/icons/music';
 	import IconSettings from '@lucide/svelte/icons/settings';
-	// Import config store
+	import IconShield from '@lucide/svelte/icons/shield';
+	import IconCog from '@lucide/svelte/icons/settings';
+	// Import config and auth stores
 	import configApi, { userConfig } from '$lib/stores/config';
+	import { authUser } from '$lib/stores/auth';
+	import type { UserResponse } from '$lib/api/types';
 
 	let isExpansed = $state(false);
 	// Track which media types the user has enabled
 	let enabledMediaTypes = $state<string[]>([]);
+	// Track if user is admin
+	let isAdmin = $state(false);
+	let currentUser = $state<UserResponse | null>(null);
 
 	// Watch for changes in user config
 	$effect(() => {
 		if ($userConfig && $userConfig.contentTypes) {
 			enabledMediaTypes = $userConfig.contentTypes.split(',');
 		}
+	});
+
+	// Subscribe to auth user changes
+	authUser.subscribe((user) => {
+		currentUser = user;
+		isAdmin = user?.role === 'admin';
 	});
 
 	function toggleExpanded() {
@@ -84,6 +97,18 @@
 			<Navigation.Tile labelExpanded="AI Chat" href="/chat" title="Discuss Your Media">
 				<IconMessageSquare />
 			</Navigation.Tile>
+			
+			<!-- Settings link -->
+			<Navigation.Tile labelExpanded="Settings" href="/settings" title="User Settings">
+				<IconCog />
+			</Navigation.Tile>
+			
+			<!-- Admin link (only for admins) -->
+			{#if isAdmin}
+				<Navigation.Tile labelExpanded="Admin" href="/admin" title="Admin Dashboard">
+					<IconShield class="text-primary-500" />
+				</Navigation.Tile>
+			{/if}
 		{/snippet}
 	</Navigation.Rail>
 </div>

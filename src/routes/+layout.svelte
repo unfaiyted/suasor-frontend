@@ -18,9 +18,9 @@
 	let isAuth = $state(false);
 
 	authStore.subscribe((change) => {
-		console.log('Auth store changed:', change);
+		// console.log('Auth store changed:', change);
 		isAuth = change.isAuthenticated;
-		
+
 		// Load user configuration and profile when authenticated
 		if (change.isAuthenticated) {
 			configApi.loadUserConfig();
@@ -139,7 +139,7 @@
 	{/if}
 	<!-- Global Movie Popover that's managed at the top level (outside any containers) -->
 	<GlobalMoviePopover />
-	
+
 	<!-- Viewport indicator for development -->
 	<ViewportIndicator />
 </div>
