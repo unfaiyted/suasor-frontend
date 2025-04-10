@@ -39,8 +39,8 @@
   }
 </script>
 
-<div class="bg-surface-100-900 rounded-lg p-6 shadow-md lg:col-span-2">
-  <h3 class="mb-4 text-lg font-semibold">Recent Activity</h3>
+<div>
+  <!-- Title is now in the parent card header -->
   <div class="divide-y divide-gray-200">
     {#each activities as activity}
       <div class="flex items-center py-3">

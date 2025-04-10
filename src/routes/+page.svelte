@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { isAuthenticated, authUser } from '$lib/stores/auth';
 	import Dashboard from '$lib/components/dashboard/Dashboard.svelte';
-	
+
 	let user = $state(null);
-	
+
 	// Subscribe to authentication changes
 	authUser.subscribe((change) => {
-		user = change;
+		if (change) {
+			user = change;
+		}
 	});
 </script>
 

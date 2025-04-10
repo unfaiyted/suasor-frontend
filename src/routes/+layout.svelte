@@ -13,6 +13,7 @@
 
 	import { authStore } from '$lib/stores/auth';
 	import configApi from '$lib/stores/config';
+	import userApi from '$lib/stores/user';
 
 	let isAuth = $state(false);
 
@@ -20,9 +21,10 @@
 		console.log('Auth store changed:', change);
 		isAuth = change.isAuthenticated;
 		
-		// Load user configuration when authenticated
+		// Load user configuration and profile when authenticated
 		if (change.isAuthenticated) {
 			configApi.loadUserConfig();
+			userApi.loadCurrentUser();
 		}
 	});
 

@@ -107,45 +107,23 @@
 	}
 </script>
 
-<div class="bg-surface-300-700/20 rounded-xl border border-surface-300-700/10 overflow-hidden shadow-xl">
-	<div class="bg-surface-300-700/30 border-b border-surface-300-700/20 px-6 py-4">
-		<div class="flex items-center justify-between">
-			<h2 class="flex items-center gap-2 text-xl font-bold">
-				<div class="bg-primary-500/10 p-1.5 rounded-lg">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5 text-primary-500"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-						<rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-						<line x1="6" y1="6" x2="6.01" y2="6"></line>
-						<line x1="6" y1="18" x2="6.01" y2="18"></line>
-					</svg>
-				</div>
-				Jobs Status
-			</h2>
-			<button class="btn btn-sm btn-primary" on:click={viewAllJobs}>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="mr-1 h-4 w-4"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<polyline points="9 18 15 12 9 6"></polyline>
-				</svg>
-				View All
-			</button>
-		</div>
+<div class="overflow-hidden">
+	<div class="flex items-center justify-end">
+		<button class="btn btn-sm btn-primary" on:click={viewAllJobs}>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="mr-1 h-4 w-4"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<polyline points="9 18 15 12 9 6"></polyline>
+			</svg>
+			View All
+		</button>
 	</div>
 
 	<div class="p-0">

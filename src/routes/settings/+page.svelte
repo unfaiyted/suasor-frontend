@@ -4,14 +4,11 @@
 	import { authUser, isAuthenticated } from '$lib/stores/auth';
 	import configApi, {
 		userConfig as userConfigStore,
-		systemConfig as systemConfigStore,
-		configLoading,
-		configError,
-		configSuccess
+		systemConfig as systemConfigStore
 	} from '$lib/stores/config';
 
 	import { TypesClientType } from '$lib/api/suasor.v1.d';
-	import type { UserResponse, UserConfig } from '$lib/api/types';
+	import type { UserResponse, UserConfig, Configuration as SystemConfig } from '$lib/api/types';
 
 	// Import components
 	import SettingsTabs from '$lib/components/settings/SettingsTabs.svelte';
@@ -30,7 +27,8 @@
 		isAdmin: false,
 		name: '',
 		email: '',
-		username: ''
+		username: '',
+		avatar: ''
 	});
 
 	// Current active tab
@@ -57,13 +55,9 @@
 	let success = $state('');
 
 	let userConfig = $state<UserConfig>();
-	let systemConfig = $state();
+	let systemConfig = $state<SystemConfig>();
 
 	let clientsByType = $state<Record<string, ClientRequest[]>>();
-
-	// Track last update time to debounce updates
-	let lastUpdateTime = 0;
-	const DEBOUNCE_TIME = 500; // ms between updates
 
 	// Subscribe to auth store
 	authUser.subscribe((change: UserResponse | null) => {
@@ -73,20 +67,27 @@
 				isAdmin: change.role === 'admin',
 				name: change.username || '',
 				email: change.email || '',
+				avatar: change.avatar || '',
 				username: change.username || ''
 			};
 		}
 	});
 
+	// Track if we already processed initial configs to prevent loops
+	// let userConfigProcessed = false;
+
 	userConfigStore.subscribe((config) => {
 		if (config) {
+			// userConfigProcessed = true;
 			userConfig = config;
 		}
 	});
 
+	// systemConfigProcessed flag is already declared above
 	systemConfigStore.subscribe((config) => {
 		if (config) {
 			systemConfig = config;
+			// Don't set systemConfigProcessed here - that's handled by the effect
 		}
 	});
 
@@ -101,21 +102,24 @@
 	];
 
 	// Subscribe to system config from the store
+	// Track if we already processed initial config to prevent loops
+	let systemConfigProcessed = false;
+
 	$effect(() => {
-		if (systemConfig) {
-			const config = systemConfig;
+		if (systemConfig && !systemConfigProcessed) {
+			systemConfigProcessed = true;
 
 			// Update server settings
 			serverSettings = {
-				maxConcurrentJobs: config.app?.maxPageSize || 5,
+				maxConcurrentJobs: systemConfig.app?.maxPageSize || 5,
 				backupEnabled: true,
 				backupFrequency: 'daily',
-				logLevel: config.app?.logLevel || 'info'
+				logLevel: systemConfig.app?.logLevel || 'info'
 			};
 
 			// Update site settings
 			siteSettings = {
-				siteName: config.app?.name || 'Suasor',
+				siteName: systemConfig.app?.name || 'Suasor',
 				description: 'Media Management Platform',
 				allowRegistration: true,
 				requireEmailVerification: true,
@@ -123,6 +127,7 @@
 			};
 		}
 	});
+
 	function switchTab(tabId: string) {
 		if (tabs.find((tab) => tab.id === tabId && tab.adminOnly && !user.isAdmin)) {
 			error = 'You do not have permission to access this section';
@@ -160,22 +165,14 @@
 	}
 
 	// Save user settings (used by the UserSettingsPanel)
-	async function saveUserSettings(userConfig: UserConfig) {
+	async function saveUserConfig(userConfig: UserConfig) {
 		error = '';
 
 		try {
-			console.log('New settings to apply:', userConfig);
+			console.log('New config settings to apply:', userConfig);
 
 			// Save the complete merged config to the backend
 			await configApi.saveUserConfig(userConfig);
-
-			// Reload the config, but not too frequently
-			const lastConfigLoad = sessionStorage.getItem('lastConfigLoad');
-			const now = Date.now();
-			if (!lastConfigLoad || now - parseInt(lastConfigLoad) > 5000) {
-				await configApi.loadUserConfig();
-				sessionStorage.setItem('lastConfigLoad', now.toString());
-			}
 
 			success = 'Settings saved successfully';
 
@@ -194,18 +191,23 @@
 		}
 	}
 
+	async function saveUser(user: UserResponse) {
+		console.log('Saving user settings:', user);
+		authUser.update(() => user);
+	}
+
 	// Save system settings
-	async function saveSystemSettings(section, data) {
+	async function saveSystemSettings(section: string, data: SystemConfig) {
 		error = '';
 
 		try {
 			if (section === 'site' && user.isAdmin) {
 				if (systemConfig) {
-					const updatedConfig = {
-						...$systemConfig,
+					const updatedConfig: SystemConfig = {
+						...systemConfig,
 						app: {
-							...$systemConfig.app,
-							name: data.siteName
+							...systemConfig.app,
+							name: data?.app?.name || 'Suasor'
 							// Add other site settings here as needed
 						}
 					};
@@ -218,7 +220,7 @@
 						...systemConfig,
 						app: {
 							...systemConfig.app,
-							logLevel: data.logLevel,
+							logLevel: data.app.logLevel,
 							maxPageSize: data.maxConcurrentJobs
 							// Add other server settings here as needed
 						}
@@ -285,29 +287,9 @@
 		}
 	}
 
-	// // Listen for store changes
-	// $effect(() => {
-	// 	if ($configError) {
-	// 		error = $configError.message || 'Failed to load settings';
-	// 	}
-	// });
-	//
-	// $effect(() => {
-	// 	if ($configSuccess) {
-	// 		success = $configSuccess;
-	// 	}
-	// });
-	//
-	// $effect(() => {
-	// 	isLoading = $configLoading;
-	// });
-
 	// Get the URL parameters to determine which tab to show
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { browser } from '$app/environment';
-
-	// Initialize component
-	const { data } = $props();
 
 	onMount(async () => {
 		// Check if user is authenticated
@@ -315,11 +297,11 @@
 			await Promise.all([fetchUserConfig(), fetchSystemConfig(), loadClientData()]);
 
 			// Check for tab in URL query parameters first
-			const tabParam = $page.url.searchParams.get('tab');
+			const tabParam = page.url.searchParams.get('tab');
 			let targetTab: string | null = tabParam;
 
 			// Check for subtab parameter (for integration subtabs)
-			const subtabParam = $page.url.searchParams.get('subtab');
+			const subtabParam = page.url.searchParams.get('subtab');
 			// We'll store this in sessionStorage for the integrations component to use
 			if (subtabParam && browser && targetTab === 'integrations') {
 				sessionStorage.setItem('integrationsSubtab', subtabParam);
@@ -327,7 +309,7 @@
 
 			// If not in query params, try to get tab from URL path
 			if (!targetTab) {
-				const path = $page.url.pathname;
+				const path = page.url.pathname;
 				if (path !== '/settings') {
 					const pathParts = path.split('/');
 					if (pathParts.length > 2) {
@@ -378,8 +360,8 @@
 			<UserSettingsPanel
 				config={userConfig}
 				{user}
-				onSave={saveUserSettings}
-				onUpdateSetting={updateUserSetting}
+				onUpdateUser={saveUser}
+				onUpdateConfig={saveUserConfig}
 				{isLoading}
 			/>
 		{:else if activeTab === 'integrations' && user.isAdmin && clientsByType}
@@ -394,19 +376,25 @@
 		{:else if activeTab === 'site' && user.isAdmin}
 			<SiteConfigPanel
 				{siteSettings}
-				onSave={(data) => saveSystemSettings('site', data)}
+				onSave={(data: SystemConfig) => saveSystemSettings('site', data)}
 				{isLoading}
 			/>
 		{:else if activeTab === 'server' && user.isAdmin}
 			<ServerSettingsPanel
 				{serverSettings}
-				onSave={(data) => saveSystemSettings('server', data)}
+				onSave={(data: SystemConfig) => saveSystemSettings('server', data)}
 				{isLoading}
 			/>
 		{:else if activeTab === 'database' && user.isAdmin}
-			<DatabasePanel onSave={(data) => saveSystemSettings('database', data)} {isLoading} />
+			<DatabasePanel
+				onSave={(data: SystemConfig) => saveSystemSettings('database', data)}
+				{isLoading}
+			/>
 		{:else if activeTab === 'security' && user.isAdmin}
-			<SecurityPanel onSave={(data) => saveSystemSettings('security', data)} {isLoading} />
+			<SecurityPanel
+				onSave={(data: SystemConfig) => saveSystemSettings('security', data)}
+				{isLoading}
+			/>
 		{:else}
 			<div class="flex h-64 items-center justify-center">
 				<p class="text-lg">Please select a settings category from the tabs above.</p>

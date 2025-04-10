@@ -11,6 +11,7 @@
 		ModelsUserConfigPreferredContentLength
 	} from '$lib/api/suasor.v1.d';
 	import type { UserConfig, UserResponse } from '$lib/api/types';
+	import userApi from '$lib/stores/user';
 
 	// Import the tab components
 	import InterfaceSettingsTab from './InterfaceSettingsTab.svelte';
@@ -21,16 +22,16 @@
 	interface UserSettingsPanelProps {
 		user: UserResponse;
 		config: UserConfig;
-		onSave: (config: UserConfig) => Promise<void>;
-		onUpdateSetting: () => Promise<void>;
+		onUpdateUser: (user: UserResponse) => void;
+		onUpdateConfig: (config: UserConfig) => Promise<void>;
 		isLoading: boolean;
 	}
 
 	// Props - receive the config object and callbacks instead of individual values
 	const {
 		config,
-		onSave,
-		onUpdateSetting,
+		onUpdateConfig,
+		onUpdateUser,
 		isLoading = false,
 		user
 	}: UserSettingsPanelProps = $props();
@@ -52,19 +53,19 @@
 		aiChatPersonality: config.aiChatPersonality || ModelsUserConfigAiChatPersonality.friendly,
 
 		// Profile settings
-		bio: config.bio || '',
-		avatarUrl: config.avatarUrl || null,
-		socialLinks: config.socialLinks || {
-			twitter: '',
-			letterboxd: '',
-			lastfm: '',
-			trakt: ''
-		},
-		privacySettings: config.privacySettings || {
-			showWatchHistory: true,
-			shareRecommendations: true,
-			publicProfile: true
-		},
+		// bio: config.bio || '',
+		// avatar: config.avatarUrl || null,
+		// socialLinks: config.socialLinks || {
+		// 	twitter: '',
+		// 	letterboxd: '',
+		// 	lastfm: '',
+		// 	trakt: ''
+		// },
+		// privacySettings: config.privacySettings || {
+		// 	showWatchHistory: true,
+		// 	shareRecommendations: true,
+		// 	publicProfile: true
+		// },
 
 		// Content settings
 		showAdultContent: config.showAdultContent || false,
@@ -127,9 +128,10 @@
 
 			console.log('Submitting complete form data:', completeConfig);
 
-			// Save to backend
+			// Save to backend - only call onSave, not both functions
+			// Removing the call to onUpdateSetting() which creates a circular update
 			await onSave(completeConfig);
-			onUpdateSetting();
+
 			// After successful save, update form state from the latest config
 			// with a slight delay to allow the backend update to complete
 			setTimeout(() => {
@@ -154,16 +156,22 @@
 		{ id: 'recommendations', label: 'Recommendations', icon: Sparkles }
 	];
 
-	// Handle genre change from the GenreSelector component
-	function handleGenreChange(mediaType: string, genresList: string[]) {
-		// Use dot notation for nested genre updates
-		if (!formState.preferredGenres) return;
-		formState.preferredGenres[mediaType as keyof typeof formState.preferredGenres] = genresList;
-	}
-
 	function updateFormState(newState: Partial<UserConfig>) {
 		formState = { ...formState, ...newState };
 		console.log('Updated form state:', formState);
+	}
+
+	// Function to handle user updates, which will update both local and global state
+	async function updateUserAndStore(userData: Partial<UserResponse>) {
+		// Update local user state
+		if (onUpdateUser) {
+			onUpdateUser({ ...user, ...userData });
+		}
+
+		// Update global user state in the store
+		if (userData && Object.keys(userData).length > 0) {
+			await userApi.updateProfile(userData);
+		}
 	}
 </script>
 
@@ -188,11 +196,7 @@
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<!-- Profile Settings Tab -->
 		{#if activeTab === 'profile'}
-			<ProfileSettingsTab
-				{formState}
-				{updateFormState}
-				user={{ name: user.name || '', email: user.email || '' }}
-			/>
+			<ProfileSettingsTab {formState} {updateFormState} updateUser={updateUserAndStore} {user} />
 			<!-- Interface Settings Tab -->
 		{:else if activeTab === 'interface'}
 			<InterfaceSettingsTab {formState} {updateFormState} />

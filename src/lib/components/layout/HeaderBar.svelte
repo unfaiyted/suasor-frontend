@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { isAuthenticated, authUser, authStore } from '$lib/stores/auth';
+	import { currentUser as storeUser } from '$lib/stores/user';
 	import type { UserResponse } from '$lib/api/types';
 	import {
 		Menu,
@@ -21,17 +22,39 @@
 	let userInitials = '';
 	let user: UserResponse | null = null;
 
+	// Subscribe to both auth user and user store
+	// Auth user updates when logging in/out
+	// User store updates with profile changes like avatar
 	authUser.subscribe((change: UserResponse | null) => {
 		console.log('authUser changed:', change);
+		if (change) {
+			updateUserData(change);
+		}
+	});
+
+	// Subscribe to user store for avatar/profile updates
+	storeUser.subscribe((change: UserResponse | null) => {
+		console.log('storeUser changed:', change);
+		if (change) {
+			updateUserData(change);
+		}
+	});
+
+	// Helper to update user data
+	function updateUserData(userData: UserResponse) {
 		userInitials =
-			change?.username
+			userData?.username
 				?.split(' ')
 				?.map((part: string) => part[0])
 				?.join('')
 				?.toUpperCase() || '';
-		console.log('userInitials changed:', userInitials);
-		user = change;
-	});
+
+		// Make sure we always have a clean reference to user data
+		user = { ...userData };
+
+		// Log avatar info for debugging
+		console.log('Updated user data with avatar:', user.avatar);
+	}
 
 	function handleLogout() {
 		authStore.logout().then(() => {
@@ -163,11 +186,17 @@
 					aria-expanded={userMenuVisible}
 				>
 					{#if $isAuthenticated}
-						<div class="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full">
-							<span class="text-sm font-bold text-white">
-								{userInitials || 'U'}
-							</span>
-						</div>
+						{#if user?.avatar}
+							<div class="h-8 w-8 overflow-hidden rounded-full">
+								<img src={user.avatar} alt="User avatar" class="h-full w-full object-cover" />
+							</div>
+						{:else}
+							<div class="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-full">
+								<span class="text-sm font-bold text-white">
+									{userInitials || 'U'}
+								</span>
+							</div>
+						{/if}
 					{:else}
 						<CircleUser size={20} />
 					{/if}
@@ -225,11 +254,17 @@
 					<div>
 						{#if $isAuthenticated}
 							<div class="flex items-center gap-2 px-4 py-2 text-sm font-medium">
-								<div class="bg-primary-500 flex h-6 w-6 items-center justify-center rounded-full">
-									<span class="text-xs font-bold text-white">
-										{userInitials || 'U'}
-									</span>
-								</div>
+								{#if user?.avatar}
+									<div class="h-6 w-6 overflow-hidden rounded-full">
+										<img src={user.avatar} alt="User avatar" class="h-full w-full object-cover" />
+									</div>
+								{:else}
+									<div class="bg-primary-500 flex h-6 w-6 items-center justify-center rounded-full">
+										<span class="text-xs font-bold text-white">
+											{userInitials || 'U'}
+										</span>
+									</div>
+								{/if}
 								<span>{user?.username || 'User'}</span>
 							</div>
 							<div class="border-surface-300-600 my-1 border-t"></div>
@@ -280,3 +315,4 @@
 
 <!-- Search component -->
 <SpotlightSearch show={showSearch} on:close={() => (showSearch = false)} />
+

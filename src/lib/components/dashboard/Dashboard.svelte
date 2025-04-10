@@ -2,11 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { UserResponse } from '$lib/api/types';
 	import DashboardHeader from './DashboardHeader.svelte';
-	import StatsOverview from './StatsOverview.svelte';
-	import RecentActivity from './RecentActivity.svelte';
-	import IntegrationsStatus from './IntegrationsStatus.svelte';
-	import MediaDiscoveryChart from './MediaDiscoveryChart.svelte';
-	import JobsStatusCard from './JobsStatusCard.svelte';
+	import DraggableDashboard from './DraggableDashboard.svelte';
 
 	interface DashboardProps {
 		user: UserResponse | null;
@@ -83,21 +79,13 @@
 
 <div>
 	<DashboardHeader {user} />
-
-	<StatsOverview {recommendations} />
-
-	<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-		<RecentActivity activities={recentActivity} />
-		<div class="lg:col-span-2">
-			<JobsStatusCard />
-		</div>
-	</div>
-
-	<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-		<div class="lg:col-span-2">
-			<MediaDiscoveryChart data={discoveryRate} />
-		</div>
-		<IntegrationsStatus {integrationStatus} />
-	</div>
+	
+	<DraggableDashboard 
+		{user} 
+		{recommendations} 
+		{integrationStatus} 
+		{recentActivity} 
+		{discoveryRate} 
+	/>
 </div>
 

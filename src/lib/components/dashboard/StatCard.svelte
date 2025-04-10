@@ -12,8 +12,8 @@
 	let percentage = (completed / count) * 100;
 </script>
 
-<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
-	<h3 class="mb-2 text-lg font-semibold">{title}</h3>
+<div>
+	<!-- No title here, it's shown in the card header -->
 	<div class="flex items-end justify-between">
 		<div>
 			<p class="text-primary-600 text-3xl font-bold">{count}</p>

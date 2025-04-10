@@ -14,8 +14,8 @@
 	let maxCount = Math.max(...data.map((item) => item.count));
 </script>
 
-<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
-	<h3 class="mb-4 text-lg font-semibold">Media Discovery Rate</h3>
+<div>
+	<!-- Title is shown in parent card -->
 	<div class="h-64">
 		<div class="flex h-full items-end">
 			{#each data as month}

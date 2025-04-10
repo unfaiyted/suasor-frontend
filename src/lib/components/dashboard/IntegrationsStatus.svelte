@@ -50,9 +50,8 @@
 	}
 </script>
 
-<div class="bg-surface-100-900 rounded-lg p-6 shadow-md">
-	<div class="mb-4 flex items-center justify-between">
-		<h3 class="text-lg font-semibold">Integrations</h3>
+<div class="h-full flex flex-col overflow-hidden">
+	<div class="flex justify-end flex-shrink-0">
 		<button
 			class="bg-tertiary-500/20 hover:bg-tertiary-600 focus:ring-tertiary-300 flex items-center gap-1 rounded-full px-2 py-2 text-xs text-white focus:ring-2 focus:outline-none"
 			onclick={() => {
@@ -66,6 +65,7 @@
 		</button>
 	</div>
 
+	<div class="flex-grow overflow-y-auto custom-scrollbar pr-2">
 	<!-- Media Servers Section -->
 	<div class="mb-4">
 		<div
@@ -215,4 +215,39 @@
 		</a>
 	</div>
 </div>
+</div>
 
+
+<style>
+  /* Custom scrollbar styles for webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.8);
+  }
+  
+  /* Only show scrollbar when hovering over the content */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+  
+  .custom-scrollbar:hover {
+    scrollbar-color: rgba(156, 163, 175, 0.5) rgba(0, 0, 0, 0.05);
+  }
+</style>

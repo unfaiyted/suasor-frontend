@@ -1,30 +1,28 @@
 <script lang="ts">
-	import { User, Mail, Camera, CircleUser, UserCircle, X, Image, Upload } from '@lucide/svelte';
-	import type { UserConfig } from '$lib/api/types';
-	import SaveButton from '../util/SaveButton.svelte';
+	import { User, Mail, CircleUser } from '@lucide/svelte';
+	import type { UserConfig, UserResponse } from '$lib/api/types';
+	import AvatarUpload from '../user/AvatarUpload.svelte';
+	import userApi from '$lib/stores/user';
 
 	interface ProfileSettingsTabProps {
 		formState: UserConfig;
+		user: UserResponse;
 		updateFormState: (formState: Partial<UserConfig>) => void;
-		user: {
-			name: string;
-			email: string;
-		};
+		updateUser: (user: UserResponse) => void;
 	}
 
 	// Props
-	let { formState, updateFormState, user }: ProfileSettingsTabProps = $props();
+	let { formState, updateFormState, updateUser, user }: ProfileSettingsTabProps = $props();
 
 	// Local state for user profile
-	let username = $state(user.name || '');
+	let username = $state(user.username || '');
 	let email = $state(user.email || '');
 	let displayName = $state(formState.displayName || '');
 	let bio = $state(formState.bio || '');
-	let avatar = $state<string | null>(formState.avatarUrl || null);
+	let avatar = $state<string | null>(user.avatar || null);
 	let tempAvatar = $state<string | null>(null);
 	let social = $state<Record<string, string>>(
 		formState.socialLinks || {
-			twitter: '',
 			letterboxd: '',
 			lastfm: '',
 			trakt: ''
@@ -38,8 +36,7 @@
 		}
 	);
 
-	// File upload handling
-	let fileInput: HTMLInputElement;
+	console.log('UserSettingsPanel props:', user);
 
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
@@ -69,7 +66,9 @@
 	function confirmAvatar() {
 		if (tempAvatar) {
 			avatar = tempAvatar;
-			updateFormState({ avatarUrl: avatar });
+			updateUser({ avatar: avatar });
+			// Also update the global store
+			userApi.updateProfile({ avatar: avatar });
 			tempAvatar = null;
 		}
 	}
@@ -80,18 +79,10 @@
 
 	function removeAvatar() {
 		avatar = null;
-		updateFormState({ avatarUrl: null });
+		updateUser({ avatar: '' });
+		// Also update the global store
+		userApi.updateProfile({ avatar: '' });
 	}
-
-	// Update form when values change
-	$effect(() => {
-		updateFormState({
-			displayName,
-			bio,
-			socialLinks: social,
-			privacySettings
-		});
-	});
 </script>
 
 <div class="space-y-8">
@@ -106,69 +97,15 @@
 		<!-- Left column: Avatar and Bio -->
 		<div class="md:col-span-1">
 			<div class="flex flex-col items-center justify-center space-y-4">
-				<!-- Avatar Upload -->
-				<div class="relative">
-					{#if tempAvatar}
-						<div class="aspect-square w-32 overflow-hidden rounded-full">
-							<img src={tempAvatar} alt="Avatar preview" class="h-full w-full object-cover" />
-						</div>
-						<div class="mt-2 flex justify-center space-x-2">
-							<button
-								type="button"
-								class="bg-primary-500 hover:bg-primary-600 rounded px-3 py-1 text-sm text-white"
-								onclick={confirmAvatar}
-							>
-								Confirm
-							</button>
-							<button
-								type="button"
-								class="hover:bg-surface-200-700 rounded px-3 py-1 text-sm"
-								onclick={cancelAvatar}
-							>
-								Cancel
-							</button>
-						</div>
-					{:else if avatar}
-						<div class="aspect-square w-32 overflow-hidden rounded-full">
-							<img src={avatar} alt="User avatar" class="h-full w-full object-cover" />
-						</div>
-						<button
-							type="button"
-							class="bg-surface-800-200 hover:bg-surface-700-300 absolute -top-2 -right-2 rounded-full p-1"
-							onclick={removeAvatar}
-							aria-label="Remove avatar"
-						>
-							<X size={16} />
-						</button>
-					{:else}
-						<div
-							class="bg-surface-200-800 flex aspect-square w-32 items-center justify-center rounded-full"
-						>
-							<UserCircle size={64} class="text-surface-500-400" />
-						</div>
-					{/if}
-				</div>
-
-				<div>
-					<button
-						type="button"
-						class="border-surface-300-700 hover:bg-surface-200-800 flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
-						onclick={() => fileInput?.click()}
-					>
-						<Upload size={16} />
-						<span>{avatar ? 'Change' : 'Upload'} Avatar</span>
-					</button>
-					<input
-						type="file"
-						accept="image/*"
-						class="hidden"
-						bind:this={fileInput}
-						onchange={handleFileSelect}
-					/>
-					<p class="text-surface-900-50 mt-2 text-center text-xs">
-						Images should be square, JPG or PNG, max 5MB
-					</p>
-				</div>
+				<!-- Avatar Upload Component -->
+				<AvatarUpload
+					{user}
+					onAvatarUploaded={(filePath) => {
+						// Update form state with new avatar URL
+						updateUser({ avatar: filePath });
+						// Store already updated by AvatarUpload component
+					}}
+				/>
 
 				<!-- Bio -->
 				<div class="w-full">
@@ -249,7 +186,7 @@
 
 			<!-- Social Media Links -->
 			<div class="form-control">
-				<label class="label">
+				<label class="label" for="social-links">
 					<span class="label-text font-medium">Social Media & Service Links</span>
 				</label>
 				<div class="bg-surface-200-800/20 rounded-lg p-4">
@@ -266,9 +203,10 @@
 						</div>
 
 						<div>
-							<label class="mb-1 block text-sm">Last.fm</label>
+							<label class="mb-1 block text-sm" for="lastfm">Last.fm</label>
 							<input
 								type="text"
+								id="lastfm"
 								class="bg-surface-200-800/50 focus:ring-primary-500 w-full rounded p-2 text-sm focus:ring-2 focus:outline-none"
 								placeholder="username"
 								bind:value={social.lastfm}
@@ -276,9 +214,10 @@
 						</div>
 
 						<div>
-							<label class="mb-1 block text-sm">Trakt.tv</label>
+							<label class="mb-1 block text-sm" for="trakt">Trakt.tv</label>
 							<input
 								type="text"
+								id="trakt"
 								class="bg-surface-200-800/50 focus:ring-primary-500 w-full rounded p-2 text-sm focus:ring-2 focus:outline-none"
 								placeholder="username"
 								bind:value={social.trakt}
@@ -333,4 +272,3 @@
 		</div>
 	</div>
 </div>
-

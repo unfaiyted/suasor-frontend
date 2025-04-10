@@ -251,6 +251,12 @@ export const GET = async <P extends PathWithGet>(path: P, params?: any, skipAuth
 };
 
 export const POST = async <P extends PathWithPost>(path: P, params?: any, skipAuth = false) => {
+	// Log FormData being sent
+	if (params?.body instanceof FormData) {
+		console.log('Sending FormData to:', path);
+		// No need to manually set Content-Type for FormData - browser handles it
+	}
+	
 	if (skipAuth) {
 		return createBasicClient().POST(path, params);
 	}

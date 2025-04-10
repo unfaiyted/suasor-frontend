@@ -39,10 +39,10 @@
 
 	// Subscribe to media collection store
 	$effect(() => {
-		const unsubscribe = mediaCollection.subscribe(store => {
+		const unsubscribe = mediaCollection.subscribe((store) => {
 			collectionItems = store.items;
 		});
-		
+
 		return unsubscribe;
 	});
 
@@ -104,7 +104,7 @@
 	}
 
 	function isInCollection(id) {
-		return collectionItems.some(item => item.id === id);
+		return collectionItems.some((item) => item.id === id);
 	}
 
 	function showMovieDetail(movie) {
@@ -307,7 +307,10 @@
 <!-- SEO metadata -->
 <svelte:head>
 	<title>Movie Recommendations | Suasor</title>
-	<meta name="description" content="Discover movies and TV shows tailored to your taste with AI-powered recommendations." />
+	<meta
+		name="description"
+		content="Discover movies and TV shows tailored to your taste with AI-powered recommendations."
+	/>
 </svelte:head>
 
 <div class="mx-auto">
@@ -332,41 +335,46 @@
 		</div>
 	{/if}
 
-	<!-- Filters and Header Section -->
-	<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-		<div>
-			<h2 class="text-2xl font-bold flex items-center gap-2">
-				<Film size={24} />
-				Movie Recommendations
-			</h2>
-			<p class="text-sm text-surface-700-300 mt-1">
-				Personalized recommendations powered by our AI to match your viewing preferences
-			</p>
-		</div>
-		<MovieFilters {filters} {genres} />
-	</div>
-
 	<!-- AI Recommendation Banner -->
-	<div class="bg-gradient-to-r from-secondary-800/30 to-secondary-500/10 mb-8 p-6 rounded-xl border border-secondary-700/20">
-		<div class="flex flex-col md:flex-row items-center gap-4">
-			<div class="bg-secondary-500/20 p-3 rounded-full">
+	<div
+		class="from-secondary-800/30 to-secondary-500/10 border-secondary-700/20 mt-6 mb-8 rounded-xl border bg-gradient-to-r p-6"
+	>
+		<div class="flex flex-col items-center gap-4 md:flex-row">
+			<div class="bg-secondary-500/20 rounded-full p-3">
 				<Sparkles size={24} class="text-secondary-500" />
 			</div>
 			<div class="flex-1">
-				<h3 class="text-lg font-semibold flex items-center gap-2">
+				<h3 class="flex items-center gap-2 text-lg font-semibold">
 					AI-Powered Recommendations
-					<span class="text-xs bg-secondary-600/20 text-secondary-400 px-2 py-0.5 rounded">New</span>
+					<span class="bg-secondary-600/20 text-secondary-400 rounded px-2 py-0.5 text-xs">New</span
+					>
 				</h3>
 				<p class="text-sm opacity-80">
-					Our AI analyzes your watching patterns to recommend new content that matches your taste. 
+					Our AI analyzes your watching patterns to recommend new content that matches your taste.
 					Select multiple movies to get even more personalized suggestions.
 				</p>
 			</div>
-			<button class="bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap">
+			<button
+				class="bg-secondary-600 hover:bg-secondary-700 flex items-center gap-2 rounded-lg px-4 py-2 whitespace-nowrap text-white"
+			>
 				<Stars size={18} />
 				<span>Tune Recommendations</span>
 			</button>
 		</div>
+	</div>
+
+	<!-- Filters and Header Section -->
+	<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+		<div>
+			<h2 class="flex items-center gap-2 text-2xl font-bold">
+				<Film size={24} />
+				Movie Recommendations
+			</h2>
+			<p class="text-surface-700-300 mt-1 text-sm">
+				Personalized recommendations powered by our AI to match your viewing preferences
+			</p>
+		</div>
+		<MovieFilters {filters} {genres} />
 	</div>
 
 	{#if isLoading}
@@ -379,7 +387,7 @@
 		<!-- Movie Sections -->
 		{#if recommendations.continuePlaying.length > 0}
 			<div class="mb-12">
-				<div class="flex items-center gap-2 mb-4">
+				<div class="mb-4 flex items-center gap-2">
 					<Clock size={20} class="text-yellow-500" />
 					<h3 class="text-xl font-bold">Continue Watching</h3>
 				</div>
@@ -396,7 +404,7 @@
 		{/if}
 
 		<div class="mb-12">
-			<div class="flex items-center gap-2 mb-4">
+			<div class="mb-4 flex items-center gap-2">
 				<Sparkles size={20} class="text-secondary-500" />
 				<h3 class="text-xl font-bold">AI Recommended For You</h3>
 			</div>
@@ -412,7 +420,7 @@
 		</div>
 
 		<div class="mb-12">
-			<div class="flex items-center gap-2 mb-4">
+			<div class="mb-4 flex items-center gap-2">
 				<TrendingUp size={20} class="text-primary-500" />
 				<h3 class="text-xl font-bold">Trending Now</h3>
 			</div>
@@ -428,7 +436,7 @@
 		</div>
 
 		<div class="mb-12">
-			<div class="flex items-center gap-2 mb-4">
+			<div class="mb-4 flex items-center gap-2">
 				<Clock size={20} class="text-emerald-500" />
 				<h3 class="text-xl font-bold">New Releases</h3>
 			</div>
@@ -449,7 +457,7 @@
 <MovieDetailModal
 	movie={selectedMovie}
 	show={showDetail}
-	isInWatchlist={isInWatchlist}
+	{isInWatchlist}
 	isInCart={isInCollection}
 	on:close={handleCloseModal}
 	on:toggleWatchlist={handleToggleWatchlist}
@@ -459,3 +467,4 @@
 
 <!-- Floating Media Collection Manager -->
 <MediaCollectionManager />
+
