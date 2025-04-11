@@ -30,7 +30,7 @@
 	// Props - receive the config object and callbacks instead of individual values
 	const {
 		config,
-		onUpdateConfig,
+		// onUpdateConfig,
 		onUpdateUser,
 		isLoading = false,
 		user
@@ -130,7 +130,7 @@
 
 			// Save to backend - only call onSave, not both functions
 			// Removing the call to onUpdateSetting() which creates a circular update
-			await onSave(completeConfig);
+			// await onSave(completeConfig);
 
 			// After successful save, update form state from the latest config
 			// with a slight delay to allow the backend update to complete

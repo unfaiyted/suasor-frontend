@@ -273,8 +273,10 @@
 
 				// Copy over any clients from organized data
 				Object.entries(organizedClients).forEach(([type, clients]) => {
-					if (type in clientsByType) {
-						clientsByType[type] = [...clients];
+					if (clientsByType && clients.length > 0) {
+						if (type in clientsByType) {
+							clientsByType[type] = [...clients];
+						}
 					}
 				});
 			});

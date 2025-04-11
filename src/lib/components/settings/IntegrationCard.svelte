@@ -2,13 +2,7 @@
 	import { clientsApi } from '$lib/stores/api';
 	import { configApi } from '$lib/stores/config';
 	import { TypesClientType, TypesMediaClientType } from '$lib/api/suasor.v1.d';
-	import type {
-		ClientResponse,
-		JellyfinConfig,
-		ClientRequest,
-		SubsonicConfig,
-		UserConfig
-	} from '$lib/api/types';
+	import type { ClientResponse, ClientRequest, SubsonicConfig, UserConfig } from '$lib/api/types';
 	import { fade, fly } from 'svelte/transition';
 	import { Star, Trash2 } from '@lucide/svelte';
 
@@ -24,12 +18,12 @@
 		onDeleted?: (event: { client: ClientResponse }) => void;
 	};
 
-	const { 
-		title, 
-		integration: initialIntegration, 
-		urlPlaceholder, 
-		clientType, 
-		onSaved, 
+	const {
+		title,
+		integration: initialIntegration,
+		urlPlaceholder,
+		clientType,
+		onSaved,
 		onError,
 		isDefault = false,
 		onSetDefault,
@@ -58,6 +52,7 @@
 				required: true,
 				placeholder: urlPlaceholder
 			},
+			{ name: 'username', label: 'Username', type: 'text', required: false },
 			{ name: 'apiKey', label: 'API Key', type: 'password', required: true }
 		],
 		[TypesClientType.ClientTypeSonarr]: [
@@ -98,6 +93,7 @@
 				required: true,
 				placeholder: urlPlaceholder
 			},
+			{ name: 'username', label: 'Username', type: 'text', required: false },
 			{ name: 'token', label: 'Auth Token', type: 'password', required: true }
 		],
 		[TypesClientType.ClientTypeEmby]: [
@@ -108,6 +104,7 @@
 				required: true,
 				placeholder: urlPlaceholder
 			},
+			{ name: 'username', label: 'Username', type: 'text', required: false },
 			{ name: 'apiKey', label: 'API Key', type: 'password', required: true }
 		],
 		[TypesClientType.ClientTypeSubsonic]: [
@@ -187,32 +184,32 @@
 
 		formIntegration = newForm;
 	}
-	
+
 	// Delete confirmation popover state
 	let showDeleteConfirm = $state(false);
-	let deleteButtonRef = $state(null); // Reference to the delete button element
+	let deleteButtonRef = $state<HTMLButtonElement>(); // Reference to the delete button element
 	let deleteInProgress = $state(false);
 	let deleteError = $state('');
-	
+
 	// Function to delete the client
 	async function deleteClient() {
 		if (!integration || !integration.id) return;
-		
+
 		// Reset status indicators
 		deleteError = '';
 		deleteInProgress = true;
-		
+
 		try {
 			// The API requires both client ID and client type
 			const clientTypeStr = integration.clientType.toString().toLowerCase();
 			const clientId = integration.id.toString();
-			
+
 			const result = await clientsApi.deleteClient(clientId, clientTypeStr);
-			
+
 			if (result) {
 				// Close the confirmation popover
 				showDeleteConfirm = false;
-				
+
 				// Notify parent component
 				setTimeout(() => {
 					onDeleted?.({ client: integration });
@@ -228,7 +225,7 @@
 			deleteInProgress = false;
 		}
 	}
-	
+
 	// Toggle delete confirmation popover
 	function toggleDeleteConfirm(e) {
 		if (e) e.stopPropagation();
@@ -351,7 +348,7 @@
 			};
 
 			let result;
-			
+
 			// If this is an existing integration, use the testClient method
 			if (integration && integration.id) {
 				const testClientRequest: ClientRequest = {
@@ -361,15 +358,11 @@
 					isEnabled: formIntegration.isEnabled,
 					client: clientConfig
 				};
-				
+
 				result = await clientsApi.testClient(testClientRequest);
 			} else {
 				// For new integrations, use the testNewClientConnection method
-				result = await clientsApi.testNewClientConnection(
-					clientType,
-					clientConfig,
-					title
-				);
+				result = await clientsApi.testNewClientConnection(clientType, clientConfig, title);
 			}
 
 			if (result) {
@@ -393,27 +386,31 @@
 	// Set this client as the default for its type
 	async function setAsDefault() {
 		if (!integration || !integration.id) return;
-		
+
 		// Reset status indicators
 		saveError = '';
 		saveSuccess = false;
 		savingInProgress = true;
-		
+
 		try {
 			// Get current user config
 			const userConfig = await configApi.loadUserConfig();
 			if (!userConfig) {
 				throw new Error('Failed to load user configuration');
 			}
-			
+
 			// Create updated config with this client set as default
 			const updatedConfig: Partial<UserConfig> = {};
-			
+
 			// Different handling for media clients vs others
 			const clientTypeStr = integration.clientType?.toString().toLowerCase();
-			
+
 			// Set as default based on client type
-			if (clientTypeStr.includes('emby') || clientTypeStr.includes('jellyfin') || clientTypeStr.includes('plex')) {
+			if (
+				clientTypeStr.includes('emby') ||
+				clientTypeStr.includes('jellyfin') ||
+				clientTypeStr.includes('plex')
+			) {
 				// Video media clients
 				updatedConfig.defaultVideoClientID = integration.id;
 			} else if (clientTypeStr.includes('subsonic')) {
@@ -428,26 +425,30 @@
 			} else if (clientTypeStr.includes('lidarr')) {
 				// Music automation
 				updatedConfig.defaultMusicClientID = integration.id;
-			} else if (clientTypeStr.includes('claude') || clientTypeStr.includes('openai') || clientTypeStr.includes('ollama')) {
+			} else if (
+				clientTypeStr.includes('claude') ||
+				clientTypeStr.includes('openai') ||
+				clientTypeStr.includes('ollama')
+			) {
 				// AI clients
 				updatedConfig.defaultAIClientID = integration.id;
 			}
-			
+
 			// Set specific client type as default
 			const clientTypeKey = `default${integration.clientType}ClientID`;
 			updatedConfig[clientTypeKey] = integration.id;
-			
+
 			// Save the updated config
 			const result = await configApi.saveUserConfig(updatedConfig);
-			
+
 			if (result) {
 				saveSuccess = true;
-				
+
 				// Notify parent component
 				if (onSetDefault) {
 					onSetDefault(integration);
 				}
-				
+
 				// Wait briefly before notifying of success
 				setTimeout(() => {
 					onSaved?.({ client: integration });
@@ -461,7 +462,7 @@
 			onError?.({ message: saveError });
 		} finally {
 			savingInProgress = false;
-			
+
 			// Auto-clear success status after 3 seconds
 			if (saveSuccess) {
 				setTimeout(() => {
@@ -516,7 +517,7 @@
 					saveSuccess = true;
 					// Update our local integration object with the result
 					integration = result;
-					
+
 					// Wait briefly before notifying parent to allow animation to be seen
 					setTimeout(() => {
 						onSaved?.({ client: result });
@@ -542,7 +543,7 @@
 					saveSuccess = true;
 					// Update our local integration object with the result
 					integration = result;
-					
+
 					// Wait briefly before notifying parent to allow animation to be seen
 					setTimeout(() => {
 						onSaved?.({ client: result });
@@ -573,7 +574,7 @@
 	<div class="mb-2 flex items-center justify-between">
 		<div class="flex items-center">
 			<!-- Default indicator star - fixed width container moved to left side -->
-			<div class="w-7 h-7 flex items-center justify-center mr-2">
+			<div class="mr-2 flex h-7 w-7 items-center justify-center">
 				{#if isDefault}
 					<!-- Default client (filled star) -->
 					<div title="Default client" class="text-amber-500">
@@ -583,7 +584,7 @@
 					<!-- Existing integration that can be set as default -->
 					<button
 						title="Set as default client"
-						class="text-amber-500/50 hover:text-amber-500 transition-colors"
+						class="text-amber-500/50 transition-colors hover:text-amber-500"
 						onclick={setAsDefault}
 						disabled={savingInProgress}
 					>
@@ -596,7 +597,7 @@
 					</div>
 				{/if}
 			</div>
-			
+
 			<h4 class="flex items-center text-lg font-bold">
 				{title}
 				{#if saveSuccess}
@@ -618,48 +619,64 @@
 				{/if}
 			</h4>
 		</div>
-		
+
 		<!-- Delete button only for existing integrations -->
 		{#if integration && integration.id}
 			<div class="relative">
 				<button
 					bind:this={deleteButtonRef}
-					class="text-error-500/70 hover:text-error-500 transition-colors rounded-full p-1.5 hover:bg-surface-300-700/20"
+					class="text-error-500/70 hover:text-error-500 hover:bg-surface-300-700/20 rounded-full p-1.5 transition-colors"
 					onclick={toggleDeleteConfirm}
 					title="Delete integration"
 				>
 					<Trash2 size={16} />
 				</button>
-				
+
 				<!-- Delete confirmation popover -->
 				{#if showDeleteConfirm}
-					<div 
-						class="delete-confirmation-popover" 
+					<div
+						class="delete-confirmation-popover"
 						in:fly={{ y: 5, duration: 150 }}
 						out:fade={{ duration: 100 }}
 					>
-						<div class="p-3 max-w-[200px]">
-							<h5 class="text-sm font-semibold mb-2">Delete {title}?</h5>
+						<div class="max-w-[200px] p-3">
+							<h5 class="mb-2 text-sm font-semibold">Delete {title}?</h5>
 							{#if deleteError}
-								<div class="text-error-500 text-xs mb-2">{deleteError}</div>
+								<div class="text-error-500 mb-2 text-xs">{deleteError}</div>
 							{/if}
-							<div class="flex gap-2 mt-3">
-								<button 
-									class="flex-1 bg-error-500 hover:bg-error-600 text-white text-xs py-1.5 px-2 rounded disabled:opacity-50"
+							<div class="mt-3 flex gap-2">
+								<button
+									class="bg-error-500 hover:bg-error-600 flex-1 rounded px-2 py-1.5 text-xs text-white disabled:opacity-50"
 									onclick={deleteClient}
 									disabled={deleteInProgress}
 								>
 									{#if deleteInProgress}
-										<svg class="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										<svg
+											class="h-3 w-3 animate-spin text-white"
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+										>
+											<circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+											></circle>
+											<path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+											></path>
 										</svg>
 									{:else}
 										Delete
 									{/if}
 								</button>
-								<button 
-									class="flex-1 bg-surface-300-700 hover:bg-surface-400-600 text-xs py-1.5 px-2 rounded"
+								<button
+									class="bg-surface-300-700 hover:bg-surface-400-600 flex-1 rounded px-2 py-1.5 text-xs"
 									onclick={toggleDeleteConfirm}
 								>
 									Cancel
@@ -744,7 +761,7 @@
 
 			<!-- Test connection and connection success indicator -->
 			{#if testConnectionSuccess}
-				<div class="flex items-center gap-2 rounded bg-green-500/10 p-2 text-green-500 text-sm">
+				<div class="flex items-center gap-2 rounded bg-green-500/10 p-2 text-sm text-green-500">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
@@ -764,18 +781,45 @@
 
 			<div class="mt-2 flex flex-wrap items-center gap-2">
 				<button
-					class="rounded-md bg-primary-600 hover:bg-primary-700 px-3 py-1.5 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-primary-700 flex items-center gap-1.5 shadow-sm"
+					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 disabled:bg-primary-700 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 					onclick={saveClient}
 					disabled={!formIntegration.isEnabled || savingInProgress}
 				>
 					{#if savingInProgress}
-						<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						<svg
+							class="h-4 w-4 animate-spin text-white"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
 						</svg>
 						<span>Saving...</span>
 					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-save"
+						>
 							<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
 							<polyline points="17 21 17 13 7 13 7 21"></polyline>
 							<polyline points="7 3 7 8 15 8"></polyline>
@@ -785,19 +829,47 @@
 				</button>
 
 				<button
-					class="rounded-md bg-surface-100-900 hover:bg-surface-200-800 border border-surface-300-700 px-3 py-1.5 text-sm font-medium transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
+					class="bg-surface-100-900 hover:bg-surface-200-800 border-surface-300-700 focus:ring-primary-500 flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 					onclick={testConnection}
 					disabled={!formIntegration.isEnabled || testingConnection}
 				>
 					{#if testingConnection}
-						<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						<svg
+							class="h-4 w-4 animate-spin"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
 						</svg>
 						<span>Testing...</span>
 					{:else}
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plug-zap">
-							<path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-plug-zap"
+						>
+							<path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"
+							></path>
 							<path d="m2 22 3-3"></path>
 							<path d="M7.5 13.5 10 11"></path>
 							<path d="M10.5 16.5 13 14"></path>
@@ -813,8 +885,18 @@
 				</button>
 
 				{#if saveSuccess}
-					<span class="text-success-500 text-sm flex items-center gap-1" transition:fade>
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<span class="text-success-500 flex items-center gap-1 text-sm" transition:fade>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
 							<path d="M20 6L9 17l-5-5"></path>
 						</svg>
 						<span>Saved</span>
@@ -839,9 +921,10 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		overflow: hidden;
 	}
-	
+
 	/* Ensure popover appears on top */
 	.relative {
 		position: relative;
 	}
 </style>
+

@@ -151,7 +151,7 @@
 				href="https://github.com/{githubUsername}"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="hover:bg-surface-200-800 flex w-full items-center gap-2 rounded rounded-lg p-2"
+				class="hover:bg-surface-200-800 flex w-full items-center gap-2 rounded-lg p-2"
 			>
 				<svg
 					class="h-5 w-5"
@@ -176,7 +176,7 @@
 					href="https://github.com/{githubUsername}"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="hover:bg-surface-200-800 flex items-center gap-2 rounded rounded-lg p-2"
+					class="hover:bg-surface-200-800 flex items-center gap-2 rounded-lg p-2"
 				>
 					<svg
 						class="h-5 w-5"
@@ -191,75 +191,9 @@
 					<span>GitHub Profile</span>
 				</a>
 			{/if}
-
-			<!-- Logout -->
-			<!-- <div -->
-			<!-- 	class="text-error-500 hover:bg-surface-300-600-token rounded-token flex items-center gap-2 p-2" -->
-			<!-- > -->
-			<!-- 	<svg -->
-			<!-- 		class="h-5 w-5" -->
-			<!-- 		fill="none" -->
-			<!-- 		stroke="currentColor" -->
-			<!-- 		viewBox="0 0 24 24" -->
-			<!-- 		xmlns="http://www.w3.org/2000/svg" -->
-			<!-- 	> -->
-			<!-- 		<path -->
-			<!-- 			stroke-linecap="round" -->
-			<!-- 			stroke-linejoin="round" -->
-			<!-- 			stroke-width="2" -->
-			<!-- 			d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" -->
-			<!-- 		></path> -->
-			<!-- 	</svg> -->
-			<!-- 	<span>Log Out</span> -->
-			<!-- </div> -->
 		</article>
 	{/snippet}
 </Popover>
 
 <style>
-	/* Toggle switch styling */
-	/* .toggle { */
-	/* 	position: relative; */
-	/* 	display: inline-block; */
-	/* 	width: 48px; */
-	/* 	height: 24px; */
-	/* } */
-	/**/
-	/* .toggle input { */
-	/* 	opacity: 0; */
-	/* 	width: 0; */
-	/* 	height: 0; */
-	/* } */
-	/**/
-	/* .toggle-slider { */
-	/* 	position: absolute; */
-	/* 	cursor: pointer; */
-	/* 	top: 0; */
-	/* 	left: 0; */
-	/* 	right: 0; */
-	/* 	bottom: 0; */
-	/* 	background-color: var(--color-surface-400); */
-	/* 	transition: 0.4s; */
-	/* 	border-radius: 34px; */
-	/* } */
-	/**/
-	/* .toggle-slider:before { */
-	/* 	position: absolute; */
-	/* 	content: ''; */
-	/* 	height: 16px; */
-	/* 	width: 16px; */
-	/* 	left: 4px; */
-	/* 	bottom: 4px; */
-	/* 	background-color: white; */
-	/* 	transition: 0.4s; */
-	/* 	border-radius: 50%; */
-	/* } */
-	/**/
-	/* input:checked + .toggle-slider { */
-	/* 	background-color: var(--color-primary-500); */
-	/* } */
-	/**/
-	/* input:checked + .toggle-slider:before { */
-	/* 	transform: translateX(24px); */
-	/* } */
 </style>

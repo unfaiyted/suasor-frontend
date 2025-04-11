@@ -1,20 +1,17 @@
 <script lang="ts">
-	import {
-		User,
-		Server,
-		Database,
-		Shield,
-		Film,
-		Radio,
-		Settings,
-		ChevronDown
-	} from '@lucide/svelte';
+	import { ChevronDown } from '@lucide/svelte';
 	import { onMount } from 'svelte';
-	import IntegrationsTabPanel from './IntegrationsTabPanel.svelte';
 	import type { UserResponse } from '$lib/api/types';
 
+	interface Tab {
+		id: string;
+		label: string;
+		icon: any;
+		adminOnly?: boolean;
+	}
+
 	interface SettingsTabProps {
-		tabs: [];
+		tabs: Tab[];
 		activeTab: string;
 		switchTab: (tabId: string) => void;
 		user: UserResponse;
@@ -38,14 +35,12 @@
 		isDropdownOpen = false;
 	}
 
-	import { goto } from '$app/navigation';
-	
 	// Handle tab selection
-	function handleTabSelect(tab) {
+	function handleTabSelect(tab: Tab) {
 		switchTab(tab.id);
 		activeTabObject = tab;
 		isDropdownOpen = false;
-		
+
 		// Update URL to match the selected tab without causing a page reload
 		if (tab.id === 'user') {
 			history.pushState({}, '', '/settings');
@@ -92,7 +87,7 @@
 <div class="settings-dropdown relative mb-6 md:hidden">
 	<button
 		class="bg-surface-200-800 flex w-full items-center justify-between rounded-md border border-slate-500 px-4 py-3 text-left shadow-sm"
-		on:click={toggleDropdown}
+		onclick={toggleDropdown}
 		aria-haspopup="true"
 		aria-expanded={isDropdownOpen}
 	>
@@ -113,16 +108,16 @@
 	{#if isDropdownOpen}
 		<div
 			class="bg-surface-200-800 absolute right-0 left-0 z-10 mt-1 overflow-hidden rounded-md border border-slate-600 shadow-lg"
-			on:click={closeDropdown}
+			onclick={closeDropdown}
 		>
 			{#each tabs as tab}
-				{#if !tab.adminOnly || (tab.adminOnly && user.isAdmin)}
+				{#if !tab.adminOnly || (tab.adminOnly && user.role === 'admin')}
 					<button
 						class="flex w-full items-center gap-2 px-4 py-3 text-left transition-colors {activeTab ===
 						tab.id
 							? 'bg-primary-500 bg-opacity-10 text-primary-500'
 							: 'hover:bg-surface-300-700'}"
-						on:click={() => handleTabSelect(tab)}
+						onclick={() => handleTabSelect(tab)}
 						aria-selected={activeTab === tab.id}
 					>
 						<svelte:component this={tab.icon} size={18} />
@@ -138,7 +133,7 @@
 <div class="scrollbar-hide mb-6 hidden scroll-m-0 overflow-x-auto md:block">
 	<div class="flex border-b border-slate-500">
 		{#each tabs as tab}
-			{#if !tab.adminOnly || (tab.adminOnly && user.isAdmin)}
+			{#if !tab.adminOnly || (tab.adminOnly && user.role === 'admin')}
 				<button
 					class="
 						mx-2 mb-2 flex items-center gap-2 rounded-md border-b-2 border-transparent px-4 py-2 transition-all duration-200 first:ml-0
@@ -146,10 +141,10 @@
 						? 'text-primary-500 !border-primary-500 -mb-px border-b-2  font-medium'
 						: ' text-gray-400 hover:bg-slate-800 hover:text-gray-200'}
 					"
-					on:click={() => handleTabSelect(tab)}
+					onclick={() => handleTabSelect(tab)}
 					aria-selected={activeTab === tab.id}
 				>
-					<svelte:component this={tab.icon} size={18} />
+					<tab.icon size={18} />
 					<span class="whitespace-nowrap">{tab.label}</span>
 				</button>
 			{/if}

@@ -9,12 +9,7 @@
 		isLoading?: boolean;
 	};
 
-	const {
-		onSave,
-		isLoading = false,
-		// clientsByType used in the template
-		clientsByType = {}
-	}: AutomationPanelProps = $props();
+	const { onSave, isLoading = false }: AutomationPanelProps = $props();
 
 	// Define the automation integrations
 	const automationIntegrations = [

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IntegrationCard from './IntegrationCard.svelte';
-	import { TypesClientType, TypesMediaClientType } from '$lib/api/suasor.v1.d';
+	import { TypesClientType } from '$lib/api/suasor.v1.d';
 	import type { ClientResponse, UserConfig } from '$lib/api/types';
 	import IconPlus from '../icons/IconPlus.svelte';
 	import { configApi } from '$lib/stores/config';
@@ -9,7 +9,7 @@
 	type IntegrationSectionProps = {
 		title: string;
 		urlPlaceholder: string;
-		clientType: TypesClientType | TypesMediaClientType;
+		clientType: TypesClientType;
 		integrations: ClientResponse[];
 		onSave?: (event: { client: Record<string, any> }) => void;
 		onError?: (event: { message: string }) => void;
@@ -27,7 +27,7 @@
 	// Array to hold additional integrations of the same type
 	let additionalIntegrations = $state<ClientResponse[]>(integrations.slice(1));
 	let mainIntegration = $state<ClientResponse>(integrations[0]);
-	
+
 	// Track default clients
 	let userConfig = $state<UserConfig | null>(null);
 	let defaultClientIds = $state<Record<string, number>>({});
@@ -44,7 +44,7 @@
 		[TypesClientType.ClientTypeClaude]: '/claude-ai.svg',
 		[TypesClientType.ClientTypeOpenAI]: '/openai.svg',
 		[TypesClientType.ClientTypeOllama]: '/ollama.svg',
-		[TypesClientType.ClientTypeSpotify]: '/spotify.svg',
+		// [TypesClientType.ClientTypeSpotify]: '/spotify.svg',
 		[TypesClientType.ClientTypeTrakt]: '/trakt.svg'
 	};
 
@@ -66,17 +66,27 @@
 		const clientTypeStr = client.clientType?.toString().toLowerCase();
 
 		// Check by media type
-		if (clientTypeStr.includes('emby') || clientTypeStr.includes('jellyfin') || clientTypeStr.includes('plex')) {
+		if (
+			clientTypeStr &&
+			(clientTypeStr.includes('emby') ||
+				clientTypeStr.includes('jellyfin') ||
+				clientTypeStr.includes('plex'))
+		) {
 			if (userConfig.defaultVideoClientID === client.id) return true;
 		} else if (clientTypeStr.includes('subsonic')) {
 			if (userConfig.defaultMusicClientID === client.id) return true;
 		} else if (clientTypeStr.includes('sonarr')) {
-			if (userConfig.defaultTVShowClientID === client.id) return true; 
+			if (userConfig.defaultTVShowClientID === client.id) return true;
 		} else if (clientTypeStr.includes('radarr')) {
 			if (userConfig.defaultMovieClientID === client.id) return true;
 		} else if (clientTypeStr.includes('lidarr')) {
 			if (userConfig.defaultMusicClientID === client.id) return true;
-		} else if (clientTypeStr.includes('claude') || clientTypeStr.includes('openai') || clientTypeStr.includes('ollama')) {
+		} else if (
+			clientTypeStr &&
+			(clientTypeStr.includes('claude') ||
+				clientTypeStr.includes('openai') ||
+				clientTypeStr.includes('ollama'))
+		) {
 			if (userConfig.defaultAIClientID === client.id) return true;
 		}
 
@@ -91,12 +101,16 @@
 		if (client.id && userConfig) {
 			// Create a temporary updated config to reflect the change in UI
 			const tempConfig = { ...userConfig };
-			
+
 			// Different handling for media clients vs others
 			const clientTypeStr = client.clientType?.toString().toLowerCase();
-			
+
 			// Update tempConfig based on client type
-			if (clientTypeStr?.includes('emby') || clientTypeStr?.includes('jellyfin') || clientTypeStr?.includes('plex')) {
+			if (
+				clientTypeStr?.includes('emby') ||
+				clientTypeStr?.includes('jellyfin') ||
+				clientTypeStr?.includes('plex')
+			) {
 				tempConfig.defaultVideoClientID = client.id;
 			} else if (clientTypeStr?.includes('subsonic')) {
 				tempConfig.defaultMusicClientID = client.id;
@@ -106,21 +120,25 @@
 				tempConfig.defaultMovieClientID = client.id;
 			} else if (clientTypeStr?.includes('lidarr')) {
 				tempConfig.defaultMusicClientID = client.id;
-			} else if (clientTypeStr?.includes('claude') || clientTypeStr?.includes('openai') || clientTypeStr?.includes('ollama')) {
+			} else if (
+				clientTypeStr?.includes('claude') ||
+				clientTypeStr?.includes('openai') ||
+				clientTypeStr?.includes('ollama')
+			) {
 				tempConfig.defaultAIClientID = client.id;
 			}
-			
+
 			// Set specific client type as default
 			const clientTypeKey = `default${client.clientType}ClientID` as keyof UserConfig;
 			tempConfig[clientTypeKey] = client.id;
-			
+
 			// Update the state immediately
 			userConfig = tempConfig;
 		}
-		
+
 		// Notify the parent component
 		onSave?.({ client: { ...client, isDefault: true } });
-		
+
 		// Wait a bit then refresh from server to ensure we have the correct state
 		setTimeout(() => {
 			loadUserConfig();
@@ -165,8 +183,7 @@
 			const { clientsApi } = await import('$lib/stores/api');
 
 			const removeClientType =
-				mainIntegration?.clientType?.toString().toLowerCase() ||
-				TypesClientType.ClientTypeUnknown;
+				mainIntegration?.clientType?.toString().toLowerCase() || TypesClientType.ClientTypeUnknown;
 
 			try {
 				// Call the API to delete the integration
@@ -248,7 +265,7 @@
 		if (event.client.isDefault) {
 			loadUserConfig();
 		}
-		
+
 		onSave?.(event);
 	}
 
@@ -288,20 +305,20 @@
 			<div class="relative">
 				<IntegrationCard
 					title={i === 0 ? title : `${title} ${i + 1}`}
-					integration={integration}
+					{integration}
 					{urlPlaceholder}
 					{clientType}
 					isDefault={isDefaultClient(integration)}
 					onSetDefault={(client) => handleSetDefault(client)}
 					onSaved={(client) => handleSaved(client)}
 					onError={(client) => handleError(client)}
-						onDeleted={(event) => {
-							if (i === 0) {
-								removeMainIntegration();
-							} else {
-								removeIntegration(i - 1);
-							}
-						}}
+					onDeleted={(event) => {
+						if (i === 0) {
+							removeMainIntegration();
+						} else {
+							removeIntegration(i - 1);
+						}
+					}}
 				/>
 
 				<!-- Remove button (for all integrations) -->
@@ -309,7 +326,7 @@
 					class="btn btn-sm btn-error btn-icon absolute top-2 right-2 hidden"
 					title="Remove integration"
 					aria-label="Remove integration"
-					onclick={() => i === 0 ? removeMainIntegration() : removeIntegration(i - 1)}
+					onclick={() => (i === 0 ? removeMainIntegration() : removeIntegration(i - 1))}
 				>
 					×
 				</button>
@@ -317,3 +334,4 @@
 		{/each}
 	</div>
 </div>
+

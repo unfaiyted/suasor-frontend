@@ -2,17 +2,13 @@
 	import CardHeader from '../util/CardHeader.svelte';
 	import SaveButton from '../util/SaveButton.svelte';
 
-	const {
-		serverSettings,
-		onSave,
-		isLoading = false
-	} = $props();
+	const { serverSettings, onSave, isLoading = false } = $props();
 </script>
 
 <CardHeader title="Server Settings" subtitle="Configure server behavior (admin only)" />
 
 <div class="card-body py-4">
-	<form on:submit|preventDefault={() => onSave(serverSettings)} class="space-y-4">
+	<form onsubmit={() => onSave(serverSettings)} class="space-y-4">
 		<!-- Concurrent Jobs -->
 		<div class="form-control">
 			<label class="label">

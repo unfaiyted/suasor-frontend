@@ -5,12 +5,12 @@
 	import IntegrationSection from './IntegrationSection.svelte';
 	import { clientsApi, clientsByTypeMap } from '$lib/stores/api';
 	import type { ClientResponse } from '$lib/api/types';
-	import type { TypesClientType, TypesMediaClientType } from '$lib/api/suasor.v1.d';
+	import type { TypesClientType } from '$lib/api/suasor.v1.d';
 
 	// Integration definition for the panel
 	export interface Integration {
 		title: string;
-		clientType: string;
+		clientType: TypesClientType;
 		urlPlaceholder: string;
 		keyType?: 'apiKey' | 'token' | 'password' | 'none';
 		keyLabel?: string;
@@ -83,10 +83,7 @@
 	});
 
 	// Event handlers for integration cards
-	function handleClientSaved(
-		event: CustomEvent<{ client: Record<string, any> }> | { client: Record<string, any> }
-	) {
-		const { client } = 'detail' in event ? event.detail : event;
+	function handleClientSaved(client: Record<string, any>) {
 		// We don't need to set global success message anymore as each card has its own status
 
 		// Refresh the data in case other components don't update
@@ -139,7 +136,7 @@
 
 		{#if localError && localError.includes('Failed to load')}
 			<div class="my-4 flex justify-center">
-				<button class="btn btn-primary" on:click={retryLoading}>Retry Loading</button>
+				<button class="btn btn-primary" onclick={retryLoading}>Retry Loading</button>
 			</div>
 		{:else}
 			<div>
@@ -149,8 +146,6 @@
 						integrations={clientsByType[integration.clientType] || []}
 						urlPlaceholder={integration.urlPlaceholder}
 						clientType={integration.clientType}
-						keyType={integration.keyType || 'apiKey'}
-						keyLabel={integration.keyLabel || 'API Key'}
 						onSave={handleClientSaved}
 						onError={handleClientError}
 					/>

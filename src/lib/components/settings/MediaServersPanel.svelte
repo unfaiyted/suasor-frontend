@@ -5,7 +5,7 @@
 
 	type MediaServersPanelProps = {
 		onSave?: (config: Record<string, ClientResponse[]>) => void;
-		clientsByType?: Record<string, ClientResponse[]>;
+		clientsByType: Record<string, ClientResponse[]>;
 		isLoading?: boolean;
 	};
 

@@ -2,17 +2,13 @@
 	import CardHeader from '../util/CardHeader.svelte';
 	import SaveButton from '../util/SaveButton.svelte';
 
-	const {
-		siteSettings,
-		onSave,
-		isLoading = false
-	} = $props();
+	const { siteSettings, onSave, isLoading = false } = $props();
 </script>
 
 <CardHeader title="Site Configuration" subtitle="Manage global site settings (admin only)" />
 
 <div class="card-body py-4">
-	<form on:submit|preventDefault={() => onSave(siteSettings)} class="space-y-4">
+	<form onsubmit={() => onSave(siteSettings)} class="space-y-4">
 		<!-- Site Name -->
 		<div class="form-control">
 			<label class="label">
