@@ -52,6 +52,47 @@ export {
   mediaItemError
 } from './mediaItem';
 
+// Person and Credits store
+export {
+  default as personApi,
+  people,
+  selectedPerson,
+  selectedPersonCredits,
+  personLoading,
+  personError,
+  getMediaItemCredits,
+  getMediaItemCreditsByRole,
+  getMediaItemCast,
+  getMediaItemCrew,
+  getMediaItemCrewByDepartment,
+  getMediaItemDirectors
+} from './personStore';
+
+// Playlist store
+export {
+  default as playlistApi,
+  playlists,
+  selectedPlaylist,
+  selectedPlaylistItems,
+  isReorderingPlaylist,
+  playlistLoading,
+  playlistError,
+  getPlaylistItems
+} from './playlistStore';
+
+// Search store
+export {
+  default as searchApi,
+  searchResults,
+  allSearchResults,
+  searchState,
+  searchQuery,
+  searchFilters,
+  recentSearches,
+  suggestedSearches,
+  selectedResult
+} from './search';
+
 // Other stores
 export { default as chatStore } from './chat';
 export { default as conversationStore } from './conversation';
