@@ -82,11 +82,50 @@ bun run test
 suasor-frontend/
 ├── src/
 │   ├── lib/           # Shared components and utilities
+│   │   ├── api/       # API services and types
+│   │   ├── components/# Reusable components
+│   │   └── stores/    # Svelte stores for state management
 │   ├── routes/        # SvelteKit routes and pages
-│   └── stores/        # Svelte stores for state management
 ├── static/           # Static assets
 ├── tests/           # Test files
 └── ... configuration files
+```
+
+### API Organization
+
+The API integration is organized into service-specific files to make it more manageable:
+
+- `src/lib/api/client.ts` - Base HTTP client and authentication functions
+- `src/lib/api/types.ts` - Central export of all types (re-exports from service files for compatibility)
+- `src/lib/api/index.ts` - Exports all services and types
+
+Service-specific files:
+- `src/lib/api/authService.ts` - Authentication and user management
+- `src/lib/api/mediaService.ts` - Media item operations
+- `src/lib/api/personService.ts` - People and credits
+- `src/lib/api/clientService.ts` - Client integrations
+- `src/lib/api/configService.ts` - Configuration operations
+- `src/lib/api/searchService.ts` - Search functionality
+- `src/lib/api/jobService.ts` - Job scheduling and management
+
+#### Usage
+
+To use the services in your components:
+
+```typescript
+import { mediaService, personService } from '$lib/api';
+
+// Media operations
+const movies = await mediaService.getAllMovies();
+
+// Person operations
+const people = await personService.getAllPeople();
+```
+
+To import types:
+
+```typescript
+import type { Movie, Person, User } from '$lib/api';
 ```
 
 ## 🔧 Configuration

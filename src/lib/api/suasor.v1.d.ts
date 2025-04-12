@@ -6973,6 +6973,463 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recommendations for the current user
+         * @description Retrieves a list of recommendations for the authenticated user
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filter by media type (movie, series, music) */
+                    mediaType?: string;
+                    /** @description Number of recommendations to return (default: 20) */
+                    limit?: number;
+                    /** @description Offset for pagination (default: 0) */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recommendations retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_RecommendationsListResponse"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recommendations/rate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rate a recommendation
+         * @description Sets a user rating for a specific recommendation
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Recommendation ID and rating */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.RateRecommendationRequest"];
+                };
+            };
+            responses: {
+                /** @description Recommendation rated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Recommendation not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recommendations/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recent recommendations for the current user
+         * @description Retrieves a list of recently created recommendations for the authenticated user
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Number of days to look back (default: 7) */
+                    days?: number;
+                    /** @description Filter by media type (movie, series, music) */
+                    mediaType?: string;
+                    /** @description Number of recommendations to return (default: 20) */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recent recommendations retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_RecommendationsListResponse"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recommendations/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get top-scored recommendations for the current user
+         * @description Retrieves a list of top-scored recommendations for the authenticated user
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Minimum score (0-1) for recommendations (default: 0.7) */
+                    minScore?: string;
+                    /** @description Filter by media type (movie, series, music) */
+                    mediaType?: string;
+                    /** @description Number of recommendations to return (default: 20) */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Top recommendations retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_RecommendationsListResponse"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recommendations/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a recommendation as viewed
+         * @description Marks a specific recommendation as viewed for the authenticated user
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Recommendation ID to mark as viewed */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["requests.MarkRecommendationAsViewedRequest"];
+                };
+            };
+            responses: {
+                /** @description Recommendation marked as viewed successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Recommendation not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/recommendations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a specific recommendation by ID
+         * @description Retrieves a specific recommendation by its ID for the authenticated user
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Recommendation ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recommendation retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-responses_RecommendationResponse"];
+                    };
+                };
+                /** @description Invalid recommendation ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Recommendation not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-responses_ErrorDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/series/actor/{actor}": {
         parameters: {
             query?: never;
@@ -8318,6 +8775,16 @@ export interface components {
     schemas: {
         /** @enum {string} */
         "errors.ErrorType": ErrorsErrorType;
+        "models.AIModelPreferences": {
+            /** @example 4000 */
+            defaultMaxTokens?: number;
+            /** @example claude-3-opus-20240229 */
+            defaultModelForChat?: string;
+            /** @example claude-3-opus-20240229 */
+            defaultModelForRecommendations?: string;
+            /** @example 0.7 */
+            defaultTemperature?: number;
+        };
         "models.Award": {
             category?: string;
             isWinner?: boolean;
@@ -8425,6 +8892,9 @@ export interface components {
             id?: string;
             /** @description e.g., "tmdb", "imdb", "trakt", "tvdb" */
             source?: string;
+        };
+        "models.ExternalIDMap": {
+            [key: string]: string;
         };
         "models.ExternalLink": {
             name?: string;
@@ -8710,39 +9180,53 @@ export interface components {
             /** @example true */
             showWatchHistory?: boolean;
         };
+        /** @description Media recommendation stored in the database */
         "models.Recommendation": {
             /** @description Whether this is an active recommendation */
             active?: boolean;
+            /** @description AI model used if recommendedBy="AI" */
+            aiModel?: string;
             /** @description Confidence score (0.0 to 1.0) if available */
             confidence?: number;
             createdAt?: string;
             deletedAt?: string;
             /** @description Whether this item has been dismissed by the user */
             dismissed?: boolean;
+            /** @description When this recommendation expires */
+            expiresAt?: string;
+            externalIds?: components["schemas"]["models.ExternalIDMap"];
+            genres?: string[];
             id?: number;
             /** @description Whether this item is present in the user's library */
             inLibrary?: boolean;
+            /** @description Whether user has viewed this item */
+            isViewed?: boolean;
             /** @description Job run that created this recommendation */
             jobRunId?: number;
-            /** @description ID of the media item being recommended */
+            matchesActors?: string[];
+            matchesDirectors?: string[];
+            matchesGenres?: string[];
             mediaItemId?: number;
-            /** @description Type of media being recommended (movie, series, etc.) */
-            mediaType?: string;
+            /** @description "movie", "series", "music" */
+            mediaType?: components["schemas"]["types.MediaType"];
             /** @description Additional metadata (stored as JSON) */
             metadata?: string;
-            /** @description Explanation of why this was recommended */
-            reason?: string;
+            reasoning?: string;
+            /** @description "AI", "popular", "similar_users" */
+            recommendedBy?: string;
+            similarItems?: string[];
             /** @description Source of the recommendation (AI, system, manual) */
             source?: components["schemas"]["models.RecommendationSource"];
             /** @description ID of the client that generated this recommendation, if applicable */
             sourceClientId?: number;
             /** @description Type of the client that generated this recommendation */
             sourceClientType?: string;
+            title?: string;
             updatedAt?: string;
-            /** @description ID of the user receiving this recommendation */
             userId?: number;
-            /** @description Whether this item has been viewed/played by the user */
-            viewed?: boolean;
+            /** @description If user has rated this recommendation */
+            userRating?: number;
+            year?: number;
         };
         /** @enum {string} */
         "models.RecommendationSource": ModelsRecommendationSource;
@@ -8773,6 +9257,8 @@ export interface components {
              * @enum {string}
              */
             aiChatPersonality?: ModelsUserConfigAiChatPersonality;
+            /** @description AI Model Preferences */
+            aiModelPreferences?: components["schemas"]["models.AIModelPreferences"];
             /**
              * @description Profile settings
              * @example I'm a developer
@@ -9295,6 +9781,10 @@ export interface components {
              *     @Description JWT refresh token to invalidate */
             refreshToken: string;
         };
+        "requests.MarkRecommendationAsViewedRequest": {
+            /** @example 123 */
+            recommendationId: number;
+        };
         /** @description Request payload for updating user profile */
         "requests.ProfileRequest": {
             /**
@@ -9318,6 +9808,12 @@ export interface components {
              * @example newusername
              */
             username?: string;
+        };
+        "requests.RateRecommendationRequest": {
+            /** @example 4.5 */
+            rating: number;
+            /** @example 123 */
+            recommendationId: number;
         };
         /** @description Request payload for refreshing access tokens */
         "requests.RefreshTokenRequest": {
@@ -9761,6 +10257,20 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-responses_RecommendationResponse": {
+            data?: components["schemas"]["responses.RecommendationResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-responses_RecommendationsListResponse": {
+            data?: components["schemas"]["responses.RecommendationsListResponse"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-responses_TestConnectionResponse": {
             data?: components["schemas"]["responses.TestConnectionResponse"];
             /** @example Operation successful */
@@ -9946,6 +10456,34 @@ export interface components {
             id?: number;
             type?: components["schemas"]["types.MediaType"];
             updatedAt?: string;
+        };
+        "responses.RecommendationResponse": {
+            aiModel?: string;
+            createdAt?: string;
+            externalIds?: {
+                [key: string]: string;
+            };
+            genres?: string[];
+            id?: number;
+            isViewed?: boolean;
+            matchesActors?: string[];
+            matchesDirectors?: string[];
+            matchesGenres?: string[];
+            mediaType?: components["schemas"]["types.MediaType"];
+            reasoning?: string;
+            recommendedBy?: string;
+            score?: number;
+            similarItems?: string[];
+            title?: string;
+            userRating?: number;
+            year?: number;
+        };
+        "responses.RecommendationsListResponse": {
+            limit?: number;
+            mediaType?: string;
+            offset?: number;
+            recommendations?: components["schemas"]["responses.RecommendationResponse"][];
+            total?: number;
         };
         "responses.TestConnectionResponse": {
             message?: string;
