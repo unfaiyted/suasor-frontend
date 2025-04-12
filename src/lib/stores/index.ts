@@ -34,6 +34,24 @@ export {
 // Media store
 export { default as mediaStore } from './mediaStore';
 
+// Media Item store
+export { 
+  default as mediaItemApi,
+  albums,
+  artists,
+  tracks,
+  movies,
+  series,
+  recentAlbums,
+  recentArtists,
+  recentTracks,
+  recentMovies,
+  recentSeries,
+  selectedMediaItem,
+  mediaItemLoading,
+  mediaItemError
+} from './mediaItem';
+
 // Other stores
 export { default as chatStore } from './chat';
 export { default as conversationStore } from './conversation';

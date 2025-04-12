@@ -18,7 +18,11 @@ export const jobService = {
 	},
 
 	getJobScheduleByName: async (name: string): Promise<JobSchedule | null> => {
-		const response = await GET(`/jobs/schedules/${name}`);
+		const response = await GET(`/jobs/schedules/{name}`, {
+			params: {
+				path: { name }
+			}
+		});
 		return response.data?.data || null;
 	},
 
@@ -50,7 +54,11 @@ export const jobService = {
 	},
 
 	getJobRunProgress: async (id: number): Promise<JobRun | null> => {
-		const response = await GET(`/jobs/runs/${id}/progress`);
+		const response = await GET(`/jobs/runs/{id}/progress`, {
+			params: {
+				path: { id }
+			}
+		});
 		return response.data?.data || null;
 	},
 
@@ -60,7 +68,11 @@ export const jobService = {
 	},
 
 	runJobManually: async (name: string): Promise<void> => {
-		await POST(`/jobs/${name}/run`);
+		await POST(`/jobs/{name}/run`, {
+			params: {
+				path: { name }
+			}
+		});
 	},
 
 	// Media Sync Jobs
