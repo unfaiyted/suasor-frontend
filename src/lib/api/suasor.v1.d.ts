@@ -4303,6 +4303,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/favorites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's favorite media items
+         * @description Get all media items marked as favorites by a user
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Media type filter (movie, series, episode, track, etc.) */
+                    type?: string;
+                    /** @description Number of items to return (default 10) */
+                    limit?: number;
+                    /** @description Number of items to skip (default 0) */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved favorites */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -4346,6 +4421,1536 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's media play history
+         * @description Get a user's media play history with optional filtering
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Number of items to return (default 10) */
+                    limit?: number;
+                    /** @description Number of items to skip (default 0) */
+                    offset?: number;
+                    /** @description Media type filter (movie, series, episode, track, etc.) */
+                    type?: string;
+                    /** @description Filter by completion status */
+                    completed?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved play history */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Record a media play event
+         * @description Record a new play event for a media item
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Media play information */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["models.MediaPlayHistoryRequest"];
+                };
+            };
+            responses: {
+                /** @description Play event recorded successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Clear a user's play history
+         * @description Delete all play history entries for a user
+         */
+        delete: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Media type filter (movie, series, episode, track, etc.) */
+                    type?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description History cleared successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/continue-watching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's continue watching list
+         * @description Get media items that a user has started but not completed
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Number of items to return (default 10) */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved continue watching items */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/media/{mediaItemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get play history for a specific media item
+         * @description Get play history entries for a specific media item
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Media Item ID */
+                    mediaItemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved play history for media item */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/media/{mediaItemId}/favorite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Toggle favorite status for a media item
+         * @description Mark or unmark a media item as a favorite
+         */
+        put: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Favorite status */
+                    favorite: boolean;
+                };
+                header?: never;
+                path: {
+                    /** @description Media Item ID */
+                    mediaItemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Favorite status updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/media/{mediaItemId}/rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update user rating for a media item
+         * @description Set a user's rating for a media item
+         */
+        put: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description User rating (0-10) */
+                    rating: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Media Item ID */
+                    mediaItemId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Rating updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/history/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a specific media play history entry
+         * @description Get a specific media play history entry by ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description History ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved play history entry */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Delete a play history entry
+         * @description Delete a specific play history entry by ID
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description History ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description History entry deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaPlayHistory-any"];
+                    };
+                };
+                /** @description Bad request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new media item
+         * @description Creates a new media item in the database
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Media item data with type, client info, and type-specific data */
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description Media item created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all media items
+         * @description Retrieves all media items with optional filtering
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/client/{clientId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media items by client
+         * @description Retrieves all media items for a specific client
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Media type filter */
+                    type?: string;
+                };
+                header?: never;
+                path: {
+                    /** @description Client ID */
+                    clientId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid client ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Not implemented */
+                501: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/external/{source}/{externalId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a media item by external source ID
+         * @description Retrieves a media item using its external source ID (e.g., TMDB ID)
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description External source name (e.g., tmdb, imdb) */
+                    source: string;
+                    /** @description External ID from the source */
+                    externalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media item retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Media item not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/genre/{genre}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media items by genre
+         * @description Retrieves media items that belong to a specific genre
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Genre name */
+                    genre: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/person/{personId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media items by person
+         * @description Retrieves media items associated with a specific person (actor, director, etc.)
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Role filter (actor, director, etc.) */
+                    role?: string;
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Person ID */
+                    personId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Not implemented */
+                501: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/popular": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get popular media items
+         * @description Retrieves popular media items based on play counts, ratings, etc.
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Popular media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recently added media items
+         * @description Retrieves recently added media items for a user
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                    /** @description Media type filter */
+                    type?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recent media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search for media items
+         * @description Searches for media items by title or other criteria
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    q: string;
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Media type filter */
+                    type?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/top-rated": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get top rated media items
+         * @description Retrieves media items with the highest ratings
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Top rated media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/year/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media items by release year
+         * @description Retrieves media items released in a specific year
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description User ID */
+                    userId: number;
+                    /** @description Maximum number of items to return */
+                    limit?: number;
+                };
+                header?: never;
+                path: {
+                    /** @description Release year */
+                    year: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media items retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-array_models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/item/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a media item by ID
+         * @description Retrieves a media item from the database by its ID
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Media item ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media item retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid media item ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Media item not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        /**
+         * Update an existing media item
+         * @description Updates a media item in the database by ID
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Media item ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description Media item data to update */
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description Media item updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-models_MediaItem-any"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Media item not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Delete a media item
+         * @description Deletes a media item from the database by ID
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Media item ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Media item deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.APIResponse-any"];
+                    };
+                };
+                /** @description Invalid media item ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -7430,6 +9035,254 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search for content across all sources
+         * @description Searches for content in the database, media clients, and metadata sources
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Search query */
+                    query: string;
+                    /** @description Limit search to specific media type (movie, series, music, person) */
+                    mediaType?: string;
+                    /** @description Maximum number of results */
+                    limit?: number;
+                    /** @description Offset for pagination */
+                    offset?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.SearchResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get recent searches for the current user
+         * @description Returns a list of the user's recent searches
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Maximum number of results */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.RecentSearchesResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get search suggestions
+         * @description Returns suggestions based on partial search input
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Partial search query */
+                    q: string;
+                    /** @description Maximum number of suggestions */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.SearchSuggestionsResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search/trending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get trending searches across all users
+         * @description Returns a list of popular searches across the platform
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Maximum number of results */
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.TrendingSearchesResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+                /** @description Internal Server Error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["responses.ErrorResponse-any"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/series/actor/{actor}": {
         parameters: {
             query?: never;
@@ -9006,6 +10859,25 @@ export interface components {
             /** @example 20 */
             series?: number;
         };
+        "models.MediaItem-any": {
+            /** @description Client IDs for this item (mapping client to their IDs) */
+            clientIds?: components["schemas"]["models.ClientID"][];
+            createdAt?: string;
+            /** @description Type-specific media data */
+            data?: unknown;
+            downloadUrl?: string;
+            /** @description External IDs for this item (TMDB, IMDB, etc.) */
+            externalIds?: components["schemas"]["models.ExternalID"][];
+            /** @description Internal ID */
+            id?: number;
+            releaseDate?: string;
+            releaseYear?: number;
+            streamUrl?: string;
+            title?: string;
+            /** @description Type of media (movie, show, episode, etc.) */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
+        };
         "models.MediaItem-suasor_client_media_types_Movie": {
             /** @description Client IDs for this item (mapping client to their IDs) */
             clientIds?: components["schemas"]["models.ClientID"][];
@@ -9119,6 +10991,42 @@ export interface components {
             /** @description Type of media (movie, show, episode, etc.) */
             type?: components["schemas"]["types.MediaType"];
             updatedAt?: string;
+        };
+        "models.MediaPlayHistory-any": {
+            completed?: boolean;
+            createdAt?: string;
+            durationSeconds?: number;
+            id?: number;
+            isDisliked?: boolean;
+            isFavorite?: boolean;
+            /** @description Not stored in DB, loaded via relationship */
+            item?: components["schemas"]["models.MediaItem-any"];
+            lastPlayedAt?: string;
+            /** @description Foreign key to MediaItem */
+            mediaItemId?: number;
+            playCount?: number;
+            playedAt?: string;
+            playedPercentage?: number;
+            positionSeconds?: number;
+            /** @description "movie", "episode", "show", "season" */
+            type?: components["schemas"]["types.MediaType"];
+            updatedAt?: string;
+            /** @description Foreign key to User */
+            userId?: number;
+            userRating?: number;
+        };
+        "models.MediaPlayHistoryRequest": {
+            completed?: boolean;
+            /** @description If this is a continuation of a previous play */
+            continued?: boolean;
+            durationSeconds?: number;
+            isFavorite?: boolean;
+            mediaItemId: number;
+            playedPercentage?: number;
+            positionSeconds?: number;
+            type: components["schemas"]["types.MediaType"];
+            userId: number;
+            userRating?: number;
         };
         "models.MediaSyncJob": {
             /** @description ID of the client to sync from */
@@ -10068,6 +11976,13 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-array_models_MediaItem-any": {
+            data?: components["schemas"]["models.MediaItem-any"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-array_models_MediaItem-suasor_client_media_types_Movie": {
             data?: components["schemas"]["models.MediaItem-suasor_client_media_types_Movie"][];
             /** @example Operation successful */
@@ -10105,6 +12020,13 @@ export interface components {
         };
         "responses.APIResponse-array_models_MediaItem-types_Track": {
             data?: components["schemas"]["models.MediaItem-types_Track"][];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-array_models_MediaPlayHistory-any": {
+            data?: components["schemas"]["models.MediaPlayHistory-any"][];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -10152,6 +12074,13 @@ export interface components {
             /** @example true */
             success?: boolean;
         };
+        "responses.APIResponse-models_MediaItem-any": {
+            data?: components["schemas"]["models.MediaItem-any"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
         "responses.APIResponse-models_MediaItem-suasor_client_media_types_Movie": {
             data?: components["schemas"]["models.MediaItem-suasor_client_media_types_Movie"];
             /** @example Operation successful */
@@ -10189,6 +12118,13 @@ export interface components {
         };
         "responses.APIResponse-models_MediaItem-types_Track": {
             data?: components["schemas"]["models.MediaItem-types_Track"];
+            /** @example Operation successful */
+            message?: string;
+            /** @example true */
+            success?: boolean;
+        };
+        "responses.APIResponse-models_MediaPlayHistory-any": {
+            data?: components["schemas"]["models.MediaPlayHistory-any"];
             /** @example Operation successful */
             message?: string;
             /** @example true */
@@ -10413,6 +12349,17 @@ export interface components {
             };
             stackInfo?: string;
         };
+        "responses.ErrorResponse-any": {
+            details?: unknown;
+            /** @example This is a pretty message */
+            message?: string;
+            request_id?: string;
+            /** @example 201 */
+            statusCode?: number;
+            timestamp?: string;
+            /** @example FAILED_CHECK */
+            type?: components["schemas"]["errors.ErrorType"];
+        };
         "responses.ErrorResponse-error": {
             details?: unknown;
             /** @example This is a pretty message */
@@ -10457,6 +12404,16 @@ export interface components {
             type?: components["schemas"]["types.MediaType"];
             updatedAt?: string;
         };
+        "responses.RecentSearchHistoryItem": {
+            id?: number;
+            query?: string;
+            resultCount?: number;
+            searchedAt?: string;
+        };
+        "responses.RecentSearchesResponse": {
+            searches?: components["schemas"]["responses.RecentSearchHistoryItem"][];
+            success?: boolean;
+        };
         "responses.RecommendationResponse": {
             aiModel?: string;
             createdAt?: string;
@@ -10485,10 +12442,182 @@ export interface components {
             recommendations?: components["schemas"]["responses.RecommendationResponse"][];
             total?: number;
         };
+        "responses.SearchResponse": {
+            results?: components["schemas"]["responses.SearchResults"];
+            success?: boolean;
+        };
+        "responses.SearchResults": {
+            albums?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Album"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            artists?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Artist"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            collections?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["suasor_client_media_types.Collection"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            episodes?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Episode"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            movies?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["suasor_client_media_types.Movie"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            people?: components["schemas"]["models.Person"][];
+            playlists?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Playlist"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            series?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Series"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+            totalCount?: number;
+            tracks?: {
+                /** @description Client IDs for this item (mapping client to their IDs) */
+                clientIds?: components["schemas"]["models.ClientID"][];
+                createdAt?: string;
+                /** @description Type-specific media data */
+                data?: components["schemas"]["types.Track"];
+                downloadUrl?: string;
+                /** @description External IDs for this item (TMDB, IMDB, etc.) */
+                externalIds?: components["schemas"]["models.ExternalID"][];
+                /** @description Internal ID */
+                id?: number;
+                releaseDate?: string;
+                releaseYear?: number;
+                streamUrl?: string;
+                title?: string;
+                /** @description Type of media (movie, show, episode, etc.) */
+                type?: components["schemas"]["types.MediaType"];
+                updatedAt?: string;
+            }[];
+        };
+        "responses.SearchSuggestionsResponse": {
+            success?: boolean;
+            suggestions?: string[];
+        };
         "responses.TestConnectionResponse": {
             message?: string;
             success?: boolean;
             version?: string;
+        };
+        "responses.TrendingSearchItem": {
+            query?: string;
+            searchCount?: number;
+        };
+        "responses.TrendingSearchesResponse": {
+            searches?: components["schemas"]["responses.TrendingSearchItem"][];
+            success?: boolean;
         };
         /** @description User information returned in API responses */
         "responses.UserResponse": {
@@ -10516,6 +12645,13 @@ export interface components {
              *     @Description User's chosen username
              *     @Example "johndoe" */
             username?: string;
+        };
+        "suasor_client_media_types.Collection": {
+            /** @description e.g., "movie", "tvshow" */
+            collectionType?: string;
+            details?: components["schemas"]["types.MediaDetails"];
+            itemCount?: number;
+            itemIDs?: string[];
         };
         "suasor_client_media_types.ExternalID": {
             /** @description The actual ID */
@@ -10735,6 +12871,15 @@ export interface components {
             username?: string;
             /** @example true */
             validateConn?: boolean;
+        };
+        "types.Episode": {
+            credits?: components["schemas"]["suasor_client_media_types.Person"][];
+            details?: components["schemas"]["types.MediaDetails"];
+            number?: number;
+            seasonID?: string;
+            seasonNumber?: number;
+            showID?: string;
+            showTitle?: string;
         };
         /** @description Jellyfin media server configuration */
         "types.JellyfinConfig": {
@@ -11153,6 +13298,7 @@ export enum TypesMediaType {
     MediaTypeAlbum = "album",
     MediaTypeTrack = "track",
     MediaTypePlaylist = "playlist",
-    MediaTypeCollection = "collection"
+    MediaTypeCollection = "collection",
+    MediaTypeAll = "all"
 }
 export type operations = Record<string, never>;
