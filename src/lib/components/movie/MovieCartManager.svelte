@@ -34,9 +34,15 @@
   
   function createListWithMovies() {
     if (movies.length > 0) {
-      console.log('Creating a list with selected movies');
-      // Open list creation modal or redirect to list creation page
-      window.location.href = `/chat?context=create-list&ids=${movies.map(m => m.id).join(',')}`;
+      // Redirect to playlists page with cart items as query parameter
+      window.location.href = `/playlists?action=create&ids=${movies.map(m => m.id).join(',')}`;
+    }
+  }
+  
+  function createCollectionWithMovies() {
+    if (movies.length > 0) {
+      // Redirect to collections page with cart items as query parameter
+      window.location.href = `/collections?action=create&ids=${movies.map(m => m.id).join(',')}`;
     }
   }
 </script>
@@ -117,20 +123,35 @@
             Chat About These Movies
           </button>
           
-          <button 
-            onclick={createListWithMovies}
-            class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded flex items-center justify-center gap-2 text-sm font-medium"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="8" y1="6" x2="21" y2="6"/>
-              <line x1="8" y1="12" x2="21" y2="12"/>
-              <line x1="8" y1="18" x2="21" y2="18"/>
-              <line x1="3" y1="6" x2="3.01" y2="6"/>
-              <line x1="3" y1="12" x2="3.01" y2="12"/>
-              <line x1="3" y1="18" x2="3.01" y2="18"/>
-            </svg>
-            Create List with AI
-          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button 
+              onclick={createListWithMovies}
+              class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded flex items-center justify-center gap-1 text-xs font-medium"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              Create Playlist
+            </button>
+            
+            <button 
+              onclick={createCollectionWithMovies}
+              class="w-full bg-secondary-500 hover:bg-secondary-600 text-white py-2 rounded flex items-center justify-center gap-1 text-xs font-medium"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              Create Collection
+            </button>
+          </div>
           
           <button 
             onclick={clearCart}

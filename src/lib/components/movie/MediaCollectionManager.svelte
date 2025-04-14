@@ -26,14 +26,14 @@
   }
   
   function createChatWithItems() {
-    if (items.length > 0) {
+    if (items.length > 0 && typeof window !== 'undefined') {
       const itemIds = items.map(m => m.id).join(',');
       window.location.href = `/chat?context=collection&ids=${itemIds}`;
     }
   }
   
   function createListWithItems() {
-    if (items.length > 0) {
+    if (items.length > 0 && typeof window !== 'undefined') {
       console.log('Creating a list with selected items');
       // Open list creation modal or redirect to list creation page
       window.location.href = `/chat?context=create-list&ids=${items.map(m => m.id).join(',')}`;
