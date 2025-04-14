@@ -32,7 +32,7 @@
 	let authInitialized = $state(false);
 
 	// Define the public paths that don't require authentication
-	const publicPaths = ['/login', '/register', '/forgot-password'];
+	const publicPaths = ['/login', '/register', '/forgot-password', '/welcome'];
 
 	// Variables for reactive state
 	let isPublicPath = $state(false);
@@ -97,6 +97,7 @@
 	// Handle redirection when needed
 	$effect(() => {
 		if (shouldRedirect) {
+			console.log('Redirecting unauthenticated user to login from:', page?.url?.pathname);
 			const currentPath = page?.url?.pathname || '';
 			console.log('Redirecting unauthenticated user to login from:', currentPath);
 			const redirectUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
