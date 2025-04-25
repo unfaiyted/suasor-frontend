@@ -9,15 +9,15 @@ export { TypesMediaType };
 // Media structural components
 export type Artwork = components['schemas']['types.Artwork'];
 export type MediaDetails = components['schemas']['types.MediaDetails'];
-export type ExternalID = components['schemas']['suasor_client_media_types.ExternalID'];
-export type Rating = components['schemas']['suasor_client_media_types.Rating'];
+export type ExternalID = components['schemas']['suasor_clients_media_types.ExternalID'];
+export type Rating = components['schemas']['suasor_clients_media_types.Rating'];
 
 // Media types - specific media formats
 export type Album = components['schemas']['types.Album'];
 export type Artist = components['schemas']['types.Artist'];
 export type Playlist = components['schemas']['types.Playlist'];
 export type Track = components['schemas']['types.Track'];
-export type Movie = components['schemas']['suasor_client_media_types.Movie'];
+export type Movie = components['schemas']['suasor_clients_media_types.Movie'];
 export type Series = components['schemas']['types.Series'];
 
 // Media item types
@@ -26,7 +26,7 @@ export type MediaItemArtist = components['schemas']['models.MediaItem-types_Arti
 export type MediaItemPlaylist = components['schemas']['models.MediaItem-types_Playlist'];
 export type MediaItemTrack = components['schemas']['models.MediaItem-types_Track'];
 export type MediaItemMovie =
-	components['schemas']['models.MediaItem-suasor_client_media_types_Movie'];
+	components['schemas']['models.MediaItem-suasor_clients_media_types_Movie'];
 export type MediaItemSeries = components['schemas']['models.MediaItem-types_Series'];
 
 export type MediaItem =
@@ -52,7 +52,7 @@ export type APIMediaItemPlaylistResponse =
 export type APIMediaItemTrackResponse =
 	components['schemas']['responses.APIResponse-models_MediaItem-types_Track'];
 export type APIMediaItemMovieResponse =
-	components['schemas']['responses.APIResponse-models_MediaItem-suasor_client_media_types_Movie'];
+	components['schemas']['responses.APIResponse-models_MediaItem-suasor_clients_media_types_Movie'];
 export type APIMediaItemSingleSeriesResponse =
 	components['schemas']['responses.APIResponse-models_MediaItem-types_Series'];
 
@@ -70,11 +70,11 @@ export type APIMediaItemAlbumsResponse =
 export type APIMediaItemArtistsResponse =
 	components['schemas']['responses.APIResponse-array_models_MediaItem-types_Artist'];
 export type APIMediaItemPlaylistsResponse =
-	components['schemas']['responses.APIResponse-array_models_MediaItem-types_Playlist'];
+	components['schemas']['responses.APIResponse-array_models_MediaItem-types_ListData'];
 export type APIMediaItemTracksResponse =
 	components['schemas']['responses.APIResponse-array_models_MediaItem-types_Track'];
 export type APIMediaItemMoviesResponse =
-	components['schemas']['responses.APIResponse-array_models_MediaItem-suasor_client_media_types_Movie'];
+	components['schemas']['responses.APIResponse-array_models_MediaItem-suasor_clients_media_types_Movie'];
 export type APIMediaItemSeriesResponse =
 	components['schemas']['responses.APIResponse-array_models_MediaItem-types_Series'];
 
@@ -277,4 +277,3 @@ export const mediaService = {
 };
 
 export default mediaService;
-
